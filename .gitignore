@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### SQLite Database ###
+*.db
+*.sqlite
+
 ### STS ###
 .apt_generated
 .classpath
