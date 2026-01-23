@@ -13,6 +13,13 @@ LOG_DIR="logs"
 # Ensure log directory exists
 mkdir -p "$LOG_DIR"
 
+# Check if jq is installed
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is required but not installed."
+    echo "Please install jq from: https://jqlang.org/"
+    exit 1
+fi
+
 # Parse arguments
 if [ "$1" = "plan" ]; then
     # Plan mode
