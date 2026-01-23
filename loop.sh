@@ -8,6 +8,10 @@
 
 # CONFIGURATION
 GEMINI_CMD="gemini" # Adjust if your binary is named differently (e.g. 'google-gemini')
+LOG_DIR="logs"
+
+# Ensure log directory exists
+mkdir -p "$LOG_DIR"
 
 # Parse arguments
 if [ "$1" = "plan" ]; then
@@ -34,6 +38,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "Mode:   $MODE"
 echo "Prompt: $PROMPT_FILE"
 echo "Branch: $CURRENT_BRANCH"
+echo "Logs:   $LOG_DIR"
 [ $MAX_ITERATIONS -gt 0 ] && echo "Max:    $MAX_ITERATIONS iterations"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
@@ -49,17 +54,50 @@ while true; do
         break
     fi
 
-    # Run Ralph iteration with selected prompt
-    # --yolo: Auto-approve all tool calls (Essential for autonomous loop)
-    # Input is piped from the prompt file
-    cat "$PROMPT_FILE" | $GEMINI_CMD --yolo
+    LOG_FILE="$LOG_DIR/loop_${ITERATION}.jsonl"
+    echo "Starting Loop $ITERATION - Full Debug Log: $LOG_FILE"
 
+        # Run Ralph iteration with streaming JSON output
+        # 1. Pipe prompt to gemini
+        # 2. Redirect stderr to stdout (2>&1) so both go into the pipe
+        # 3. Use tee to save RAW mixed output (text logs + JSON) to log file
+        # 4. Use jq with -R (raw input) to handle the mixed stream:
+        #    - Try to parse line as JSON
+        #    - If valid JSON: Apply formatting logic
+        #    - If text (parsing fails): Print as dim gray text (system logs)
+
+        cat "$PROMPT_FILE" | \
+        $GEMINI_CMD --yolo --output-format stream-json 2>&1 | \
+        tee "$LOG_FILE" | \
+        jq -R -r --unbuffered '
+            # Try to parse the raw line as JSON
+            (try fromjson catch null) as $json |
+
+            if $json then
+                # Valid JSON Event
+                if $json.type == "tool_use" then
+                    "\u001b[36m[Tool] " + $json.tool_name + "\u001b[0m"
+                elif $json.type == "tool_result" and $json.status == "error" then
+                    "\u001b[31m[Error] " + $json.tool_name + ": " + $json.output + "\u001b[0m"
+                elif $json.type == "message" and $json.role == "assistant" and $json.content != null then
+                    $json.content
+                elif $json.type == "error" then
+                     "\u001b[31m[System Error] " + $json.message + "\u001b[0m"
+                else
+                    empty
+                end
+            else
+                # Not JSON (System Log from stderr) - Print in dim gray
+                "\u001b[90m[Log] " + . + "\u001b[0m"
+            end'
     # Push changes after each iteration
-    git push origin "$CURRENT_BRANCH" || {
-        echo "Failed to push. Creating remote branch..."
-        git push -u origin "$CURRENT_BRANCH"
-    }
+    # git push origin "$CURRENT_BRANCH" || {
+    #     echo "Failed to push. Creating remote branch..."
+    #     git push -u origin "$CURRENT_BRANCH"
+    # }
+    # Git push removed to prevent hanging on credentials.
+    # Commits are local only.
 
     ITERATION=$((ITERATION + 1))
-    echo -e "\n\n======================== LOOP $ITERATION ========================\n"
+    echo -e "\n\n======================== LOOP $ITERATION FINISHED ========================\n"
 done
