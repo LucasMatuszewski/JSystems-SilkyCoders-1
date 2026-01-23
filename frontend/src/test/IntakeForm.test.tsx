@@ -7,12 +7,14 @@ describe('IntakeForm', () => {
     const onSubmit = vi.fn();
     render(<IntakeForm onSubmit={onSubmit} />);
 
-    expect(screen.getByText('Verification Request')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('e.g. PL-123456')).toBeInTheDocument();
-    expect(screen.getByText('Standard Return')).toBeInTheDocument();
-    expect(screen.getByText('Complaint (Reklamacja)')).toBeInTheDocument();
+    expect(screen.getByText('Numer zamówienia')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('np. PL-123456')).toBeInTheDocument();
+    expect(screen.getByText('Zwrot standardowy')).toBeInTheDocument();
+    expect(screen.getByText('Reklamacja')).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText('Describe the issue or reason for return...'),
+      screen.getByPlaceholderText(
+        'Opisz krótko przyczynę zwrotu lub wadę produktu...',
+      ),
     ).toBeInTheDocument();
   });
 
@@ -20,11 +22,11 @@ describe('IntakeForm', () => {
     const onSubmit = vi.fn();
     render(<IntakeForm onSubmit={onSubmit} />);
 
-    const orderInput = screen.getByPlaceholderText('e.g. PL-123456');
+    const orderInput = screen.getByPlaceholderText('np. PL-123456');
     const descInput = screen.getByPlaceholderText(
-      'Describe the issue or reason for return...',
+      'Opisz krótko przyczynę zwrotu lub wadę produktu...',
     );
-    const submitBtn = screen.getByText('Proceed to Verification');
+    const submitBtn = screen.getByText('Rozpocznij weryfikację');
 
     fireEvent.change(orderInput, { target: { value: 'ABC' } });
     fireEvent.change(descInput, {
@@ -34,7 +36,7 @@ describe('IntakeForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Order ID must be at least 5 chars'),
+        screen.getByText('Numer zamówienia musi mieć co najmniej 5 znaków'),
       ).toBeInTheDocument();
     });
   });
@@ -43,18 +45,20 @@ describe('IntakeForm', () => {
     const onSubmit = vi.fn();
     render(<IntakeForm onSubmit={onSubmit} />);
 
-    const orderInput = screen.getByPlaceholderText('e.g. PL-123456');
+    const orderInput = screen.getByPlaceholderText('np. PL-123456');
     const descInput = screen.getByPlaceholderText(
-      'Describe the issue or reason for return...',
+      'Opisz krótko przyczynę zwrotu lub wadę produktu...',
     );
-    const submitBtn = screen.getByText('Proceed to Verification');
+    const submitBtn = screen.getByText('Rozpocznij weryfikację');
 
     fireEvent.change(orderInput, { target: { value: 'PL-12345' } });
     fireEvent.change(descInput, { target: { value: 'Short' } });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(screen.getByText('Please describe the issue')).toBeInTheDocument();
+      expect(
+        screen.getByText('Opis musi mieć co najmniej 10 znaków'),
+      ).toBeInTheDocument();
     });
   });
 });

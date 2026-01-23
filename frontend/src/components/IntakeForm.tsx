@@ -5,18 +5,29 @@ import type { SessionContext } from '../App';
 import { useState } from 'react';
 
 const schema = z.object({
-  orderId: z.string().min(5, "Order ID must be at least 5 chars"),
-  intent: z.enum(["RETURN", "COMPLAINT"]),
-  description: z.string().min(10, "Please describe the issue"),
+  orderId: z.string().min(5, 'Numer zamówienia musi mieć co najmniej 5 znaków'),
+  intent: z.enum(['RETURN', 'COMPLAINT']),
+  description: z.string().min(10, 'Opis musi mieć co najmniej 10 znaków'),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export function IntakeForm({ onSubmit }: { onSubmit: (data: SessionContext) => void }) {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+export function IntakeForm({
+  onSubmit,
+}: {
+  onSubmit: (data: SessionContext) => void;
+}) {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { intent: "RETURN" }
+    defaultValues: { intent: 'RETURN' },
   });
+
+  const watchIntent = watch('intent');
 
   const [image, setImage] = useState<string | null>(null);
 
@@ -49,7 +60,7 @@ export function IntakeForm({ onSubmit }: { onSubmit: (data: SessionContext) => v
           const type = file.type === 'image/jpeg' ? 'image/jpeg' : 'image/png';
           resolve(canvas.toDataURL(type, 0.8)); // 0.8 quality for JPEG
         } else {
-          reject(new Error("Canvas context not available"));
+          reject(new Error('Canvas context not available'));
         }
         URL.revokeObjectURL(img.src);
       };
@@ -64,7 +75,7 @@ export function IntakeForm({ onSubmit }: { onSubmit: (data: SessionContext) => v
         const resized = await resizeImage(file);
         setImage(resized);
       } catch (err) {
-        console.error("Failed to resize image", err);
+        console.error('Failed to resize image', err);
         // Fallback to original if resize fails
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -77,80 +88,155 @@ export function IntakeForm({ onSubmit }: { onSubmit: (data: SessionContext) => v
 
   const onFormSubmit = (data: FormData) => {
     if (!image) {
-      alert("Please upload a photo.");
+      alert('Please upload a photo.');
       return;
     }
     onSubmit({ ...data, image });
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-xl font-semibold">Verification Request</h2>
-        <p className="text-gray-500 text-sm">Please provide details to start the AI analysis.</p>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Order Number</label>
-        <input {...register("orderId")} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:ring-black focus:border-black" placeholder="e.g. PL-123456" />
-        {errors.orderId && <p className="text-red-500 text-xs mt-1">{errors.orderId.message}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Request Type</label>
-        <div className="mt-2 space-y-2">
-          <label className="flex items-center p-3 border rounded cursor-pointer hover:bg-gray-50">
-            <input type="radio" {...register("intent")} value="RETURN" className="form-radio text-black" />
-            <div className="ml-3">
-              <span className="block text-sm font-medium">Standard Return</span>
-              <span className="block text-xs text-gray-500">Within 30 days. Unworn items only.</span>
-            </div>
+    <form
+      onSubmit={handleSubmit(onFormSubmit)}
+      className="space-y-10 animate-slide-up"
+    >
+      <div className="space-y-4">
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            Numer zamówienia
           </label>
-          <label className="flex items-center p-3 border rounded cursor-pointer hover:bg-gray-50">
-            <input type="radio" {...register("intent")} value="COMPLAINT" className="form-radio text-black" />
-            <div className="ml-3">
-              <span className="block text-sm font-medium">Complaint (Reklamacja)</span>
-              <span className="block text-xs text-gray-500">2 years warranty for defects.</span>
-            </div>
-          </label>
+          <input
+            {...register('orderId')}
+            className="sinsay-input"
+            placeholder="np. PL-123456"
+          />
+          {errors.orderId && (
+            <p className="text-red-500 text-[10px] mt-2 uppercase font-bold tracking-tight">
+              {errors.orderId.message}
+            </p>
+          )}
         </div>
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Photo Evidence</label>
-        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition">
-          <div className="space-y-1 text-center">
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            Typ zgłoszenia
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label
+              className={`flex flex-col p-4 border transition-all cursor-pointer hover:border-black ${watchIntent === 'RETURN' ? 'border-black bg-gray-50' : 'border-gray-200'}`}
+            >
+              <div className="flex items-center mb-1">
+                <input
+                  type="radio"
+                  {...register('intent')}
+                  value="RETURN"
+                  className="accent-black"
+                />
+                <span className="ml-3 text-sm font-bold uppercase tracking-wide">
+                  Zwrot standardowy
+                </span>
+              </div>
+              <span className="ml-7 text-[10px] text-gray-500 leading-tight">
+                Do 30 dni. Produkty nieużywane z metkami.
+              </span>
+            </label>
+            <label
+              className={`flex flex-col p-4 border transition-all cursor-pointer hover:border-black ${watchIntent === 'COMPLAINT' ? 'border-black bg-gray-50' : 'border-gray-200'}`}
+            >
+              <div className="flex items-center mb-1">
+                <input
+                  type="radio"
+                  {...register('intent')}
+                  value="COMPLAINT"
+                  className="accent-black"
+                />
+                <span className="ml-3 text-sm font-bold uppercase tracking-wide">
+                  Reklamacja
+                </span>
+              </div>
+              <span className="ml-7 text-[10px] text-gray-500 leading-tight">
+                Wada produktu. 2 lata rękojmi.
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            Zdjęcie produktu / wady
+          </label>
+          <div className="relative group">
             {image ? (
-              <div className="relative">
-                <img src={image} alt="Preview" className="mx-auto h-32 object-cover rounded" />
-                <button type="button" onClick={() => setImage(null)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-xs">X</button>
+              <div className="relative aspect-video rounded-none overflow-hidden border border-gray-200">
+                <img
+                  src={image}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => setImage(null)}
+                  className="absolute top-2 right-2 bg-black text-white w-8 h-8 flex items-center justify-center font-bold hover:bg-red-600 transition-colors"
+                >
+                  ✕
+                </button>
               </div>
             ) : (
-              <>
-                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <label className="flex flex-col items-center justify-center aspect-video border-2 border-dashed border-gray-200 hover:border-black transition-colors cursor-pointer bg-gray-50 group-hover:bg-white">
+                <svg
+                  className="w-12 h-12 text-gray-300 group-hover:text-black transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1"
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1"
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
-                <div className="flex text-sm text-gray-600 justify-center">
-                  <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-black hover:text-gray-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-black">
-                    <span>Upload a file</span>
-                    <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleFileChange} />
-                  </label>
-                </div>
-                <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
-              </>
+                <span className="mt-4 text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-black">
+                  Dodaj zdjęcie
+                </span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </label>
             )}
           </div>
         </div>
+
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            Opis zgłoszenia
+          </label>
+          <textarea
+            {...register('description')}
+            className="sinsay-input !rounded-2xl min-h-[120px] resize-none"
+            placeholder="Opisz krótko przyczynę zwrotu lub wadę produktu..."
+          />
+          {errors.description && (
+            <p className="text-red-500 text-[10px] mt-2 uppercase font-bold tracking-tight">
+              {errors.description.message}
+            </p>
+          )}
+        </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Description</label>
-        <textarea {...register("description")} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:ring-black focus:border-black" rows={4} placeholder="Describe the issue or reason for return..." />
-        {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
-      </div>
-
-      <button type="submit" className="w-full bg-black text-white py-3 px-4 rounded font-medium hover:bg-gray-800 transition shadow-md">
-        Proceed to Verification
+      <button
+        type="submit"
+        className="sinsay-button w-full !py-4 text-base tracking-widest hover:scale-[1.01] active:scale-[0.99] transition-all"
+      >
+        Rozpocznij weryfikację
       </button>
     </form>
   );

@@ -1,42 +1,128 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+:root {
+  --sinsay-red: #e90000;
+  --sinsay-black: #000000;
+  --sinsay-white: #ffffff;
+  --sinsay-gray-50: #f9f9f9;
+  --sinsay-gray-100: #f3f3f3;
+  --sinsay-gray-200: #e5e5e5;
+  --sinsay-gray-400: #a3a3a3;
+  --sinsay-gray-500: #737373;
+  --sinsay-font: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: var(--sinsay-font);
+  background-color: var(--sinsay-white);
+  color: var(--sinsay-black);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+/* Custom transitions and utility classes for Sinsay feel */
+.sinsay-button {
+  background-color: var(--sinsay-black);
+  color: var(--sinsay-white);
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 0px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+
+.sinsay-button:hover {
+  background-color: #333;
+}
+
+.sinsay-input {
+  background-color: var(--sinsay-white);
+  border: 1px solid var(--sinsay-gray-200);
+  border-radius: 999px;
+  padding: 14px 24px;
+  font-size: 14px;
+  color: var(--sinsay-black);
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.sinsay-input:focus {
+  border-color: var(--sinsay-black);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+.sinsay-card {
+  background: var(--sinsay-white);
+  border: 1px solid var(--sinsay-gray-200);
+  border-radius: 0;
+}
+
+.promo-bar {
+  background-color: var(--sinsay-red);
+  color: var(--sinsay-white);
   text-align: center;
+  padding: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
+/* Animations */
+@keyframes slideUp {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
-.card {
-  padding: 2em;
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.read-the-docs {
-  color: #888;
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
