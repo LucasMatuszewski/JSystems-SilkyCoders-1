@@ -42,6 +42,8 @@ Run these after implementing to get immediate feedback:
 - **Lombok:** Use for boilerplate (`@Data`, `@RequiredArgsConstructor`).
 - **Tests:** `*Tests` suffix. Write tests *alongside* features (backend integration tests for SSE are critical).
 - **Commits:** Follow `Area: short summary` (e.g., `Feature: add chat endpoint`).
+- **Spring AI:** Version 1.1.2 uses `org.springframework.ai.content.Media` and `UserMessage.builder()`.
+- **JDK:** Use JDK 17 for compilation.
 
 ## Documentation Sources (Context7 MCP)
 
