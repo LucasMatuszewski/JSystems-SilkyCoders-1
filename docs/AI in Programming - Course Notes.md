@@ -1,12 +1,13 @@
 
 Notes for my presentation for JSystem AI in Programming course I will lead in 01.2026
 
-Survey results: [Form - Tally](https://tally.so/r/9q9kMG)
+Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 
 ## PYTANIA NA START:
-- Jak do tej pory używasz AI w pracy? Jakich narzędzi i w jaki sposób?
-- Jakie są Twoje doświadczenia? Pomaga?
-- Oczekiwania od szkolenia
+- Jak do tej pory używasz AI w pracy? Jakich narzędzi i w jaki sposób? (poziom autonomii)
+- Jakie są Twoje doświadczenia? Pomaga? Przyspiesza? Spowalnia?
+	- Czy używasz AGENTS.md, Rules?
+- Największe problemy jakie masz z AI
 - Co sądzisz o AI i przyszłości programowania?
 
 ---
@@ -55,9 +56,7 @@ Survey results: [Form - Tally](https://tally.so/r/9q9kMG)
 
 - Microsoft plans to rewrite all code from C/C++ to Rust using AI and algorithms
 	- Linkedin post from [Galen Hunt - Principal Software Engineer (CoreAI)](https://www.linkedin.com/posts/galenh_principal-software-engineer-coreai-microsoft-activity-7407863239289729024-WTzf)
-	 ![[Pasted image 20260114204229.png]]
 	 My goal is to eliminate every line of C and C++ from Microsoft by 2030. Our strategy is to combine AI *and* Algorithms to rewrite Microsoft’s largest codebases. Our North Star is “1 engineer, 1 month, 1 million lines of code”.   To accomplish this previously unimaginable task, we’ve built a powerful code processing infrastructure. Our algorithmic infrastructure creates a scalable graph over source code at scale. Our AI processing infrastructure then enables us to apply AI agents, guided by algorithms, to make code modifications at scale. The core of this infrastructure is already operating at scale on problems such as code understanding.
-	 ![[Pasted image 20260114205002.png]]
 
 ### AI real impact we already see in Dev/IT:
 - TailwindCSS financial issues
@@ -109,6 +108,7 @@ Survey results: [Form - Tally](https://tally.so/r/9q9kMG)
 		- Goose
 		- Claude Cowork: [Introducing Cowork | Claude](https://claude.com/blog/cowork-research-preview)
 	- Agentic workflows in the cloud, CI/CD, Repo
+
 ## LLM benchmarks, best models
 
 - SWE Bench: [SWE-bench Leaderboards](https://www.swebench.com/)
