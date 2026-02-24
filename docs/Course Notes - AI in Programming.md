@@ -304,7 +304,15 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- in Cursor: [Agent Skills | Cursor Docs](https://cursor.com/docs/context/skills)
 	- in OpenCode: [Agent Skills | OpenCode](https://opencode.ai/docs/skills/)
 	- in Codex CLI: [Agent Skills](https://developers.openai.com/codex/skills)
-
+- **Skills for Java**
+	- [java-testing – pluginagentmarketplace/custom-plugin-java](https://skills.sh/pluginagentmarketplace/custom-plugin-java/java-testing)
+	- [java-spring-boot – pluginagentmarketplace/custom-plugin-java](https://skills.sh/pluginagentmarketplace/custom-plugin-java/java-spring-boot)
+	- [java-maven – pluginagentmarketplace/custom-plugin-java](https://skills.sh/pluginagentmarketplace/custom-plugin-java/java-maven)
+	- [java-architect – jeffallan/claude-skills](https://skills.sh/jeffallan/claude-skills/java-architect)
+	- [java-coding-standards – affaan-m/everything-claude-code](https://skills.sh/affaan-m/everything-claude-code/java-coding-standards)
+	- [android-java – alinaqi/claude-bootstrap](https://skills.sh/alinaqi/claude-bootstrap/android-java)
+	- [custom-plugin-java/skills – full skills collection on GitHub](https://github.com/pluginagentmarketplace/custom-plugin-java/tree/main/skills)
+	- [agent-browser SKILL.md – vercel-labs/agent-browser (example skill structure)](https://github.com/vercel-labs/agent-browser/blob/2fe7394dbeb89efb00e56899dd71f32db5ec1dee/skills/agent-browser/SKILL.md)
 
 ### Tools
 
@@ -332,7 +340,20 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- Open Standard: [What is the Model Context Protocol (MCP)? - Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro)
 	- Why MCP moved from SSE to Streamable HTTP: [SSE vs. Streamable HTTP - which will be the standard for remote servers? : r/mcp](https://www.reddit.com/r/mcp/comments/1kdyse2/sse_vs_streamable_http_which_will_be_the_standard/)
 	- Java Skills
-  	- 
+  	- [What is the Model Context Protocol (MCP)? - Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro)
+  	- [modelcontextprotocol/java-sdk – The official Java SDK for MCP servers and clients, maintained with Spring AI](https://github.com/modelcontextprotocol/java-sdk)
+  	- **Example Java MCP Servers:**
+  		- [tangcent/maven-indexer-mcp](https://github.com/tangcent/maven-indexer-mcp)
+  		- [OpenLinkSoftware/mcp-jdbc-server – Java based MCP Server for JDBC](https://github.com/OpenLinkSoftware/mcp-jdbc-server)
+  		- [quarkiverse/quarkus-mcp-servers – Model Context Protocol Servers in Quarkus](https://github.com/quarkiverse/quarkus-mcp-servers)
+  		- [quarkiverse/quarkus-mcp-server – Extension for implementing MCP server features in Quarkus](https://github.com/quarkiverse/quarkus-mcp-server)
+  		- [hpalma/springinitializr-mcp – MCP server for Spring Initializr](https://github.com/hpalma/springinitializr-mcp)
+  		- [vishalmysore/a2ajava – Pure Java implementation of Google A2A protocol with Spring Boot; agents also exposed as MCP tools](https://github.com/vishalmysore/a2ajava)
+  		- [ECF/MCPToolGroups – Tool Groups Support for the Model Context Protocol](https://github.com/ECF/MCPToolGroups)
+  		- [arvindand/maven-tools-mcp – MCP server for Maven Central dependency intelligence for Maven, Gradle, SBT, Mill](https://github.com/arvindand/maven-tools-mcp)
+  		- [idachev/mcp-javadc](https://github.com/idachev/mcp-javadc)
+  		- [jasonkylelol/jenkins-mcp-server – MCP server for Jenkins build tasks](https://github.com/jasonkylelol/jenkins-mcp-server)
+  		- [studykit/mcp-jar-indexer](https://github.com/studykit/mcp-jar-indexer)
 	- Example usage for Agents:
 		- in Claude Code: [Connect Claude Code to tools via MCP - Claude Code Docs](https://code.claude.com/docs/en/mcp)
 		- in Zed: [Redirecting... | Zed Code Editor Documentation](https://zed.dev/docs/assistant/model-context-protocol)
