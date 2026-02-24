@@ -290,17 +290,25 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- Examples:
 		- [mcp-for-beginners/AGENTS.md at main · microsoft/mcp-for-beginners · GitHub](https://github.com/microsoft/mcp-for-beginners/blob/main/AGENTS.md) (includes Java Spring Boot)
 		- [payload/templates/website/AGENTS.md at main · payloadcms/payload · GitHub](https://github.com/payloadcms/payload/blob/main/templates/website/AGENTS.md)
-- **SKILLS.md**
+
+### SKILLS.md
+
+- Skill libraries:
 	- [GitHub - agentskills/agentskills: Specification and documentation for Agent Skills](https://github.com/agentskills/agentskills)
 	- [Overview - Agent Skills](https://agentskills.io/home)
 		- Library of Skills from Vercel: [The Agent Skills Directory](https://skills.sh/)
+- Skills in most popular tools:
 	- in Copilot: [About Agent Skills - GitHub Docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
 	- in Claude Code: [Agent Skills - Claude Code Docs](https://code.claude.com/docs/en/skills)
 	- in Gemini CLI: [Agent Skills | Gemini CLI](https://geminicli.com/docs/cli/skills/)
 	- in Cursor: [Agent Skills | Cursor Docs](https://cursor.com/docs/context/skills)
 	- in OpenCode: [Agent Skills | OpenCode](https://opencode.ai/docs/skills/)
 	- in Codex CLI: [Agent Skills](https://developers.openai.com/codex/skills)
-- **Tools** - built-in Agent tools (provided by IDE / CLI you use):
+
+
+### Tools
+
+- built-in Agent tools (provided by IDE / CLI you use):
 	- Terminal
 	- Browse / Search
 	- Docs (RAG) lub Contex7 MCP jeśli nie ma docs wbudowanych
@@ -310,7 +318,10 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- + Custom Tools
 - **LSP** (Language Server Protocol)
 	- allows agent to use diagnostic tools and understand syntax, linting errors
-- **MCP** Servers (Model Context Protocol)
+
+### MCP
+
+- Servers (Model Context Protocol)
 	- MCP as type of a tool based on open standard for anybody to build tools for agents
 	- Problems:
 		- Context bloating = Context rot,
@@ -320,6 +331,8 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- Donated to Linux Foundation subsidiary: [Donating the MCP and the Agentic AI Foundation](https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation)
 	- Open Standard: [What is the Model Context Protocol (MCP)? - Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro)
 	- Why MCP moved from SSE to Streamable HTTP: [SSE vs. Streamable HTTP - which will be the standard for remote servers? : r/mcp](https://www.reddit.com/r/mcp/comments/1kdyse2/sse_vs_streamable_http_which_will_be_the_standard/)
+	- Java Skills
+  	- 
 	- Example usage for Agents:
 		- in Claude Code: [Connect Claude Code to tools via MCP - Claude Code Docs](https://code.claude.com/docs/en/mcp)
 		- in Zed: [Redirecting... | Zed Code Editor Documentation](https://zed.dev/docs/assistant/model-context-protocol)
@@ -336,7 +349,10 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 		- PostgreSQL, MongoDB, ...
 		- Figma
 		- Blender
-- **ACP** - use CLI Agents in other tools / IDEs
+
+### ACP
+
+- use CLI Agents in other tools / IDEs
 	- Created by Zed IDE to use Claude Code in Zed (now also for Codex, Gemini, OpenCode)
 	- in ZED [Zed — Agent Client Protocol](https://zed.dev/acp)
 	- in OpenCode: [ACP Support | OpenCode](https://opencode.ai/docs/acp/)
