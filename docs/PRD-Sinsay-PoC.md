@@ -43,25 +43,20 @@ When the conversation reveals that the user wants to initiate a return or file a
 
 ```mermaid
 flowchart TD
-    A([User opens the app]) --> B[Chat window opens\nAI sends a welcome message]
+    A([User opens the app]) --> B[Chat window opens - AI sends a welcome message]
     B --> C[User types a message]
-    C --> D{Does the message\nindicate intent to\nreturn or complain?}
-
-    D -- No --> E[AI answers the question\nin Polish]
+    C --> D{Does the message - indicate intent to return or complain?}
+    D -- No --> E[AI answers the question in user's language]
     E --> C
-
-    D -- Yes --> F[AI detects intent\nand pre-selects form type\nReturn or Complaint]
-    F --> G[Form card appears\nin the chat thread]
-
-    G --> H[User fills the form:\nProduct name · Type · Description · Photo]
-    H --> I{All fields\ncompleted?}
+    D -- Yes --> F[AI detects intent and uses AG-UI protocol to show form with `type` value set as `Return` or `Complaint` based on user's intention]
+    F --> G[Form card appears in the chat thread with `Type` select field pre-selected]
+    G --> H[User fills the form: Product name · Type · Description · Photo]
+    H --> I{All fields completed?}
     I -- No --> H
-
     I -- Yes --> J[User submits the form]
-    J --> K[AI analyzes:\nphoto · description · Sinsay policies]
-    K --> L[AI streams verdict in Polish]
-
-    L --> M{User has\nfollow-up questions?}
+    J --> K[AI analyzes: photo · description · Sinsay policies]
+    K --> L[AI streams verdict in user's language]
+    L --> M{User has follow-up questions?}
     M -- Yes --> C
     M -- No --> N([Conversation ends])
 ```
@@ -83,7 +78,7 @@ sequenceDiagram
         Chat->>Agent: Forward message + history
         Agent->>Policies: Look up relevant rules (if needed)
         Policies-->>Agent: Return policy content
-        Agent-->>Chat: Stream answer in Polish
+        Agent-->>Chat: Stream answer
         Chat-->>User: Display AI response
     end
 
@@ -122,12 +117,12 @@ stateDiagram-v2
     Visible --> Filling : User starts entering data
     Filling --> Filling : User edits fields
 
-    Filling --> ValidationError : User clicks Submit\nwith missing/invalid fields
+    Filling --> ValidationError : User clicks Submit with missing/invalid fields
     ValidationError --> Filling : User corrects errors
 
-    Filling --> Submitted : All fields valid\nUser clicks Submit
+    Filling --> Submitted : All fields valid User clicks Submit
 
-    Submitted --> [*] : Form frozen (read-only)\nAI analysis begins
+    Submitted --> [*] : Form frozen (read-only) AI analysis begins
 ```
 
 ---
@@ -172,7 +167,7 @@ When the AI detects return/complaint intent, it calls the `show_return_form` too
 
 - Responds in Polish or English (depending on the user's language).
 - Answers questions about: return windows, complaint procedures, product categories, store locations, payment options, loyalty points.
-- Grounds all answers in the content of `docs/sinsay-documents/`.
+- Grounds all answers in the content of `docs/sinsay-documents/` (`zwrot-30-dni.md`, `reklamacje.md`, `regulamin.md`).
 - Does not fabricate Sinsay policies.
 
 **Intent detection:**
@@ -235,11 +230,16 @@ Every session is stored in SQLite:
 - AI messages: left-aligned on a light background.
 - Form cards: left-aligned, visually distinct with a border and subtle shadow, wider than regular messages to accommodate all fields.
 
+### Wireframes
+
+- `docs/assets/sinsay-wireframe-1-step.png` (chat window with first agent's message)
+- `docs/assets/sinsay-wireframe-2-step.png` (chat window with form card in chat thread)
+
 ### In-chat form card layout
 
 ```
 ┌─────────────────────────────────────────────┐
-│  Formularz Zwrotu / Reklamacji               │
+│  Formularz Zwrotu / Reklamacji              │
 │  [context summary from AI]                  │
 │                                             │
 │  Nazwa produktu *                           │
@@ -262,8 +262,9 @@ Every session is stored in SQLite:
 ### Visual style
 
 - Sinsay brand: monochrome, clean, minimal. Shadcn UI components.
+- Follow strictly Sinsay Design System: `docs/sinsay-design-system.md`
 - Submit button: full-width, black fill, white text.
-- Verdict message: the conclusion line (_"Reklamacja uzasadniona ✓"_) is visually prominent — bold or accented.
+- Verdict message: the conclusion line (e.g. "Reklamacja uzasadniona ✓") is visually prominent — bold or accented.
 
 ### Language
 
