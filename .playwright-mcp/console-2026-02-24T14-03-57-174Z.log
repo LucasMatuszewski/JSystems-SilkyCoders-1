@@ -1,0 +1,45 @@
+[    3123ms] [WARNING] The resource https://static.sinsay.com/media/media/SHARED/stronywizerunkowe/sinsay/homepage-new/images/https://media.sinsay.com/media/3/t/o/96779c0135-plheader-slidertrzeci-produktw08-2402desktop.jpg was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://www.sinsay.com/pl/pl/:0
+[   11708ms] TypeError: Cannot read properties of undefined (reading 'replace')
+    at <anonymous>:1:136
+    at Array.forEach (<anonymous>)
+    at <anonymous>:1:66
+    at <anonymous>:1:395
+    at HTMLBodyElement.nrWrapper [as insertBefore] (<anonymous>:1:16760)
+    at https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1013:429
+    at GR (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1015:31)
+    at Od.FR (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1012:92)
+    at Od.<anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:421:187)
+    at k.apply (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:347:466)
+[   11709ms] TypeError: Cannot read properties of undefined (reading 'replace')
+    at <anonymous>:1:146
+    at Array.forEach (<anonymous>)
+    at <anonymous>:1:69
+    at HTMLBodyElement.nrWrapper [as insertBefore] (<anonymous>:1:16760)
+    at https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1013:429
+    at GR (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1015:31)
+    at Od.FR (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1012:92)
+    at Od.<anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:421:187)
+    at k.apply (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:347:466)
+    at lb (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:309:209)
+[   11719ms] TypeError: Unhandled Promise Rejection: t.getProductsData is not a function
+    at https://www.sinsay.com/skin/frontend/6.435.0/narch/legacy-catalog/redesigned-components/catalog.js:1:491453
+    at nrWrapper (<anonymous>:1:16760)
+    at new Promise (<anonymous>)
+    at new Promise (<anonymous>:1:20926)
+    at https://www.sinsay.com/skin/frontend/6.435.0/narch/legacy-catalog/redesigned-components/catalog.js:1:491341
+    at step (https://www.sinsay.com/pl/pl/skin/frontend/6.435.0/narch/vendor.js:2:4868688)
+    at Object.next (https://www.sinsay.com/pl/pl/skin/frontend/6.435.0/narch/vendor.js:2:4868805)
+    at fulfilled (https://www.sinsay.com/pl/pl/skin/frontend/6.435.0/narch/vendor.js:2:4867342)
+    at nrWrapper (<anonymous>:1:16760)
+[   11866ms] TypeError: Cannot read properties of undefined (reading 'replace')
+    at <anonymous>:1:268
+    at HTMLBodyElement.nrWrapper [as insertBefore] (<anonymous>:1:16760)
+    at https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1013:429
+    at GR (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1015:31)
+    at Od.FR (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:1012:92)
+    at Od.<anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:421:187)
+    at k.apply (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:347:466)
+    at lb (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:309:209)
+    at kb (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:308:527)
+    at Od.<anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-MPDR46:371:473)
+[   12119ms] [WARNING] [Meta Pixel] - You are sending a non-standard event 'ViewCategory'. The preferred way to send these events is using trackCustom. See 'https://developers.facebook.com/docs/ads-for-websites/pixel-events/#events' for more information. @ https://connect.facebook.net/en_US/fbevents.js:171

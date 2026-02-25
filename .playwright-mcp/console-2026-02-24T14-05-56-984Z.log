@@ -1,0 +1,12 @@
+[    1913ms] [WARNING] ProductCardNext/SinsayModule/activate | Exec time: 1ms @ https://www.sinsay.com/pl/pl/skin/frontend/6.435.0/narch/test/dlr.js:0
+[    2100ms] [WARNING] [Translation] Missing translation for key: "reviews_multiple_text" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_bar_undersize" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_bar_standard" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_bar_oversize" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_info_percentage_undersize" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_info_percentage_standard" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_info_percentage_oversize" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_length_bar_shorter" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_length_bar_perfect" @ :2
+[    2101ms] [WARNING] [Translation] Missing translation for key: "compatibility_length_bar_longer" @ :2
+[    2980ms] [ERROR] Attestation check for Attribution Reporting on https://www.facebook.com failed. @ https://www.sinsay.com/pl/pl/bawelniana-koszulka-basic-237hb-99x:0
