@@ -147,14 +147,15 @@ A task is **complete** only when **all** of the following are true, regardless o
 
 ```
 □ I read the PRD for the changed area before starting
+□ Context7 MCP used to check latest docs for any library API used
 □ Tests were written BEFORE implementing production code (TDD)
 □ All new code has corresponding test files
 □ All tests pass (zero failures, zero errors)
 □ Build is clean (no compiler/transpiler errors or warnings)
 □ No hardcoded secrets, API keys, or credentials in any file
 □ No .db or secret files staged for commit
+□ Code formatting is aligned with the project conventions
 □ /code-review run on the changes before committing (for non-trivial changes)
-□ Context7 MCP used to check latest docs for any library API used
 □ Commit message follows: Area: short summary (e.g., `Feature: add chat SSE endpoint`)
 ```
 
@@ -184,10 +185,11 @@ For layer-specific checklist items, see `src/AGENTS.md` (backend) or `Frontend/A
 3. Use Context7 MCP to fetch current library documentation before implementing new integrations
 4. Use the JetBrains MCP for IDE-level navigation and diagnostics when available
 5. Run `/code-review` on all non-trivial PRs
-6. When adding new structure (backend/frontend), update the relevant AGENTS.md files accordingly
-7. After every correction, end with: Update your AGENTS.md so you don't make that mistake again.
-8. Create a new commit after each step, make commits granular and often with descriptive messages.
-9. Do not push changes to remote! Let user check changes locally.
+6. Before committing, always run linting and formatting fix (auto formatting)
+7. When adding new structure (backend/frontend), update the relevant AGENTS.md files accordingly
+8. After every correction, end with: Update your AGENTS.md so you don't make that mistake again.
+9. Create a new commit after each step, make commits granular and often with descriptive messages.
+10. Do not push changes to remote! Let user check changes locally.
 
 ---
 

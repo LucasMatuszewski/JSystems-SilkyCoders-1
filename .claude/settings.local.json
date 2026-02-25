@@ -11,7 +11,8 @@
       "mcp__playwright__browser_resize",
       "WebSearch",
       "WebFetch(domain:skills.sh)",
-      "WebFetch(domain:vercel.com)"
+      "WebFetch(domain:vercel.com)",
+      "Bash(git add:*)"
     ]
   }
 }
