@@ -128,7 +128,7 @@ Follow the universal TDD process from the root `AGENTS.md`. Backend-specific com
 ./mvnw test -Dtest=YourTestClass
 ```
 
-Tests must fail at this point. If they pass, the test is not testing anything.
+Tests must fail at this point (no functionality implemented yet). If they pass, the test is not testing anything.
 
 ### Step 6 — Confirm All Tests Pass
 
@@ -136,7 +136,7 @@ Tests must fail at this point. If they pass, the test is not testing anything.
 ./mvnw test
 ```
 
-All tests must pass. Fix the implementation (not the test) unless the test itself was wrong.
+All tests must pass. If they don't, fix the implementation (not the test) unless the test itself was wrong.
 
 ### Test Style
 
@@ -199,7 +199,9 @@ In addition to the universal criteria in root `AGENTS.md`, a backend task requir
 
 ---
 
-## Skills available to use
+## MCP and Skills available to use in backend
+
+### Skills (reusable workflows)
 
 #### `java-spring-boot` — Spring Boot Development
 
@@ -215,9 +217,15 @@ In addition to the universal criteria in root `AGENTS.md`, a backend task requir
 - **When to use**: When writing any Java test class.
 - **Security note**: Flagged as High Risk by Gen Agent Trust Hub — risk is from overly broad `Bash` permissions only, no malicious code found. Review Bash commands before running.
 
----
+### MCP Servers (Model Context Protocol)
 
-## Relevant Context7 MCP Documentation
+#### `jetbrains` — IntelliJ IDEA IDE Integration
+
+- **What it does**: Bridges Claude Code with IntelliJ IDEA — open files, navigate symbols, run configurations, access project structure, read diagnostics.
+- **When to use**: When navigating the Java codebase, running Spring Boot, or checking live compiler errors before committing.
+- **Note**: Requires IntelliJ IDEA to be running with the MCP server plugin active.
+
+#### `context7` — Live Library Documentation
 
 Fetch these before implementing features that depend on them:
 

@@ -41,19 +41,10 @@ The following standards define acceptable work for all frontend code. Every item
 | **MSW (Mock Service Worker)**   | Mock API calls in tests (including SSE streams) | v2+                                          |
 | **Playwright**                  | End-to-end and visual verification              | latest stable (already available via plugin) |
 
-#### `playwright` — Browser Automation and Visual Verification
-
-- **What it does**: Provides browser automation tools (navigate, click, snapshot, screenshot, evaluate, network inspection) powered by Playwright MCP integration.
-- **When to use**:
-  - Frontend work: mandatory visual verification of every rendered page or component change
-  - API testing: verify the running application responds correctly end-to-end
-  - Self-code-review: open the running app and visually confirm the implementation before committing
-- **Integration into workflow**: After any frontend change, use Playwright tools to open the page, take a screenshot, inspect the DOM, and confirm correctness before committing.
-
 ### Initial Setup Commands
 
 ```bash
-# Inside the Frontend/ directory
+# Inside the frontend/ directory
 npm create vite@latest . -- --template react-ts
 npm install
 
@@ -138,6 +129,8 @@ export const handlers = [
   }
 }
 ```
+
+Build script should bundle the frontend into the backend `../src/main/resources/static/` folder.
 
 ---
 
@@ -372,7 +365,14 @@ All universal criteria from root `AGENTS.md` apply. In addition, a frontend task
 
 ---
 
-## Relevant Context7 MCP Documentation
+## MCP Servers (Model Context Protocol)
+
+### `context7` — Live Library Documentation
+
+- **What it does**: Fetches up-to-date documentation for project libraries on demand. Avoids relying on potentially outdated training data.
+- **When to use**: Whenever implementing features using a library below. Always fetch current docs before writing new integration code.
+
+#### Relevant Context7 MCP Documentation
 
 Fetch these before implementing features that depend on them:
 
@@ -383,3 +383,12 @@ Fetch these before implementing features that depend on them:
 | `/reactjs/react.dev`            | React 19 patterns (use(), Suspense, transitions)          |
 | `/tailwindlabs/tailwindcss.com` | Tailwind utility classes and configuration                |
 | `/shadcn-ui/ui`                 | Shadcn component integration                              |
+
+### `playwright` — Browser Automation and Visual Verification
+
+- **What it does**: Provides browser automation tools (navigate, click, snapshot, screenshot, evaluate, network inspection) powered by Playwright MCP integration.
+- **When to use**:
+  - Frontend work: mandatory visual verification of every rendered page or component change
+  - API testing: verify the running application responds correctly end-to-end
+  - Self-code-review: open the running app and visually confirm the implementation before committing
+- **Integration into workflow**: After any frontend change, use Playwright tools to open the page, take a screenshot, inspect the DOM, and confirm correctness before committing.

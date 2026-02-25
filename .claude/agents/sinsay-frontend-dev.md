@@ -1,6 +1,6 @@
 ---
 name: sinsay-frontend-dev
-description: "Use this agent when working on any frontend development task for the Sinsay PoC application, including building React components, implementing UI screens, integrating CopilotKit interactive elements, wiring up AG-UI protocol connections, styling with TailwindCSS, or making any visual/UX change to the Frontend/ directory.\\n\\n<example>\\nContext: The user wants to create the initial landing/form screen for the Sinsay returns application.\\nuser: \"Build the first step of the Sinsay returns form where users enter their order number and select their intent (return or complaint)\"\\nassistant: \"I'll use the sinsay-frontend-dev agent to build this form step following the Sinsay design system and wireframes.\"\\n<commentary>\\nThis is a frontend UI task involving React, TypeScript, TailwindCSS, and Sinsay brand assets. Launch the sinsay-frontend-dev agent to handle it end-to-end.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: The developer needs to integrate CopilotKit into the chat interface.\\nuser: \"Add CopilotKit copilot sidebar to the chat view so users can get guided assistance during the returns process\"\\nassistant: \"I'll launch the sinsay-frontend-dev agent to integrate CopilotKit into the chat UI.\"\\n<commentary>\\nCopilotKit integration is a core responsibility of this agent. Use it to wire up the CopilotKit provider, configure the sidebar, and ensure AG-UI protocol compatibility.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: A new component needs to match Sinsay brand guidelines.\\nuser: \"Create a reusable Button component that matches the Sinsay design system\"\\nassistant: \"Let me use the sinsay-frontend-dev agent to create this component — it will read the design system docs and assets first to ensure brand compliance.\"\\n<commentary>\\nAny component that must adhere to Sinsay brand identity should go through this agent, which always consults the design system docs and assets before writing code.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: The user asks to visually verify the frontend after a backend change.\\nuser: \"Can you check how the chat interface looks now after the SSE endpoint fix?\"\\nassistant: \"I'll invoke the sinsay-frontend-dev agent to take a Playwright screenshot and inspect the rendered UI.\"\\n<commentary>\\nFrontend visual verification is part of this agent's workflow. It uses Playwright to open the app, screenshot it, and confirm correctness.\\n</commentary>\\n</example>"
+description: "Use this agent when working on any frontend development task for the Sinsay PoC application, including building React components, implementing UI screens, integrating CopilotKit interactive elements, wiring up AG-UI protocol connections, styling with TailwindCSS, or making any visual/UX change to the frontend/ directory.\\n\\n<example>\\nContext: The user wants to create the initial landing/form screen for the Sinsay returns application.\\nuser: \"Build the first step of the Sinsay returns form where users enter their order number and select their intent (return or complaint)\"\\nassistant: \"I'll use the sinsay-frontend-dev agent to build this form step following the Sinsay design system and wireframes.\"\\n<commentary>\\nThis is a frontend UI task involving React, TypeScript, TailwindCSS, and Sinsay brand assets. Launch the sinsay-frontend-dev agent to handle it end-to-end.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: The developer needs to integrate CopilotKit into the chat interface.\\nuser: \"Add CopilotKit copilot sidebar to the chat view so users can get guided assistance during the returns process\"\\nassistant: \"I'll launch the sinsay-frontend-dev agent to integrate CopilotKit into the chat UI.\"\\n<commentary>\\nCopilotKit integration is a core responsibility of this agent. Use it to wire up the CopilotKit provider, configure the sidebar, and ensure AG-UI protocol compatibility.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: A new component needs to match Sinsay brand guidelines.\\nuser: \"Create a reusable Button component that matches the Sinsay design system\"\\nassistant: \"Let me use the sinsay-frontend-dev agent to create this component — it will read the design system docs and assets first to ensure brand compliance.\"\\n<commentary>\\nAny component that must adhere to Sinsay brand identity should go through this agent, which always consults the design system docs and assets before writing code.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: The user asks to visually verify the frontend after a backend change.\\nuser: \"Can you check how the chat interface looks now after the SSE endpoint fix?\"\\nassistant: \"I'll invoke the sinsay-frontend-dev agent to take a Playwright screenshot and inspect the rendered UI.\"\\n<commentary>\\nFrontend visual verification is part of this agent's workflow. It uses Playwright to open the app, screenshot it, and confirm correctness.\\n</commentary>\\n</example>"
 tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, WebSearch, Skill, TaskCreate, TaskGet, TaskUpdate, TaskList, EnterWorktree, ToolSearch
 model: sonnet
 color: purple
@@ -61,10 +61,10 @@ If any of these files is missing or unreadable, stop and report the issue before
 
 ## Application Structure
 
-Work within the `Frontend/` directory. Follow this structure:
+Work within the `frontend/` directory. Follow this structure:
 
 ```
-Frontend/
+frontend/
   src/
     app/                  # Top-level screens / page components
     components/
@@ -77,7 +77,7 @@ Frontend/
   public/                 # Static assets
 ```
 
-Refer to `Frontend/AGENTS.md` for any additional frontend-specific rules defined in that file.
+Refer to `frontend/AGENTS.md` for any additional frontend-specific rules defined in that file.
 
 ---
 
@@ -176,7 +176,7 @@ cd Frontend && npm run format:check # Prettier
 - Context7 Shadcn docs: `/shadcn-ui/ui`
 - Project PRD: `docs/PRD-Sinsay-PoC.md`
 - Project ADR: `docs/ADR-Sinsay-PoC.md`
-- Frontend rules: `Frontend/AGENTS.md`
+- Frontend rules: `frontend/AGENTS.md`
 - Design system: `docs/sinsay-design-system.md`
 - Wireframe step 1: `docs/assets/sinsay-wireframe-1-step.png`
 - Wireframe step 2: `docs/assets/sinsay-wireframe-2-step.png`

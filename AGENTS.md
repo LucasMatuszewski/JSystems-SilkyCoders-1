@@ -4,20 +4,23 @@
 > It is accessible to Claude Code via a symlink: `CLAUDE.md → AGENTS.md`.
 > **All procedures defined here are mandatory. Non-compliance blocks commits and task completion.**
 
-**Primary references**: see `docs/PRD-Sinsay-PoC.md` and `docs/ADR-Sinsay-PoC.md` before making changes.
+**Primary references**: when you need details about the project see:
+
+- `docs/PRD-Sinsay-PoC.md` - Product Requirement Document (functional requirements)
+- `docs/ADR-Sinsay-PoC.md` - Architecture Decision Record (technical decisions)
 
 ---
 
 ## Project Overview
 
-This repo hosts a Proof of Concept for Sinsay returns/complaints verification using multimodal AI. The target flow is a form-to-chat experience where users submit order context and images, then receive a streamed verdict in Polish. The backend is Spring Boot + Spring AI; the frontend is React 19 + assistant-ui. Streaming must follow the Vercel AI SDK Data Stream Protocol.
+This repo hosts a Proof of Concept for Sinsay (fashion brand) returns/complaints verification using multimodal AI. The target flow is a chat-to-form-to-chat experience where users start conversation, if they want to submit a return or complaint, agent shows them the form to submit order context and images, then agent sends a streamed verdict in chat again where user can continue the conversation. The backend is Spring Boot + Spring AI; the frontend is React 19 + CopilotKit UI (based on AG-UI Protocol to let agent communicate with frontend and display UI components).
 
 ---
 
 ## Current vs. Planned Structure
 
-- **Current (in repo)**: single Spring Boot app under `src/` with Maven wrapper and minimal tests. React frontend under `Frontend/`.
-- **Planned (ADR)**: a monorepo with separate `backend/` and `frontend/` directories and a build that bundles the frontend into the backend `static/` folder. If you introduce the monorepo layout, keep the existing root `pom.xml` aligned or migrate intentionally.
+- **Current (in repo)**: single Spring Boot app under `src/` with Maven wrapper and minimal tests. React frontend under `frontend/`.
+- **Planned (ADR)**: a monorepo with a build that bundles the frontend into the backend `static/` folder.
 
 ---
 
@@ -28,7 +31,7 @@ This repo hosts a Proof of Concept for Sinsay returns/complaints verification us
 │   ├── main/java/...      # Application source code
 │   ├── main/resources/    # application.properties, static/, templates/
 │   └── test/java/...      # JUnit tests
-├── Frontend/              # React + Tailwind frontend (TypeScript / Vite)
+├── frontend/              # React + Tailwind frontend (TypeScript / Vite)
 ├── docs/                  # PRD, ADR, and research notes
 │   └── sinsay/            # Sinsay terms of returns and complaints (knowledge base)
 ├── pom.xml                # Maven build descriptor
@@ -41,20 +44,15 @@ This repo hosts a Proof of Concept for Sinsay returns/complaints verification us
 | Area                          | File                                       |
 | ----------------------------- | ------------------------------------------ |
 | Backend (Java / Spring Boot)  | [`src/AGENTS.md`](src/AGENTS.md)           |
-| Frontend (React / TypeScript) | [`Frontend/AGENTS.md`](Frontend/AGENTS.md) |
-
-### Target Modules (from ADR)
-
-If/when split into modules, use the following layout and names:
-
-- `backend/src/main/java/com/sinsay/`: `config/`, `controller/`, `service/`, `model/`
-- `frontend/src/`: `app/` (screens), `components/ui/` (Shadcn), form + chat components
+| Frontend (React / TypeScript) | [`frontend/AGENTS.md`](frontend/AGENTS.md) |
 
 ---
 
 ## Claude Code Tools and Resources
 
-Claude Code has access to three categories of tools. **Agents must actively use these tools** to maximize code quality and development efficiency. Do not ignore available tools — their use is part of the standard workflow.
+Claude Code has access to three categories of tools: plugins, MCP servers, and skills.
+**Agents must actively use these tools** to maximize code quality and development efficiency.
+Do not ignore available tools — their use is part of the standard workflow.
 
 ### Plugins (Enabled)
 
@@ -64,33 +62,7 @@ Claude Code has access to three categories of tools. **Agents must actively use 
 - **What it does**: Launches 4 parallel agents to independently review a pull request — 2 agents check AGENTS.md/CLAUDE.md compliance, 1 scans for bugs in changed code, 1 analyzes git history for context. Issues are confidence-scored 0–100; only issues ≥80 are reported.
 - **When to use**: Before merging any non-trivial PR. Run as the final step before marking a PR ready for merge.
 
----
-
-### MCP Servers (Model Context Protocol)
-
-#### `jetbrains` — IntelliJ IDEA Integration
-
-- **What it does**: Bridges Claude Code with IntelliJ IDEA 2025.3 — open files, navigate symbols, run configurations, access project structure, read diagnostics.
-- **When to use**: When navigating the Java codebase, running Spring Boot, or checking live compiler errors before committing.
-- **Note**: Requires IntelliJ IDEA to be running with the MCP server plugin active.
-
-#### `context7` — Live Library Documentation
-
-- **What it does**: Fetches up-to-date documentation for project libraries on demand. Avoids relying on potentially outdated training data.
-- **When to use**: Whenever implementing features using a library below. Always fetch current docs before writing new integration code.
-
-| Handler                                  | Library         |
-| ---------------------------------------- | --------------- |
-| `/websites/spring_io_projects_spring-ai` | Spring AI       |
-| `/spring-projects/spring-boot`           | Spring Boot     |
-| `/projectlombok/lombok`                  | Lombok          |
-| `/openai/openai-java`                    | OpenAI Java SDK |
-| `/websites/platform_openai`              | OpenAI Platform |
-| `/vercel/ai`                             | Vercel AI SDK   |
-| `/assistant-ui/assistant-ui`             | assistant-ui    |
-| `/reactjs/react.dev`                     | React 19        |
-| `/tailwindlabs/tailwindcss.com`          | Tailwind CSS    |
-| `/shadcn-ui/ui`                          | Shadcn/ui       |
+> MCP Servers and Skills are described in `src/AGENTS.md` and `frontend/AGENTS.md` respectively.
 
 ---
 
@@ -105,7 +77,7 @@ These apply to **all code in this repository** regardless of language or layer.
 - No `.db` database files or secret files committed to git
 - Implementation must match the specification in `docs/PRD-Sinsay-PoC.md` and `docs/ADR-Sinsay-PoC.md`
 
-For layer-specific quality standards, see `src/AGENTS.md` or `Frontend/AGENTS.md`.
+For layer-specific quality standards, see `src/AGENTS.md` or `frontend/AGENTS.md`.
 
 ---
 
@@ -121,7 +93,7 @@ For layer-specific quality standards, see `src/AGENTS.md` or `Frontend/AGENTS.md
 6. **Confirm all tests pass** — run the full test suite; fix the implementation, not the tests
 7. **Refactor** — clean up while keeping all tests green
 
-For language-specific TDD commands and tooling, see `src/AGENTS.md` (backend) or `Frontend/AGENTS.md` (frontend).
+For language-specific TDD commands and tooling, see `src/AGENTS.md` (backend) or `frontend/AGENTS.md` (frontend).
 
 ---
 
@@ -159,7 +131,7 @@ A task is **complete** only when **all** of the following are true, regardless o
 □ Commit message follows: Area: short summary (e.g., `Feature: add chat SSE endpoint`)
 ```
 
-For layer-specific checklist items, see `src/AGENTS.md` (backend) or `Frontend/AGENTS.md` (frontend).
+For layer-specific checklist items, see `src/AGENTS.md` (backend) or `frontend/AGENTS.md` (frontend).
 
 ---
 
@@ -180,7 +152,7 @@ For layer-specific checklist items, see `src/AGENTS.md` (backend) or `Frontend/A
 
 ## Agent Workflow
 
-1. Read the specialist AGENTS.md for the area you are working in (`src/AGENTS.md` or `Frontend/AGENTS.md`)
+1. Read the specialist AGENTS.md for the area you are working in (`src/AGENTS.md` or `frontend/AGENTS.md`)
 2. Keep changes aligned with the PoC scope (no auth, no production deployment)
 3. Use Context7 MCP to fetch current library documentation before implementing new integrations
 4. Use the JetBrains MCP for IDE-level navigation and diagnostics when available

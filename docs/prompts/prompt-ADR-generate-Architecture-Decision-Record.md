@@ -3,7 +3,7 @@ Generate an Architecture Decision Record document in ./doc folder, with technica
 For persistence on BE you can use SQLite to save data from the form, conversation history and logs.
 Analyse what else should be implemented based on PRD document.
 
-Analyse also @AGENTS.md and @src/AGENTS.md and @Frontend/AGENTS.md files to align ADR with instructions we provided for the agents.
+Analyse also @AGENTS.md and @src/AGENTS.md and @frontend/AGENTS.md files to align ADR with instructions we provided for the agents.
 All these documents (ADR, PRD and AGENTS.md files) should be aligned and consistent. Make sure we will not have any contradicting statements, instructions or decisions.
 
 You should also start with making research about how to implement CopilotKit UI framework (based on AG-UI) together with OpenAI Java SDK, and if they can talk to each other, what data contract we should create for them to communicate. Or maybe they need some additional intermediary layer that would translate AG-UI protocol to our BE in Java?
