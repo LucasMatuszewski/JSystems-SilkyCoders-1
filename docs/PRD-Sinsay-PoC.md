@@ -1,91 +1,133 @@
-# Product Requirements Document: Sinsay AI Assistant PoC — v2.0
+# Product Requirements Document: Sinsay AI Assistant PoC
 
 **Version:** 2.0
 **Status:** Active
 **Date:** 2026-02-25
-**Supersedes:** `PRD-Sinsay-PoC.md` (v1.0 — form-first flow)
 **Target Audience:** AI coding assistants and developers
 
 ---
 
 ## 1. Introduction & Overview
 
-This document describes the **v2.0 redesign** of the Sinsay AI Assistant PoC. The core change from v1.0 is the UX paradigm shift: instead of a form-first flow where the user must fill a structured form before accessing AI chat, the application now opens **directly as a chat**.
+This PoC validates the technical feasibility of using multimodal AI (GPT-4o Vision) to assist Sinsay customers with product returns (_Zwrot_) and complaints (_Reklamacja_) through a conversational interface.
 
-The user arrives at a chat window and can have a natural conversation — asking about the Sinsay offer, return windows, complaint procedures, sizing, store locations, or any general customer service question. The AI responds as a knowledgeable Sinsay assistant.
+The application opens directly as a **chat**. The user can have a free conversation — asking about the Sinsay offer, return windows, complaint procedures, or any general customer service question. The AI responds as a knowledgeable Sinsay assistant in Polish.
 
-When the conversation reveals that the user wants to **initiate a return (*Zwrot*)** or file a **complaint (*Reklamacja*)**, the AI agent automatically injects a **structured form component directly into the chat window** (as an interactive chat message). The user fills the form in-context, submits it, and the AI analyzes the data and photo to issue a verdict — all without leaving the chat.
-
-**Key distinction from v1.0:**
-- v1.0: Form → Chat (linear, form is the entry point)
-- v2.0: Chat → Form-in-Chat → Verdict (form appears contextually, mid-conversation, as a chat component)
+When the conversation reveals that the user wants to initiate a return or file a complaint, the AI agent **injects a structured form component directly into the chat window** as an interactive message. The user fills the form in context, submits it with a product photo, and the AI analyzes the data against Sinsay's policies to issue a justified verdict — all within the same chat.
 
 ---
 
 ## 2. Goals
 
-1. **Natural entry point:** Users start a conversation without any barrier — no form to fill before they can ask a question.
-2. **Contextual form injection:** The structured data collection form appears only when needed, triggered by the AI detecting return/complaint intent.
-3. **Validate AI tool-use UX:** Test the `assistant-ui` tool call rendering pattern to display interactive React components inside the chat thread.
-4. **Validate AI verdict quality:** Confirm that GPT-4o can analyze a product photo + description and cross-reference it against Sinsay's return/complaint regulations to produce a justified verdict in Polish.
-5. **Data persistence:** Log all sessions, form submissions, photos, and verdicts to a local SQLite database for post-analysis.
-
----
+1. **Natural entry point** — users start a conversation without any barrier; no form to fill before asking a question.
+2. **Contextual form injection** — the data collection form appears only when needed, triggered by the AI detecting return/complaint intent.
+3. **Validate in-chat interactive components** — test the pattern of rendering interactive React forms as chat messages.
+4. **Validate AI verdict quality** — confirm GPT-4o can analyze a product photo and description against Sinsay's return/complaint regulations to produce a justified Polish verdict.
+5. **Data persistence** — log all sessions, form submissions, photos, and verdicts locally for post-analysis.
 
 ## 3. User Stories
 
-### General Chat
 1. **As a Customer**, I want to ask the AI about Sinsay's return policy so I know my options before committing to a return.
 2. **As a Customer**, I want to ask general questions about the Sinsay offer, store locations, or current promotions.
-3. **As a Customer**, I want the AI to respond in Polish so the experience feels natural.
-
-### Return/Complaint Flow
-4. **As a Customer**, when I say I want to return a product, I want a form to appear in the chat — not on a separate page — so I can provide the details without losing my conversation context.
-5. **As a Customer**, I want the return/complaint type to be pre-selected in the form based on what I told the AI, but I want to be able to change it in case the AI misunderstood.
-6. **As a Customer**, I want all form fields to be required so I don't accidentally submit incomplete information.
-7. **As a Customer**, I want to upload a photo of the product (or defect) directly in the form so the AI can see the actual condition of the item.
-8. **As a Customer**, after submitting the form, I want the AI to give me a clear verdict — justified or not — explained in Polish, with references to the applicable policy.
-9. **As a Customer**, I want to be able to continue the conversation after receiving a verdict, to ask follow-up questions.
-
-### Developer
-10. **As a Developer**, I want form submissions and verdicts stored in SQLite with timestamps so I can audit the AI's accuracy.
+3. **As a Customer**, I want the AI to respond in Polish if I ask a question in Polish, and in English if I ask a question in English so the experience feels natural.
+4. **As a Customer**, I want to select whether I am making a "Return" or a "Complaint" so the system applies the correct rules (30 days vs. 2 years).
+5. **As a Customer**, I want to upload a photo of my product and receipt so the verification happens instantly without waiting for an email.
+6. **As a Customer**, I want to see a clear explanation of why my return was rejected (e.g., "The item appears worn").
+7. **As a Developer**, I want all chat sessions and verdicts saved to a local SQLite database so I can manually review the AI's performance later.
 
 ---
 
-## 4. Application Flow
+## 4. User Journey
 
+### 4.1 High-Level Flow
+
+```mermaid
+flowchart TD
+    A([User opens the app]) --> B[Chat window opens\nAI sends a welcome message]
+    B --> C[User types a message]
+    C --> D{Does the message\nindicate intent to\nreturn or complain?}
+
+    D -- No --> E[AI answers the question\nin Polish]
+    E --> C
+
+    D -- Yes --> F[AI detects intent\nand pre-selects form type\nReturn or Complaint]
+    F --> G[Form card appears\nin the chat thread]
+
+    G --> H[User fills the form:\nProduct name · Type · Description · Photo]
+    H --> I{All fields\ncompleted?}
+    I -- No --> H
+
+    I -- Yes --> J[User submits the form]
+    J --> K[AI analyzes:\nphoto · description · Sinsay policies]
+    K --> L[AI streams verdict in Polish]
+
+    L --> M{User has\nfollow-up questions?}
+    M -- Yes --> C
+    M -- No --> N([Conversation ends])
 ```
-[User opens chat]
-       │
-       ▼
-[General conversation with AI]
-  - Questions about offer, returns policy, complaints, etc.
-  - AI responds in Polish as a Sinsay assistant
-       │
-       ├─ [User expresses return/complaint intent]
-       │         │
-       │         ▼
-       │  [AI calls show_form tool]
-       │  AI pre-fills the "type" field (Return or Complaint)
-       │  based on the conversation context
-       │         │
-       │         ▼
-       │  [Form component renders IN the chat thread]
-       │  User sees the form as an interactive chat message
-       │  User fills all fields, can change the pre-selected type
-       │  User submits the form
-       │         │
-       │         ▼
-       │  [Form data + photo sent to /api/chat]
-       │  Agent analyzes: product name, type, description, photo
-       │  Agent cross-references: Sinsay regulations (zwrot, reklamacje, regulamin)
-       │         │
-       │         ▼
-       │  [AI streams verdict as a chat message in Polish]
-       │  Verdict: justified/not justified + reasoning
-       │         │
-       │         ▼
-       └─ [Conversation continues — user can ask follow-up questions]
+
+### 4.2 Detailed Interaction Sequence
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Chat as Chat Window
+    participant Agent as AI Agent
+    participant Policies as Sinsay Policies
+
+    User->>Chat: Opens the application
+    Chat-->>User: Welcome message (streamed)
+
+    loop General conversation
+        User->>Chat: Asks a question
+        Chat->>Agent: Forward message + history
+        Agent->>Policies: Look up relevant rules (if needed)
+        Policies-->>Agent: Return policy content
+        Agent-->>Chat: Stream answer in Polish
+        Chat-->>User: Display AI response
+    end
+
+    User->>Chat: Expresses return or complaint intent
+    Chat->>Agent: Forward message
+    Agent->>Agent: Detect intent, choose form type
+    Agent-->>Chat: Trigger: show_return_form(type)
+    Chat-->>User: Form card renders in chat thread
+
+    User->>Chat: Fills all form fields + attaches photo
+    User->>Chat: Clicks Submit
+
+    Chat->>Agent: Send form data + photo
+    Agent->>Policies: Retrieve return / complaint rules
+    Policies-->>Agent: zwrot-30-dni · reklamacje · regulamin
+    Agent->>Agent: Analyze photo against policy rules
+    Agent-->>Chat: Stream verdict in Polish
+    Chat-->>User: Display verdict with justification
+
+    loop Follow-up conversation
+        User->>Chat: Asks follow-up question
+        Chat->>Agent: Forward message
+        Agent-->>Chat: Stream answer
+        Chat-->>User: Display response
+    end
+```
+
+### 4.3 In-Chat Form Lifecycle
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> Visible : AI calls show_return_form
+
+    Visible --> Filling : User starts entering data
+    Filling --> Filling : User edits fields
+
+    Filling --> ValidationError : User clicks Submit\nwith missing/invalid fields
+    ValidationError --> Filling : User corrects errors
+
+    Filling --> Submitted : All fields valid\nUser clicks Submit
+
+    Submitted --> [*] : Form frozen (read-only)\nAI analysis begins
 ```
 
 ---
@@ -94,163 +136,117 @@ When the conversation reveals that the user wants to **initiate a return (*Zwrot
 
 ### 5.1 Chat Interface
 
-- The application opens directly as a full-screen chat window — no landing form, no onboarding screen.
-- The AI assistant introduces itself briefly on first load (a welcome message, hardcoded or streamed).
-- The user can type freely and receive responses streamed via SSE.
-- The chat history must persist for the duration of the browser session (no page-reload wipe).
-- The chat must display all message types: plain text AI messages, plain text user messages, and **in-chat form components** (see §5.2).
+- The application opens directly as a full-height chat window — no landing form, no onboarding screen.
+- The AI sends a short welcome message on first load.
+- The user can type freely and receive streamed responses.
+- Chat history persists for the duration of the browser session.
+- The thread must render three types of messages:
+  - Plain text user messages
+  - Plain text AI messages (streamed)
+  - **In-chat form cards** (interactive React components, see §4.2)
 
-### 5.2 In-Chat Form Component (Critical)
+### 5.2 In-Chat Form Component
 
-This is the central new feature of v2.0. When the AI detects return/complaint intent:
+When the AI detects return/complaint intent, it calls the `show_return_form` tool. The frontend renders this as an interactive card in the chat thread.
 
-**Trigger mechanism:** The backend AI calls a tool named `show_return_form`. The tool call result is rendered by the frontend as an interactive React component embedded in the chat thread, appearing as a distinct "card" in the message list.
+**Form fields — all mandatory:**
 
-**Form fields (all mandatory):**
+| Field        | Type            | Details                                                                                             |
+| ------------ | --------------- | --------------------------------------------------------------------------------------------------- |
+| Product name | Text input      | Name of the product                                                                                 |
+| Type         | Select dropdown | Options: `Return` (Zwrot) · `Complaint` (Reklamacja). Pre-populated by the AI, editable by the user |
+| Description  | Textarea        | Problem description or return reason. Minimum 20 characters                                         |
+| Photo        | File input      | Photo of the product or defect. JPEG / PNG / WebP. One file                                         |
 
-| Field | Type | Details |
-|---|---|---|
-| `productName` | Text input | Name of the product being returned or complained about |
-| `type` | Select dropdown | Options: `Return` (Zwrot), `Complaint` (Reklamacja). Pre-populated by the AI via the tool call parameters, but fully editable by the user |
-| `defectDescription` | Textarea | Description of the defect (for complaints) or reason for return (for returns). Min 20 characters |
-| `photo` | File input | Photo of the product or defect. Accepted: JPEG, PNG, WebP. Max display: 1 file. Mandatory |
-| — | Submit button | "Send to Assistant" — sends the completed form back as a user message |
+**Behaviour:**
 
-**Form behaviour:**
-- All fields validate on submit attempt; errors display inline below each field.
-- The submit button is disabled until all fields are filled and a photo is attached.
-- After successful submission, the form card becomes read-only (frozen state showing submitted values) — the user cannot re-submit the same form.
-- The photo is resized on the client to max 1024px (longest edge) before upload using the Canvas API.
-- The form card must be visually distinct from regular chat messages (e.g., bordered card with a light background).
+- All fields validate on submit attempt; errors display inline.
+- The submit button is disabled until every field has a value and a photo is attached.
+- The photo is resized client-side to max 1024px (longest edge) before encoding.
+- After successful submission the form card becomes **read-only** (frozen state showing submitted values). The user cannot re-submit.
+- A second `show_return_form` call in the same session renders a new independent form card — previous submitted cards remain frozen in the history.
 
-**Tool call data contract** (backend → frontend via SSE tool call chunk):
-```json
-{
-  "tool": "show_return_form",
-  "parameters": {
-    "preselectedType": "return" | "complaint",
-    "contextSummary": "Short sentence from AI explaining why the form is being shown"
-  }
-}
-```
+### 5.3 AI Agent Behaviour
 
-**Form submission data contract** (frontend → backend, as a user message payload):
-```json
-{
-  "formData": {
-    "productName": "string",
-    "type": "return" | "complaint",
-    "defectDescription": "string",
-    "photo": "<base64-encoded image, resized to max 1024px>"
-  }
-}
-```
+**General conversation mode:**
 
-### 5.3 Backend API
+- Responds in Polish or English (depending on the user's language).
+- Answers questions about: return windows, complaint procedures, product categories, store locations, payment options, loyalty points.
+- Grounds all answers in the content of `docs/01-2026-Sinsay-PoC-Returns-Bot/sinsay-documents/`.
+- Does not fabricate Sinsay policies.
 
-1. **Endpoint:** `POST /api/chat`
-2. **Streaming:** Server-Sent Events (SSE), strictly following the **Vercel AI SDK Data Stream Protocol**:
-   - Text chunks: `0:"token"`
-   - Tool call chunks: `9:{...}` (tool call invocation)
-   - Tool result chunks: `a:{...}` (tool result / parameters for the frontend to render)
-   - Finish chunks: `8:[{"finishReason":"stop",...}]`
-3. **Request body:** Vercel AI SDK message array format — includes conversation history and, when submitting a form, a user message with `formData` embedded in the content.
-4. **AI model:** `gpt-4o` via `spring-ai-starter-model-openai`.
-5. **Image handling:** The backend receives the base64 photo and passes it to the ChatClient using Spring AI's `Media` object for multimodal analysis.
+**Intent detection:**
 
-### 5.4 AI Agent Behaviour
+- Calls `show_return_form(type: "return")` when the user signals: _"chcę zwrócić"_, _"zwrot"_, _"oddać"_, _"nie pasuje"_, _"want to return"_, etc.
+- Calls `show_return_form(type: "complaint")` when the user signals: _"reklamacja"_, _"wadliwy"_, _"uszkodzony"_, _"defekt"_, _"complaint"_, etc.
+- When intent is ambiguous, asks one clarifying question before triggering the form.
 
-#### General conversation mode
-- The agent acts as a knowledgeable Sinsay customer service assistant.
-- All responses must be in **Polish**.
-- The agent may answer questions about: return windows, complaint procedures, product categories, store locations, payment methods, loyalty points, etc. Ground answers in the content of `docs/01-2026-Sinsay-PoC-Returns-Bot/sinsay-documents/`.
-- The agent must NOT fabricate Sinsay policies. If it doesn't know, it should say so and direct the user to official channels.
+**Verdict after form submission:**
 
-#### Intent detection
-- When the user's message indicates they want to return a product or file a complaint, the agent must call the `show_return_form` tool.
-- Signals for **return** intent: "chcę zwrócić", "zwrot", "oddać produkt", "nie pasuje", "nie spełnia oczekiwań", "want to return", etc.
-- Signals for **complaint** intent: "reklamacja", "wadliwy", "uszkodzony", "defekt", "zepsuty", "nie działa", "complaint", etc.
-- When intent is ambiguous, the agent asks one clarifying question before calling the tool.
-- The `preselectedType` parameter in the tool call must reflect the agent's best judgment from the conversation.
+For **returns** (`type: return`):
 
-#### Post-form-submission verdict
-After the user submits the form, the agent receives the `formData` (including the photo) and must:
+- Assess photo: are original tags present? Signs of use (wear, stains, washing)?
+- Apply rule: item must be unused and originally tagged. Return window is 30 days from receipt.
+- Verdict: _"Zwrot możliwy"_ or _"Zwrot niemożliwy"_ + Polish justification + next steps.
 
-1. **Identify the type:** `return` or `complaint`.
-2. **For returns (`type: return`):**
-   - Check if return is within 30 days (the agent cannot verify the purchase date from the photo alone — it notes this limitation and asks the user to confirm the date if not already provided in conversation).
-   - Assess the photo: are original tags present? Does the item show signs of use (wear marks, stains, washing)?
-   - Cross-reference: `sinsay-documents/zwrot-30-dni.md` — item must have no signs of use and must be originally tagged.
-   - Verdict: **"Zwrot możliwy" / "Zwrot niemożliwy"** + Polish explanation of reasoning.
-3. **For complaints (`type: complaint`):**
-   - Analyze the photo: identify the visible defect type (seam slippage, fabric tear, stain, pilling, etc.).
-   - Assess whether the defect appears to be a manufacturing/material defect vs. user-caused damage (e.g., scissors cut, obvious misuse).
-   - Note: complaint window is 2 years from receipt date.
-   - Cross-reference: `sinsay-documents/reklamacje.md` and `sinsay-documents/regulamin.md`.
-   - Verdict: **"Reklamacja uzasadniona" / "Reklamacja nieuzasadniona"** + Polish explanation of reasoning.
-4. The verdict message must include:
-   - The verdict conclusion (bold, prominent).
-   - A 2–4 sentence justification referencing the relevant policy rule.
-   - Next steps the user should take (e.g., how to physically return the item).
-5. After the verdict, the agent remains in the chat and can answer follow-up questions.
+For **complaints** (`type: complaint`):
 
-**System prompt structure (per intent mode):**
-```
-You are a helpful Sinsay customer service assistant.
-Always respond in Polish.
-You have access to Sinsay's return and complaint policies.
-[policy document content injected here]
+- Identify defect type from photo: seam slippage, fabric tear, stain, pilling, etc.
+- Assess: manufacturing/material defect vs. user-caused damage.
+- Apply rule: complaint window is 2 years from receipt.
+- Verdict: _"Reklamacja uzasadniona"_ or _"Reklamacja nieuzasadniona"_ + Polish justification + next steps.
 
-When the user wants to return a product or file a complaint:
-- Call the show_return_form tool with the appropriate preselectedType.
-- Do not ask the user to fill in information you will collect via the form.
+The verdict message must contain: the conclusion (prominent), 2–4 sentence justification referencing the applicable policy rule, and the recommended next step for the user.
 
-When you receive formData in a user message:
-- Analyze the photo and text fields carefully.
-- Issue a verdict based solely on Sinsay policies.
-- Never approve a claim that violates policy; never reject a claim without policy justification.
-```
+### 5.4 Persistence
 
-### 5.5 Persistence
+Every session is stored in SQLite:
 
-- Every chat session is stored in SQLite via Spring Data JPA.
-- Schema: `session_id` (UUID), `created_at`, `intent` (null until form submitted), `product_name`, `defect_description`, `photo_path` (local file path), `verdict`, `full_transcript` (JSON array of messages).
-- Photos are saved to a local `/uploads` directory; only the file path is stored in the DB.
-- No data is sent to any external service beyond the OpenAI API call.
+| Column            | Type      | Content                                                |
+| ----------------- | --------- | ------------------------------------------------------ |
+| `session_id`      | UUID      | Unique session identifier                              |
+| `created_at`      | Timestamp | Session start time                                     |
+| `intent`          | String    | `return` · `complaint` · `null` (if no form submitted) |
+| `product_name`    | String    | From submitted form                                    |
+| `description`     | String    | From submitted form                                    |
+| `photo_path`      | String    | Local path to saved photo file                         |
+| `verdict`         | String    | AI verdict text                                        |
+| `full_transcript` | JSON      | Complete message array for the session                 |
 
 ---
 
 ## 6. Non-Goals (Out of Scope)
 
-- **Authentication:** No login required. The PoC is open access.
-- **Production deployment:** Running via `./mvnw spring-boot:run` + `npm run dev` is sufficient.
-- **Order number validation:** The agent does not verify order numbers against a real Sinsay database.
-- **Multiple photos per submission:** The form accepts one photo. Multiple photo support is a v3 consideration.
-- **Email notifications:** Verdicts are displayed in-chat only.
-- **Multi-language UI:** The chat responses are in Polish; UI labels may be in English.
-- **Returning/re-opening previous sessions:** Each page load starts a fresh session.
+- **Authentication** — no login required; the PoC is open access.
+- **Production deployment** — running via `./mvnw spring-boot:run` + `npm run dev` is sufficient.
+- **Order number validation** — the agent does not verify order numbers against a real Sinsay database.
+- **Multiple photos per submission** — the form accepts one photo.
+- **Email notifications** — verdicts are displayed in-chat only.
+- **Returning to previous sessions** — each page load starts a fresh session.
 
 ---
 
 ## 7. Design Considerations
 
 ### Chat window
-- Full-height, full-width layout.
-- User messages: right-aligned, Sinsay brand colour fill.
-- AI messages: left-aligned, white/light grey fill.
-- The in-chat form card: left-aligned (appears as an AI message), distinct bordered card, wider than standard messages to accommodate all form fields comfortably.
 
-### In-chat form card visual anatomy
+- Full-height, full-width layout.
+- User messages: right-aligned with Sinsay brand colour.
+- AI messages: left-aligned on a light background.
+- Form cards: left-aligned, visually distinct with a border and subtle shadow, wider than regular messages to accommodate all fields.
+
+### In-chat form card layout
+
 ```
 ┌─────────────────────────────────────────────┐
-│  📋  Formularz Zwrotu / Reklamacji           │
-│  [contextSummary from AI]                   │
+│  Formularz Zwrotu / Reklamacji               │
+│  [context summary from AI]                  │
 │                                             │
 │  Nazwa produktu *                           │
 │  [________________________]                 │
 │                                             │
 │  Typ zgłoszenia *                           │
-│  [Return ▼]  (or [Complaint ▼])             │
+│  [ Zwrot ▼ ]  or  [ Reklamacja ▼ ]          │
 │                                             │
 │  Opis problemu *                            │
 │  [________________________]                 │
@@ -259,59 +255,38 @@ When you receive formData in a user message:
 │  Zdjęcie produktu *                         │
 │  [ + Dodaj zdjęcie ]  filename.jpg ✓        │
 │                                             │
-│         [ Wyślij do asystenta ]             │
+│       [ Wyślij do asystenta ]               │
 └─────────────────────────────────────────────┘
 ```
 
 ### Visual style
-- Sinsay brand: monochrome, clean, minimal. Use Shadcn UI components.
-- Form card: white background, 1px border, subtle shadow, 8px border-radius.
-- Submit button: full-width, black fill, white text — consistent with Sinsay style.
-- Verdict message: the verdict line (e.g., "Reklamacja uzasadniona ✓") should be visually prominent — larger font or green/red accent colour.
+
+- Sinsay brand: monochrome, clean, minimal. Shadcn UI components.
+- Submit button: full-width, black fill, white text.
+- Verdict message: the conclusion line (_"Reklamacja uzasadniona ✓"_) is visually prominent — bold or accented.
+
+### Language
+
+- All UI labels in **Polish**.
+- AI responses in Polish or English (depending on the user's language).
 
 ---
 
-## 8. Technical Considerations & Constraints
+## 8. Technical Constraints
 
-### Tool call rendering in assistant-ui
-- Use `assistant-ui`'s `makeAssistantToolUI` (or equivalent API) to register a custom renderer for the `show_return_form` tool call.
-- The rendered component must be a controlled React form with Zod validation.
-- On submit, the form calls the `useChat` append function with a user message containing the serialized `formData` (including base64 photo).
-
-### Photo handling
-- Client-side resize to max 1024px (longest edge) using Canvas API before encoding to base64.
-- Base64 string is embedded in the user message JSON payload: `{ formData: { ..., photo: "data:image/jpeg;base64,..." } }`.
-- The backend extracts the base64, saves the file to `/uploads/{sessionId}.jpg`, and passes a `Media` object to the Spring AI ChatClient.
-
-### SSE and Vercel AI SDK compatibility
-- The Spring Boot backend must produce SSE chunks in the exact Vercel AI SDK Data Stream Protocol format.
-- Tool call chunks (`9:`) and tool result chunks (`a:`) must be emitted before text chunks for the same turn.
-- The frontend's `useChat` hook must be configured with `streamProtocol: "data"`.
-
-### assistant-ui and React 19 peer dependencies
-- If `npm install` produces peer dependency warnings for `assistant-ui` or `@radix-ui` with React 19, use `--legacy-peer-deps`.
-
-### SQLite
-- Use `org.xerial:sqlite-jdbc` + `org.hibernate.orm:hibernate-community-dialects`.
-- DB file: `sinsay-assistant.db` in the project root. Add to `.gitignore`.
+- **Image resize:** Canvas API on the client, max 1024px longest edge, before base64 encoding.
+- **Multiple form instances:** If the user wants to submit a second claim in the same session, a second form card must render independently while the first remains frozen.
+- **Blurry photo handling:** If GPT-4o cannot analyse the photo, the agent asks the user to send a clearer image. For MVP: user sends a follow-up message with a new photo — no full form re-render.
+- **System prompt length:** Injecting `zwrot-30-dni.md` OR `reklamacje.md` (depending on the form type) + `regulamin.md` (always) into the system prompt alongside conversation history and image — do not polute the context window with unnecessary information.
 
 ---
 
 ## 9. Success Metrics
 
-| Metric | Target |
-|---|---|
-| Intent detection accuracy | Agent correctly triggers the form (correct `preselectedType`) in ≥90% of clear return/complaint messages |
-| Form usability | User completes and submits the form without error in ≤2 attempts |
-| Verdict accuracy | Agent correctly identifies "obvious wear" or "manufacturing defect" in ≥85% of test images |
-| Streaming latency | First token appears within 3 seconds of form submission |
-| Persistence | 100% of form submissions with photos are recoverable from SQLite + `/uploads` |
-
----
-
-## 10. Open Questions
-
-1. **Tool call streaming:** Does the Vercel AI SDK's `useChat` hook correctly handle `9:` tool call chunks mid-stream for triggering form rendering? Needs validation with actual `assistant-ui` version.
-2. **Form re-trigger:** If the user wants to submit a second complaint in the same session, can the agent call `show_return_form` a second time in the same thread? The component must support multiple instances in the chat history.
-3. **Blurry photo handling:** If the photo is too low-quality for GPT-4o to analyse, the agent should ask for a retake. How does the user submit a new photo without re-filling the whole form? For MVP: agent asks user to send a new, clearer photo as a follow-up image attachment in the chat composer (no full form re-render required).
-4. **Policy grounding accuracy:** Does injecting the full content of `zwrot-30-dni.md`, `reklamacje.md`, and `regulamin.md` into the system prompt stay within the GPT-4o context window comfortably alongside the conversation history and image?
+| Metric                    | Target                                                         |
+| ------------------------- | -------------------------------------------------------------- |
+| Intent detection accuracy | Correct `type` pre-selected in ≥90% of unambiguous messages    |
+| Verdict accuracy          | Correct classification of photo evidence in ≥85% of test cases |
+| Form usability            | User completes and submits in ≤2 attempts                      |
+| Streaming latency         | First token within 3 seconds of form submission                |
+| Persistence               | 100% of sessions with submitted forms recoverable from SQLite  |
