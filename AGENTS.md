@@ -2,7 +2,7 @@
 
 // TODO: split to multiple smaller files with granural control over folders where these filess will be.
 // Only information **VERY** relevant to both FE/BE should be here, that we always want to be used by Agents (always auto delivered).
-// TODO: Make Symlink to juni/.guidelines & to CLAUDE.md
+// TODO: Make Symlink to .juni/guidelines.md & to CLAUDE.md
 // TODO: split like Cursor (patterns), sniper context delivery exactly where needed
 // TODO: separate AGENTS.md in Java /src folder (since in root we have JAva app) or move whole BE app to /backend folder?)
 
@@ -35,6 +35,7 @@ This repo hosts a Proof of Concept for Sinsay returns/complaints verification us
 ### Target Modules (from ADR)
 
 If/when split into modules, use the following layout and names:
+
 - `backend/src/main/java/com/sinsay/`: `config/`, `controller/`, `service/`, `model/`.
 - `frontend/src/`: `app/` (screens), `components/ui/` (Shadcn), form + chat components.
 
@@ -89,18 +90,18 @@ MCP servers give Claude Code access to live, external data sources and IDE integ
 - **When to use**: Whenever implementing features using a library from the list below. Always fetch current docs before writing new integration code.
 - **Available documentation handlers**:
 
-  | Handler | Library |
-  |---|---|
-  | `/websites/spring_io_projects_spring-ai` | Spring AI |
-  | `/spring-projects/spring-boot` | Spring Boot |
-  | `/projectlombok/lombok` | Lombok |
-  | `/openai/openai-java` | OpenAI Java SDK |
-  | `/websites/platform_openai` | OpenAI Platform |
-  | `/vercel/ai` | Vercel AI SDK |
-  | `/assistant-ui/assistant-ui` | assistant-ui |
-  | `/reactjs/react.dev` | React 19 |
-  | `/tailwindlabs/tailwindcss.com` | Tailwind CSS |
-  | `/shadcn-ui/ui` | Shadcn/ui |
+  | Handler                                  | Library         |
+  | ---------------------------------------- | --------------- |
+  | `/websites/spring_io_projects_spring-ai` | Spring AI       |
+  | `/spring-projects/spring-boot`           | Spring Boot     |
+  | `/projectlombok/lombok`                  | Lombok          |
+  | `/openai/openai-java`                    | OpenAI Java SDK |
+  | `/websites/platform_openai`              | OpenAI Platform |
+  | `/vercel/ai`                             | Vercel AI SDK   |
+  | `/assistant-ui/assistant-ui`             | assistant-ui    |
+  | `/reactjs/react.dev`                     | React 19        |
+  | `/tailwindlabs/tailwindcss.com`          | Tailwind CSS    |
+  | `/shadcn-ui/ui`                          | Shadcn/ui       |
 
 ---
 
@@ -156,6 +157,7 @@ The following standards define acceptable work for this project. **All work must
 ### Current Test Dependencies (already in `pom.xml`)
 
 `spring-boot-starter-test` is included in `test` scope. It transitively provides:
+
 - **JUnit 5** (Jupiter) — test engine
 - **Mockito** — mocking framework
 - **AssertJ** — fluent assertions
@@ -229,6 +231,7 @@ Think through: What class/method will implement this? What are the inputs? What 
 ### Step 3 — Write the Tests First
 
 Write complete, failing test classes **before** implementing the production code. Tests must:
+
 - Be named descriptively: `shouldReturnStreamedVerdictForValidReturnRequest()`
 - Cover the happy path, boundary conditions, and at least one error/exception path
 - Use `given / when / then` structure (BDD style with Mockito BDDMockito)
@@ -324,6 +327,7 @@ A backend task is **complete** only when **all** of the following are true:
 - `./mvnw clean verify`: full build + test validation
 
 Planned commands once frontend exists:
+
 - `cd Frontend && npm run dev`: run React app
 - `cd Frontend && npm run build`: build frontend into `backend/src/main/resources/static`
 - `cd Frontend && npm test`: run Vitest tests
