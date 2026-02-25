@@ -1,11 +1,5 @@
 # Repository Guidelines
 
-// TODO: split to multiple smaller files with granural control over folders where these filess will be.
-// Only information **VERY** relevant to both FE/BE should be here, that we always want to be used by Agents (always auto delivered).
-// TODO: Make Symlink to juni/.guidelines & to CLAUDE.md
-// TODO: split like Cursor (patterns), sniper context delivery exactly where needed
-// TODO: separate AGENTS.md in Java /src folder (since in root we have JAva app) or move whole BE app to /backend folder?)
-
 > **This file is the single source of truth for all AI agents working on this project.**
 > It is accessible to Claude Code via a symlink: `CLAUDE.md → AGENTS.md`.
 > **All procedures defined here are mandatory. Non-compliance blocks commits and task completion.**
