@@ -1,5 +1,7 @@
 # Hallucination detection and reliability
 
+> [Perplexity Research](https://www.perplexity.ai/search/you-are-an-ai-research-assista-VxIhIRFTTe6_g.D8u6UjxQ)
+
 ## OpenAI SDK Capabilities
 
 OpenAI's primary mechanism for confidence scoring is **logprobs** (log probabilities), available in the Chat Completions API via the `logprobs` and `top_logprobs` parameters. When enabled, the API returns the log probability of each output token, where a value of `0.0` represents 100% probability and any negative number represents lower confidence. Developers can aggregate these per-token values (using mean, sum, or weighted distribution) to produce a sentence- or response-level confidence score.[^1_1][^1_2][^1_3]

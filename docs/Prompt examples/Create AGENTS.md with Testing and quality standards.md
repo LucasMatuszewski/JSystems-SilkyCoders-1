@@ -34,7 +34,9 @@ itself. And only after visually and functionally verifying that what
 it created works and looks correct. The agent only after this can
 approve and consider its work finished.
 
+> *Please notice, how Transcription made a mistake in "Time Wind" and Prywright, but Prompt Cowboy corrected it to Tailwind and Playwright :)*
 
+> If you use Tailwind, add it to Transcriber's (e.g.Handy) defined words: Advanced settings > Custom words & in Post Process add to our prompt: `Names/terms that may appear and must be preserved exactly (or be corrected if misspelled): Tailwind, Playwright, IntelliJ, ...`
 
 ---
 

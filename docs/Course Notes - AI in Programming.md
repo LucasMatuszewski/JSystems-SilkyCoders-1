@@ -121,8 +121,9 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- Better use **Java 21 (2023)** than 25 (07.2025)
 	- Add context, docs for latest features
 	- Overfitting - LLM may still struggle, ignore context and follow old path
-- **Hallucinations** - RAG / Context / Browser helps to solve this issue, but not 100%
-  - [AA-Omniscience Index](https://artificialanalysis.ai/evaluations/omniscience) - Benchmark for Hallucination level: 
+- **Hallucinations**
+  - RAG / Context / Browser helps to solve this issue, but not 100%
+  - [AA-Omniscience Index](https://artificialanalysis.ai/evaluations/omniscience) (Benchmark for Hallucination level)
   - [LogProbs parameter](https://developers.openai.com/cookbook/examples/using_logprobs/) (log probabilities of each output token)
 - **Context Window**
 	- Temporary "working memory" of LLM,
@@ -132,7 +133,7 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 - **Tokens**, Tokenizer, Embedding (osadzanie), Vector DB, etc.
 - **Autoregression**
 	- model predicts future values in a sequence by using a linear combination of its own past values
-	- one mistake may lead to cascade / domino effect of mistakes (better to start again - branching in ChatGPT, Cursor can)
+	- one mistake may lead to cascade / domino effect of mistakes (better to start again - branching in ChatGPT, Cursor can also revert with back icon next to our prompts in history)
 -  What LLM needs to support to use it as **AI Agent**???
 	- **Structured Output** / Json schema:
   	- [OpenAI Structured Outputs Guide (JavaScript)](https://developers.openai.com/api/docs/guides/structured-outputs/?lang=javascript)
@@ -258,21 +259,26 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 - **Handy STT** (like SuperWhisper but Open Source MIT)
 	- [Handy](https://handy.computer/)
 	- architecture details (Tauri): [Code Wiki](https://codewiki.google/github.com/cjpais/handy)
+- Claude Code - for multi-step tasks, leading in innovation, and access to best models on discounted prices (especially on Max plan)
+  - Desktop & Mobile apps with Code Agent in the cloud! [Claude Desktop App](https://code.claude.com/docs/en/desktop)
+- Codex - for very high limits, best models for hard work (not as good as Opus in architecture, but great for development and more focused), good cloud agents with GitHub integration.
 - Zed.ai - to use any AI tool/Provider you wont, Open Source, Rust (fast)
 - Cursor - for best autocomplete and cloud agents, RAG on any docs
-- GitHub Copilot - for integration with JetBrains IDEs & Code Reviews online
-- Google AI Pro - Gemini App, Gmail, Docs + Gemini CLI + Antigravity + Veo
+- GitHub Copilot - for integration with JetBrains IDEs, access to many models, good Cloud Agent (GH native), best Code Reviews online, and good price.
+- Google AI Pro - not best for programming, but best value for money overall: Gemini App, Gmail, Docs + Gemini CLI + Antigravity + Code Assist + Veo + ...
 	- NotebookLM for learning / knowledge base: [NotebookLM](https://notebooklm.google.com/)
 - [OpenRouter](https://openrouter.ai/) for control, observability and 1 API Key for all tools
 - [Goose](https://block.github.io/goose/) Agent for programming, PC control & automation workflows
 	- Advent of AI: [Advent of AI](https://adventofai.dev/) (by Goose)
 	- based on: [Advent of Code 2025](https://adventofcode.com/)
 
-
 ---
+
 ## AI Agents Tool-belt:
 
-- **Rules** - custom prompts per project / folder / type of file
+### Rules
+
+- custom prompts per project / folder / type of file
 	- Cursor, GitHub Copilot & Claude Code has path based targeting e.g. `"src/api/**/*.ts"`
 	- in Cluade Code: [Path Specific Rules](https://code.claude.com/docs/en/memory#path-specific-rules)
 	- in Cursor: [Rules | Cursor Docs](https://cursor.com/docs/context/rules)
@@ -280,7 +286,10 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- in Codex CLI: [Rules](https://developers.openai.com/codex/rules)
 	- examples:
 		- [payload/templates/website/.cursor/rules at main · payloadcms/payload · GitHub](https://github.com/payloadcms/payload/tree/main/templates/website/.cursor/rules)
-- **AGENTS.md**
+
+### AGENTS.md
+
+Custom project file (or many nested files) with instructions and description of application or it's parts:
 	- Growing standard: [AGENTS.md](https://agents.md/)
 	- CLAUDE.md [CLAUDE.MD files: Customizing Claude Code for your codebase | Claude](https://claude.com/blog/using-claude-md-files)
 	- GEMINI.md [Provide context with GEMINI.md files | Gemini CLI](https://geminicli.com/docs/cli/gemini-md/)
@@ -313,6 +322,9 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- [android-java – alinaqi/claude-bootstrap](https://skills.sh/alinaqi/claude-bootstrap/android-java)
 	- [custom-plugin-java/skills – full skills collection on GitHub](https://github.com/pluginagentmarketplace/custom-plugin-java/tree/main/skills)
 	- [agent-browser SKILL.md – vercel-labs/agent-browser (example skill structure)](https://github.com/vercel-labs/agent-browser/blob/2fe7394dbeb89efb00e56899dd71f32db5ec1dee/skills/agent-browser/SKILL.md)
+	- [spring-ai - Spring AI framework skill](https://skills.sh/teachingai/full-stack-skills/spring-ai)
+	- [spring-ai-mcp-server-patterns - Spring AI MCP server patterns](https://skills.sh/giuseppe-trisciuoglio/developer-kit/spring-ai-mcp-server-patterns)
+	- [langchain4j-spring-boot-integration - LangChain for Java with Spring Boot integration](https://skills.sh/giuseppe-trisciuoglio/developer-kit/langchain4j-spring-boot-integration)
 
 ### Tools
 
@@ -339,29 +351,30 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- Donated to Linux Foundation subsidiary: [Donating the MCP and the Agentic AI Foundation](https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation)
 	- Open Standard: [What is the Model Context Protocol (MCP)? - Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro)
 	- Why MCP moved from SSE to Streamable HTTP: [SSE vs. Streamable HTTP - which will be the standard for remote servers? : r/mcp](https://www.reddit.com/r/mcp/comments/1kdyse2/sse_vs_streamable_http_which_will_be_the_standard/)
-	- Java Skills
-  	- [What is the Model Context Protocol (MCP)? - Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro)
-  	- [modelcontextprotocol/java-sdk – The official Java SDK for MCP servers and clients, maintained with Spring AI](https://github.com/modelcontextprotocol/java-sdk)
-  	- **Example Java MCP Servers:**
-  		- [tangcent/maven-indexer-mcp](https://github.com/tangcent/maven-indexer-mcp)
-  		- [OpenLinkSoftware/mcp-jdbc-server – Java based MCP Server for JDBC](https://github.com/OpenLinkSoftware/mcp-jdbc-server)
-  		- [quarkiverse/quarkus-mcp-servers – Model Context Protocol Servers in Quarkus](https://github.com/quarkiverse/quarkus-mcp-servers)
-  		- [quarkiverse/quarkus-mcp-server – Extension for implementing MCP server features in Quarkus](https://github.com/quarkiverse/quarkus-mcp-server)
-  		- [hpalma/springinitializr-mcp – MCP server for Spring Initializr](https://github.com/hpalma/springinitializr-mcp)
-  		- [vishalmysore/a2ajava – Pure Java implementation of Google A2A protocol with Spring Boot; agents also exposed as MCP tools](https://github.com/vishalmysore/a2ajava)
-  		- [ECF/MCPToolGroups – Tool Groups Support for the Model Context Protocol](https://github.com/ECF/MCPToolGroups)
-  		- [arvindand/maven-tools-mcp – MCP server for Maven Central dependency intelligence for Maven, Gradle, SBT, Mill](https://github.com/arvindand/maven-tools-mcp)
-  		- [idachev/mcp-javadc](https://github.com/idachev/mcp-javadc)
-  		- [jasonkylelol/jenkins-mcp-server – MCP server for Jenkins build tasks](https://github.com/jasonkylelol/jenkins-mcp-server)
-  		- [studykit/mcp-jar-indexer](https://github.com/studykit/mcp-jar-indexer)
-	- Example usage for Agents:
+ 	- Create own MCP server in Java: [modelcontextprotocol/java-sdk – The official Java SDK for MCP servers and clients, maintained with Spring AI](https://github.com/modelcontextprotocol/java-sdk)
+ 	- **Example Java MCP Servers:**
+		- [tangcent/maven-indexer-mcp](https://github.com/tangcent/maven-indexer-mcp)
+		- [OpenLinkSoftware/mcp-jdbc-server – Java based MCP Server for JDBC](https://github.com/OpenLinkSoftware/mcp-jdbc-server)
+		- [quarkiverse/quarkus-mcp-servers – Model Context Protocol Servers in Quarkus](https://github.com/quarkiverse/quarkus-mcp-servers)
+		- [quarkiverse/quarkus-mcp-server – Extension for implementing MCP server features in Quarkus](https://github.com/quarkiverse/quarkus-mcp-server)
+		- [hpalma/springinitializr-mcp – MCP server for Spring Initializr](https://github.com/hpalma/springinitializr-mcp)
+		- [vishalmysore/a2ajava – Pure Java implementation of Google A2A protocol with Spring Boot; agents also exposed as MCP tools](https://github.com/vishalmysore/a2ajava)
+		- [ECF/MCPToolGroups – Tool Groups Support for the Model Context Protocol](https://github.com/ECF/MCPToolGroups)
+		- [arvindand/maven-tools-mcp – MCP server for Maven Central dependency intelligence for Maven, Gradle, SBT, Mill](https://github.com/arvindand/maven-tools-mcp)
+		- [idachev/mcp-javadc](https://github.com/idachev/mcp-javadc)
+		- [jasonkylelol/jenkins-mcp-server – MCP server for Jenkins build tasks](https://github.com/jasonkylelol/jenkins-mcp-server)
+		- [studykit/mcp-jar-indexer](https://github.com/studykit/mcp-jar-indexer)
+	- Installation instructions for Agents:
 		- in Claude Code: [Connect Claude Code to tools via MCP - Claude Code Docs](https://code.claude.com/docs/en/mcp)
 		- in Zed: [Redirecting... | Zed Code Editor Documentation](https://zed.dev/docs/assistant/model-context-protocol)
 		- in Cursor: [Model Context Protocol (MCP) | Cursor Docs](https://cursor.com/docs/context/mcp)
 		- in OpenCode: [MCP servers | OpenCode](https://opencode.ai/docs/mcp-servers/)
-	- Most Popular:
-		- **Context7** - documentation: [Context7 - Up-to-date documentation for AI](https://context7.com/)
+	- **Most Popular MCPs**:
+		- Context7 - documentation: [Context7 - Up-to-date documentation for AI](https://context7.com/)
 		- Chrome DevTools: [GitHub - Chrome DevTools for coding agents](https://github.com/ChromeDevTools/chrome-devtools-mcp)
+		- Playwright: [Microsoft Playwright MCP](https://github.com/microsoft/playwright-mcp)
+  		- Claude: `claude mcp add playwright npx @playwright/mcp@latest`
+      - Codex: `codex mcp add playwright npx "@playwright/mcp@latest"`
 		- Browser Use: [MCP Server - Browser Use](https://docs.browser-use.com/customize/integrations/mcp-server)
 		- IntelliJ IDEA: [MCP Server | IntelliJ IDEA Documentation](https://www.jetbrains.com/help/idea/mcp-server.html)
 		- GitHub: [MCP GitHub · GitHub](https://github.com/mcp/io.github.github/github-mcp-server)
@@ -371,6 +384,23 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 		- Figma
 		- Blender
 
+Example MCP Config (it's standard, similar for all MCPs):
+
+```json
+{
+  "mcpServers": {
+    "maven-indexer": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "maven-indexer-mcp@latest"
+      ]
+    },
+    
+  }
+}
+```
+
 ### ACP
 
 - use CLI Agents in other tools / IDEs
@@ -378,15 +408,49 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 	- in ZED [Zed — Agent Client Protocol](https://zed.dev/acp)
 	- in OpenCode: [ACP Support | OpenCode](https://opencode.ai/docs/acp/)
 	- in Goose: [Using goose in ACP Clients | goose](https://block.github.io/goose/docs/guides/acp-clients)
-- **Sub-Agents**
-	- in Claude Code: [Create custom subagents - Claude Code Docs](https://code.claude.com/docs/en/sub-agents)
-	- in Cursor: [Subagents | Cursor Docs](https://cursor.com/docs/context/subagents)
-	- in Goose: [Subagents | goose](https://block.github.io/goose/docs/guides/subagents/)
+
+### Sub-Agents
+
+Main agent can delegate tasks to sub-agents (often specialized).
+
+- In most popular tools:
+	- Claude Code: [Create custom subagents - Claude Code Docs](https://code.claude.com/docs/en/sub-agents)
+	- Codex CLI [Multi-agents](https://developers.openai.com/codex/multi-agent/)
+	- Cursor: [Subagents | Cursor Docs](https://cursor.com/docs/context/subagents)
+	- Goose: [Subagents | goose](https://block.github.io/goose/docs/guides/subagents/)
 - Parallel Agents / Git Worktree
-	- in Cursor: [Parallel Agents | Cursor Docs](https://cursor.com/docs/configuration/worktrees)
+	- Cursor: [Parallel Agents | Cursor Docs](https://cursor.com/docs/configuration/worktrees)
 - Custom Agents (custom system prompt / instructions)
-	- In Copilot: [About custom agents - GitHub Docs](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents)
-	- in OpenCode: [Agents | OpenCode](https://opencode.ai/docs/agents/)
+	- Copilot: [About custom agents - GitHub Docs](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents)
+	- OpenCode: [Agents | OpenCode](https://opencode.ai/docs/agents/)
+- Based on **Git Worktrees**:
+	- https://git-scm.com/docs/git-worktree 
+	- https://code.claude.com/docs/en/common-workflows#run-parallel-claude-code-sessions-with-git-worktrees 
+	- https://developers.openai.com/codex/app/worktrees/
+
+
+### Claude Code Plugins vs MCP/Skills
+
+- https://code.claude.com/docs/en/plugins
+- https://github.com/luongnv89/claude-howto/blob/main/claude_concepts_guide.md#plugins
+
+## Security
+
+- Validate skills, MCPs and any scripts before installing and using theme.
+- YOLO MODE requires good sandboxing or phisical 2nd device without sensitive credentials.
+- https://code.claude.com/docs/en/best-practices#safe-autonomous-mode
+- https://code.claude.com/docs/en/sandboxing
+
+### Evals, Tests & Observability
+
+- [PromptFoo](https://www.promptfoo.dev/) (open source) -prompt x model testing framework
+- [LangFuse](https://langfuse.com/) (open source) - advanced OSS framework and application for tracing, evals, prompt management, metrics and debugging of LLL-based app! 
+- OpenAI Evals:
+	- https://developers.openai.com/api/docs/guides/evals/
+	- https://developers.openai.com/api/docs/guides/evaluation-getting-started
+- Google Vertex: https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/evaluation-overview
+- Microsoft Foundry Evals: https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/evaluate-generative-ai-app?view=foundry-classic
+
 
 ## Best Practices / Methodologies for Agentic Codding:
 
@@ -394,6 +458,7 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
 - Plan-Execute-Test-Commit loop
 - Good AGENTS.md and rules for better understanding of the project
 - Make AI Agent ask you questions instead of acting immediately (Custom agent or in AGENTS.md)
+  - With better initial prompt and info Agent will not interrupt you so often and work longer
 - Product Requirement Document (PRD): 
 	- [GitHub - snarktank/ai-dev-tasks: A simple task management system for managing AI dev agents](https://github.com/snarktank/ai-dev-tasks)
 	- [Legal agent income up-cert PRD creation - Amp](https://ampcode.com/threads/T-019b98b9-3fe1-77ea-9d43-235c62200559)
@@ -519,8 +584,10 @@ Survey results: [Form - Tally](https://tally.so/forms/lbdPzv?tab=answers)
     - [Semantic Kernel](https://github.com/microsoft/semantic-kernel) (.Net, Python & Java)
     - [365 Agent SDK](https://github.com/microsoft/Agents/tree/main)
 - **No-Code Tools**
-  - No-Code (based on LangChain and LangGraph = many agents working together) [Flowise - Build AI Agents, Visually](https://flowiseai.com/)
-  - No-Code for business automation & simple AI Agents [AI Workflow Automation Platform & Tools - n8n](https://n8n.io/)
+  - Flowise, OpenSource Apache (based on LangChain and LangGraph = many agents working together) [Flowise - Build AI Agents, Visually](https://flowiseai.com/)
+  - n8n for business automation & simple AI Agents [AI Workflow Automation Platform & Tools - n8n](https://n8n.io/)
+  - MS 365 + Power Automate + [Microsoft Copilot Studio](https://www.microsoft.com/en-us/microsoft-365-copilot/microsoft-copilot-studio)
+  - Google [Workspace Studio](https://workspace.google.com/studio/)
 
 ---
 
