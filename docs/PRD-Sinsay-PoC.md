@@ -172,7 +172,7 @@ When the AI detects return/complaint intent, it calls the `show_return_form` too
 
 - Responds in Polish or English (depending on the user's language).
 - Answers questions about: return windows, complaint procedures, product categories, store locations, payment options, loyalty points.
-- Grounds all answers in the content of `docs/01-2026-Sinsay-PoC-Returns-Bot/sinsay-documents/`.
+- Grounds all answers in the content of `docs/sinsay-documents/`.
 - Does not fabricate Sinsay policies.
 
 **Intent detection:**
