@@ -2,7 +2,7 @@
 
 // TODO: split to multiple smaller files with granural control over folders where these filess will be.
 // Only information **VERY** relevant to both FE/BE should be here, that we always want to be used by Agents (always auto delivered).
-// TODO: Make Symlink to .juni/guidelines.md & to CLAUDE.md
+// TODO: Make Symlink to .juni/guidelines.md & to CLAUDE.md - `mklink CLAUDE.md AGENTS.md` and `mklink .juni/guidelines.md AGENTS.md`
 // TODO: split like Cursor (patterns), sniper context delivery exactly where needed
 // TODO: separate AGENTS.md in Java /src folder (since in root we have JAva app) or move whole BE app to /backend folder?)
 
