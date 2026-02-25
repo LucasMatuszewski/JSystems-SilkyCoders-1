@@ -32,14 +32,23 @@ The following standards define acceptable work for all frontend code. Every item
 
 ### Recommended Stack
 
-| Tool | Purpose | Version target |
-|---|---|---|
-| **Vitest** | Unit and integration test runner (Vite-native) | latest stable |
-| **React Testing Library** | Component testing with user-centric queries | latest stable |
-| **@testing-library/user-event** | Realistic user interaction simulation | latest stable |
-| **jsdom** | DOM environment for Vitest | via Vitest config |
-| **MSW (Mock Service Worker)** | Mock API calls in tests (including SSE streams) | v2+ |
-| **Playwright** | End-to-end and visual verification | latest stable (already available via plugin) |
+| Tool                            | Purpose                                         | Version target                               |
+| ------------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| **Vitest**                      | Unit and integration test runner (Vite-native)  | latest stable                                |
+| **React Testing Library**       | Component testing with user-centric queries     | latest stable                                |
+| **@testing-library/user-event** | Realistic user interaction simulation           | latest stable                                |
+| **jsdom**                       | DOM environment for Vitest                      | via Vitest config                            |
+| **MSW (Mock Service Worker)**   | Mock API calls in tests (including SSE streams) | v2+                                          |
+| **Playwright**                  | End-to-end and visual verification              | latest stable (already available via plugin) |
+
+#### `playwright` — Browser Automation and Visual Verification
+
+- **What it does**: Provides browser automation tools (navigate, click, snapshot, screenshot, evaluate, network inspection) powered by Playwright MCP integration.
+- **When to use**:
+  - Frontend work: mandatory visual verification of every rendered page or component change
+  - API testing: verify the running application responds correctly end-to-end
+  - Self-code-review: open the running app and visually confirm the implementation before committing
+- **Integration into workflow**: After any frontend change, use Playwright tools to open the page, take a screenshot, inspect the DOM, and confirm correctness before committing.
 
 ### Initial Setup Commands
 
@@ -61,8 +70,8 @@ npx playwright install chromium
 ### Vitest Configuration (`vite.config.ts`)
 
 ```typescript
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
@@ -80,35 +89,35 @@ export default defineConfig({
       },
     },
   },
-})
+});
 ```
 
 ### Test Setup File (`src/test/setup.ts`)
 
 ```typescript
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 ```
 
 ### MSW Setup for API Mocking (`src/test/mocks/`)
 
 ```typescript
 // src/test/mocks/handlers.ts
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw';
 
 export const handlers = [
   http.post('/api/chat', () => {
     // Return mock SSE stream for testing
     const stream = new ReadableStream({
       start(controller) {
-        controller.enqueue(new TextEncoder().encode('0:"Mock response"\n'))
-        controller.close()
+        controller.enqueue(new TextEncoder().encode('0:"Mock response"\n'));
+        controller.close();
       },
-    })
+    });
     return new HttpResponse(stream, {
       headers: { 'Content-Type': 'text/event-stream' },
-    })
+    });
   }),
-]
+];
 ```
 
 ### NPM Scripts (`package.json`)
@@ -134,21 +143,7 @@ export const handlers = [
 
 ## Test-Driven Development Process (Mandatory)
 
-TDD applies to frontend code exactly as it does to backend code. Follow this order for every component or feature:
-
-### Step 1 — Read the Specification
-
-Read the relevant section of `../docs/PRD-Sinsay-PoC.md`. Understand exactly what the component must render, what user interactions it must handle, and what the acceptance criteria are.
-
-### Step 2 — Design the Tests
-
-Before writing any component code, list:
-- What the component renders by default
-- What changes when the user interacts with it
-- What error states it must handle
-- What it communicates to parent components or the API
-
-Write these as test names before implementing them.
+Follow the universal TDD process defined in the root `AGENTS.md` (steps 1–7). Frontend-specific commands and patterns:
 
 ### Step 3 — Write Component Tests First
 
@@ -208,15 +203,15 @@ After tests pass, perform visual and functional verification using Playwright to
 
 Every React component must have a test file covering:
 
-| Category | What to test |
-|---|---|
-| Rendering | Component renders without crashing; key elements are present |
-| Props | Different prop values produce correct output |
+| Category          | What to test                                                    |
+| ----------------- | --------------------------------------------------------------- |
+| Rendering         | Component renders without crashing; key elements are present    |
+| Props             | Different prop values produce correct output                    |
 | User interactions | Clicks, input changes, form submission trigger correct behavior |
-| Validation | Invalid input shows correct error messages |
-| Loading states | Spinner/skeleton appears during async operations |
-| Error states | API errors are displayed correctly |
-| Accessibility | Interactive elements have accessible names (ARIA) |
+| Validation        | Invalid input shows correct error messages                      |
+| Loading states    | Spinner/skeleton appears during async operations                |
+| Error states      | API errors are displayed correctly                              |
+| Accessibility     | Interactive elements have accessible names (ARIA)               |
 
 ### Integration Tests — Required for Critical Flows
 
@@ -251,6 +246,7 @@ Use the `browser_navigate` tool to open the application URL.
 ### Step 3 — Capture Accessibility Snapshot
 
 Use `browser_snapshot` to capture the full accessibility tree. Verify:
+
 - All form labels are present and correctly associated
 - Interactive elements have accessible roles and names
 - Required ARIA attributes are present
@@ -259,6 +255,7 @@ Use `browser_snapshot` to capture the full accessibility tree. Verify:
 ### Step 4 — Take a Screenshot
 
 Use `browser_take_screenshot` to capture the visual state. Verify:
+
 - Layout matches the design specification from the PRD
 - Tailwind classes produce the expected visual result
 - No broken layouts, overflow, or missing elements
@@ -267,6 +264,7 @@ Use `browser_take_screenshot` to capture the visual state. Verify:
 ### Step 5 — Inspect Network Requests (for interactive features)
 
 If the change involves API calls, use `browser_network_requests` after triggering the interaction. Verify:
+
 - The correct endpoint is called (`/api/chat`)
 - The request payload matches the expected format
 - The SSE stream is received and rendered correctly
@@ -274,6 +272,7 @@ If the change involves API calls, use `browser_network_requests` after triggerin
 ### Step 6 — Interact and Verify Behavior
 
 Use `browser_click`, `browser_type`, and `browser_fill_form` to simulate real user interactions. Verify:
+
 - Form validation triggers correctly
 - Loading states appear and disappear as expected
 - Chat responses render incrementally as SSE chunks arrive
@@ -285,12 +284,13 @@ Use `browser_evaluate` to inspect specific elements when the snapshot is insuffi
 
 ```javascript
 // Example: verify image resize happened
-() => document.querySelector('img')?.naturalWidth
+() => document.querySelector('img')?.naturalWidth;
 ```
 
 ### Step 8 — Self Code Review
 
 Review the rendered output against your implementation:
+
 - Does the DOM structure match what you intended to build?
 - Are CSS classes applied correctly?
 - Is the component tree structured correctly?
@@ -321,6 +321,7 @@ Review the rendered output against your implementation:
 ### Approval Criteria
 
 A visual change is approved **only when**:
+
 1. All unit and integration tests pass (`npm test`)
 2. Playwright screenshot confirms the layout looks correct
 3. Playwright interaction confirms the behavior works correctly
@@ -331,10 +332,9 @@ A visual change is approved **only when**:
 
 ## Pre-Commit Checklist (Frontend)
 
-**Every commit must pass this checklist. Do not commit if any item is unchecked.**
+**Complete the universal checklist in root `AGENTS.md`, then verify these frontend-specific items:**
 
 ```
-□ I read the PRD for this feature before starting
 □ I wrote tests BEFORE implementing the component (TDD)
 □ All new components have unit test files
 □ Critical flows have integration tests with MSW mocks
@@ -350,7 +350,6 @@ A visual change is approved **only when**:
     □ DOM snapshot reviewed for accessibility issues
     □ Interactive behavior verified (forms, chat, API calls)
     □ No console errors in browser
-□ Commit message follows convention: Area: short summary (e.g., Feature: add return form validation)
 □ Context7 MCP used for any new library API (Vercel AI SDK, assistant-ui, Tailwind, Shadcn)
 ```
 
@@ -358,18 +357,16 @@ A visual change is approved **only when**:
 
 ## Task Completion Criteria (Frontend)
 
-A frontend task is **complete** only when **all** of the following are true:
+All universal criteria from root `AGENTS.md` apply. In addition, a frontend task requires:
 
-1. **Tests written first** — unit test files exist and were written before component code
-2. **All tests pass** — `npm test` exits with zero failures
-3. **TypeScript clean** — `tsc --noEmit` produces no errors
-4. **Linting clean** — `npm run lint` produces no errors
-5. **Playwright verification complete** — page opened, screenshot taken, DOM inspected, behavior confirmed
-6. **Visual appearance correct** — screenshot matches specification, no layout issues
-7. **Functional behavior correct** — interactions work as specified in the PRD
-8. **No console errors** — browser developer console is clean
-9. **Accessibility verified** — DOM snapshot confirms labels, roles, and ARIA attributes are correct
-10. **Commit message correct** — follows `Area: summary` convention
+1. **All tests pass** — `npm test` exits with zero failures
+2. **TypeScript clean** — `tsc --noEmit` produces no errors
+3. **Linting clean** — `npm run lint` produces no errors
+4. **Playwright verification complete** — page opened, screenshot taken, DOM inspected, behavior confirmed
+5. **Visual appearance correct** — screenshot matches specification, no layout issues
+6. **Functional behavior correct** — interactions work as specified in the PRD
+7. **No console errors** — browser developer console is clean
+8. **Accessibility verified** — DOM snapshot confirms labels, roles, and ARIA attributes are correct
 
 **If any criterion is not met, the task is NOT complete.** Do not move to the next task.
 
@@ -379,10 +376,10 @@ A frontend task is **complete** only when **all** of the following are true:
 
 Fetch these before implementing features that depend on them:
 
-| Handler | Use when |
-|---|---|
-| `/vercel/ai` | Implementing `useChat`, SSE stream handling, AI SDK hooks |
-| `/assistant-ui/assistant-ui` | Building chat UI components |
-| `/reactjs/react.dev` | React 19 patterns (use(), Suspense, transitions) |
-| `/tailwindlabs/tailwindcss.com` | Tailwind utility classes and configuration |
-| `/shadcn-ui/ui` | Shadcn component integration |
+| Handler                         | Use when                                                  |
+| ------------------------------- | --------------------------------------------------------- |
+| `/vercel/ai`                    | Implementing `useChat`, SSE stream handling, AI SDK hooks |
+| `/assistant-ui/assistant-ui`    | Building chat UI components                               |
+| `/reactjs/react.dev`            | React 19 patterns (use(), Suspense, transitions)          |
+| `/tailwindlabs/tailwindcss.com` | Tailwind utility classes and configuration                |
+| `/shadcn-ui/ui`                 | Shadcn component integration                              |

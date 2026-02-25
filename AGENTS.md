@@ -64,15 +64,6 @@ Claude Code has access to three categories of tools. **Agents must actively use 
 - **What it does**: Launches 4 parallel agents to independently review a pull request — 2 agents check AGENTS.md/CLAUDE.md compliance, 1 scans for bugs in changed code, 1 analyzes git history for context. Issues are confidence-scored 0–100; only issues ≥80 are reported.
 - **When to use**: Before merging any non-trivial PR. Run as the final step before marking a PR ready for merge.
 
-#### `playwright` — Browser Automation and Visual Verification
-
-- **What it does**: Provides browser automation tools (navigate, click, snapshot, screenshot, evaluate, network inspection) powered by Playwright MCP integration.
-- **When to use**:
-  - Frontend work: mandatory visual verification of every rendered page or component change
-  - API testing: verify the running application responds correctly end-to-end
-  - Self-code-review: open the running app and visually confirm the implementation before committing
-- **Integration into workflow**: After any frontend change, use Playwright tools to open the page, take a screenshot, inspect the DOM, and confirm correctness before committing.
-
 ---
 
 ### MCP Servers (Model Context Protocol)
