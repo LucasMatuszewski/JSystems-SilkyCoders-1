@@ -12,7 +12,13 @@
       "WebSearch",
       "WebFetch(domain:skills.sh)",
       "WebFetch(domain:vercel.com)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "mcp__maven-indexer__search_artifacts",
+      "Bash(./mvnw test:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "playwright"
+  ],
+  "enableAllProjectMcpServers": true
 }
