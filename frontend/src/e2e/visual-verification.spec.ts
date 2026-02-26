@@ -3,7 +3,13 @@ import path from 'path';
 
 const BACKEND_HEALTH_URL = 'http://localhost:8085/langgraph4j/copilotkit';
 const APP_URL = 'http://localhost:3000';
-const FIXTURE_PHOTO = path.join(__dirname, 'fixtures', 'test-product.jpg');
+
+// Real product images from docs/example-images/ — vary in size to exercise image resize logic:
+//   cloth2.jpg:  ~26 KB  (small, no resize needed)
+//   cloth3.jpg:  ~1.4 MB (large, resize to 800px should trigger)
+const EXAMPLE_IMAGES_DIR = path.join(__dirname, '../../../docs/example-images');
+const SMALL_PHOTO = path.join(EXAMPLE_IMAGES_DIR, 'cloth2.jpg');   // ~26 KB
+const LARGE_PHOTO = path.join(EXAMPLE_IMAGES_DIR, 'cloth3.jpg');   // ~1.4 MB
 
 /**
  * Every test suite in this file requires a live backend.
@@ -107,14 +113,13 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Test 4 — COMPLETE FLOW: form submission with photo produces a verdict
-  // This is the core feature test. It MUST FAIL if:
-  //   - Ollama is down or returns broken pipe on the multimodal call
-  //   - The verdict event is not emitted by the backend
-  //   - The frontend does not render the verdict component
-  // This test exercises the entire flow: chat → form → photo upload → verdict.
+  // Test 4a — COMPLETE FLOW with small photo (cloth2.jpg ~26KB, no resize needed)
+  // This test exercises the full round-trip: chat → form → photo → verdict.
+  // It MUST FAIL if the backend does not produce a verdict.
+  // If the backend returns an error, data-testid="error-toast" appears immediately
+  // and the test fails fast (instead of timing out after 60s).
   // ─────────────────────────────────────────────────────────────────────────
-  test('complete flow: form submission with photo produces an AI verdict', async ({ page }) => {
+  test('complete flow: small photo (26KB) produces an AI verdict', async ({ page }) => {
     page.on('pageerror', (err) => {
       throw err;
     });
@@ -137,20 +142,80 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
       'Kurtka posiada wadę fabryczną — rozerwany szew na lewym rękawie po pierwszym praniu.'
     );
 
-    // Step 4: upload test photo
-    await page.getByTestId('form-photo-upload').setInputFiles(FIXTURE_PHOTO);
+    // Step 4: upload small test photo (~26KB — no resize should trigger)
+    await page.getByTestId('form-photo-upload').setInputFiles(SMALL_PHOTO);
 
     // Step 5: submit the form
     await page.getByTestId('form-submit-btn').click();
 
-    // Step 6: a verdict MUST appear — either approved or rejected.
-    // This will time out (60s) and FAIL if:
-    //   - Ollama returns a broken pipe on the multimodal call
-    //   - The backend sends a RUN_ERROR instead of a verdict
-    //   - The frontend does not render the verdict component
+    // Step 6: a verdict MUST appear. If an error toast appears first, fail immediately.
+    // This is better than waiting 60s for a verdict that will never arrive.
     const approved = page.getByTestId('verdict-approved');
     const rejected = page.getByTestId('verdict-rejected');
-    await expect(approved.or(rejected)).toBeVisible({ timeout: 60000 });
+    const errorToast = page.getByTestId('error-toast');
+
+    // Wait for whichever appears first: verdict or error
+    const result = await Promise.race([
+      approved.waitFor({ timeout: 60000 }).then(() => 'approved' as const),
+      rejected.waitFor({ timeout: 60000 }).then(() => 'rejected' as const),
+      errorToast.waitFor({ timeout: 60000 }).then(() => 'error' as const),
+    ]);
+
+    // An error toast means the backend failed (auth/model error) — this must fail the test.
+    if (result === 'error') {
+      const errorText = await errorToast.textContent();
+      throw new Error(`Backend returned an error instead of a verdict: "${errorText}"`);
+    }
+
+    expect(['approved', 'rejected']).toContain(result);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test 4b — COMPLETE FLOW with large photo (cloth3.jpg ~1.4MB)
+  // Verifies the image resize logic: large images must be downscaled before
+  // sending to the model, otherwise Ollama returns "broken pipe".
+  // ─────────────────────────────────────────────────────────────────────────
+  test('complete flow: large photo (1.4MB) triggers resize and produces a verdict', async ({ page }) => {
+    page.on('pageerror', (err) => {
+      throw err;
+    });
+
+    await page.goto(APP_URL);
+
+    const chatInput = page.getByTestId('chat-input');
+    await expect(chatInput).toBeVisible({ timeout: 15000 });
+
+    await chatInput.fill('Mam reklamację do produktu');
+    await page.getByTestId('chat-send-btn').click();
+
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 30000 });
+
+    await page.getByTestId('form-product-name').fill('Płaszcz wiosenny M');
+    await page.getByTestId('form-description').fill(
+      'Produkt ma wyraźną wadę fabryczną — odklejona podszewka przy kołnierzu.'
+    );
+
+    // Upload large photo (~1.4MB — must be resized to ≤800px before sending)
+    await page.getByTestId('form-photo-upload').setInputFiles(LARGE_PHOTO);
+
+    await page.getByTestId('form-submit-btn').click();
+
+    const approved = page.getByTestId('verdict-approved');
+    const rejected = page.getByTestId('verdict-rejected');
+    const errorToast = page.getByTestId('error-toast');
+
+    const result = await Promise.race([
+      approved.waitFor({ timeout: 60000 }).then(() => 'approved' as const),
+      rejected.waitFor({ timeout: 60000 }).then(() => 'rejected' as const),
+      errorToast.waitFor({ timeout: 60000 }).then(() => 'error' as const),
+    ]);
+
+    if (result === 'error') {
+      const errorText = await errorToast.textContent();
+      throw new Error(`Backend returned an error instead of a verdict: "${errorText}"`);
+    }
+
+    expect(['approved', 'rejected']).toContain(result);
   });
 
   // ─────────────────────────────────────────────────────────────────────────

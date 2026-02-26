@@ -59,6 +59,25 @@ export function SinsayChat() {
     return () => observer.disconnect();
   }, []);
 
+  // Tag the CopilotKit error banner (class "usage-banner") with data-testid="error-toast"
+  // so E2E tests can detect backend errors without waiting 60s for a verdict.
+  // The banner is rendered by CopilotKit outside our chatContainerRef, so we observe document.body.
+  useEffect(() => {
+    function tagErrorBanner(): void {
+      const banner = document.querySelector<HTMLElement>('.usage-banner');
+      if (banner && !banner.dataset['testid']) {
+        banner.dataset['testid'] = 'error-toast';
+      }
+    }
+
+    tagErrorBanner();
+
+    const observer = new MutationObserver(tagErrorBanner);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
   useCopilotAction({
     name: 'showReturnForm',
     description: 'Display return/complaint form in chat',

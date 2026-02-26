@@ -192,21 +192,46 @@ class FallbackChatModelTests {
         }
 
         @Test
-        @DisplayName("Non-transient error (e.g. 401 Unauthorized) is NOT retried - propagates immediately")
-        void shouldNotRetryNonTransientError() {
-            // given: auth error should not be retried (it will never self-heal)
+        @DisplayName("Non-transient error (e.g. 401 Unauthorized) is NOT retried but falls through to next model")
+        void shouldNotRetryNonTransientErrorButFallback() {
+            // given: primary auth error — no retry — but fallback model succeeds
             given(primaryModel.stream(any(Prompt.class)))
                     .willReturn(Flux.error(new RuntimeException("401 Unauthorized")));
 
+            given(fallbackModel.stream(any(Prompt.class)))
+                    .willReturn(streamingResponseOf("Odpowiedź z fallback modelu"));
+
             var sut = new FallbackChatModel(List.of(primaryModel, fallbackModel));
 
-            // when & then: error propagates without retry or fallback
+            // when & then: no retry on primary, fallback is used
             StepVerifier.create(sut.stream(testPrompt))
-                    .expectErrorMatches(e -> e.getMessage().contains("401 Unauthorized"))
+                    .expectNextCount(1)
+                    .verifyComplete();
+
+            // primary called only ONCE (no retry for non-transient), fallback called once
+            verify(primaryModel, times(1)).stream(any(Prompt.class));
+            verify(fallbackModel, times(1)).stream(any(Prompt.class));
+        }
+
+        @Test
+        @DisplayName("Non-transient error propagates only when ALL models are exhausted")
+        void shouldPropagateNonTransientErrorWhenAllModelsExhausted() {
+            // given: both models fail with non-transient errors
+            given(primaryModel.stream(any(Prompt.class)))
+                    .willReturn(Flux.error(new RuntimeException("401 Unauthorized")));
+
+            given(fallbackModel.stream(any(Prompt.class)))
+                    .willReturn(Flux.error(new RuntimeException("403 Forbidden")));
+
+            var sut = new FallbackChatModel(List.of(primaryModel, fallbackModel));
+
+            // when & then: last error in chain propagates
+            StepVerifier.create(sut.stream(testPrompt))
+                    .expectErrorMatches(e -> e.getMessage().contains("403 Forbidden"))
                     .verify(Duration.ofSeconds(5));
 
-            // primary called only once (no retry for non-transient)
             verify(primaryModel, times(1)).stream(any(Prompt.class));
+            verify(fallbackModel, times(1)).stream(any(Prompt.class));
         }
 
         @Test
@@ -337,19 +362,46 @@ class FallbackChatModelTests {
         }
 
         @Test
-        @DisplayName("Non-transient error is NOT retried for call()")
-        void shouldNotRetryNonTransientErrorForCall() {
-            // given
+        @DisplayName("Non-transient error is NOT retried but falls through to next model for call()")
+        void shouldNotRetryNonTransientErrorButFallbackForCall() {
+            // given: primary auth error — no retry — fallback succeeds
             given(primaryModel.call(any(Prompt.class)))
                     .willThrow(new RuntimeException("401 Unauthorized"));
 
+            given(fallbackModel.call(any(Prompt.class)))
+                    .willReturn(batchResponseOf("Odpowiedź z fallback"));
+
             var sut = new FallbackChatModel(List.of(primaryModel, fallbackModel));
 
-            // when & then
-            assertThatThrownBy(() -> sut.call(testPrompt))
-                    .hasMessageContaining("401 Unauthorized");
+            // when
+            ChatResponse response = sut.call(testPrompt);
+
+            // then: fallback response used, primary called only once (no retry)
+            assertThat(response.getResult().getOutput().getText())
+                    .isEqualTo("Odpowiedź z fallback");
 
             verify(primaryModel, times(1)).call(any(Prompt.class));
+            verify(fallbackModel, times(1)).call(any(Prompt.class));
+        }
+
+        @Test
+        @DisplayName("Non-transient error propagates only when ALL models are exhausted for call()")
+        void shouldPropagateNonTransientErrorWhenAllModelsExhaustedForCall() {
+            // given: both fail non-transient
+            given(primaryModel.call(any(Prompt.class)))
+                    .willThrow(new RuntimeException("401 Unauthorized"));
+
+            given(fallbackModel.call(any(Prompt.class)))
+                    .willThrow(new RuntimeException("403 Forbidden"));
+
+            var sut = new FallbackChatModel(List.of(primaryModel, fallbackModel));
+
+            // when & then: last error propagates
+            assertThatThrownBy(() -> sut.call(testPrompt))
+                    .hasMessageContaining("403 Forbidden");
+
+            verify(primaryModel, times(1)).call(any(Prompt.class));
+            verify(fallbackModel, times(1)).call(any(Prompt.class));
         }
     }
 

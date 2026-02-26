@@ -32,6 +32,12 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <!-- Silence ChatResponseMetadata noise ("Ignore null value for key [eval-duration]", etc.) -->
+    <logger name="org.springframework.ai.chat.metadata.ChatResponseMetadata" level="WARN" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <!-- Our own code: DEBUG so detailed request/response traces are available -->
     <logger name="org.bsc.langgraph4j" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>

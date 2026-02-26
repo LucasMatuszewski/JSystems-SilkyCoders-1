@@ -68,9 +68,19 @@ public class FallbackChatModel implements ChatModel {
 
         return Flux.defer(() -> model.stream(prompt))
                 .onErrorResume(error -> {
+                    int next = modelIndex + 1;
+
                     if (!isTransient(error)) {
-                        log.warn("Non-transient error from model at index {}: {}", modelIndex, error.getMessage());
-                        return Flux.error(error);
+                        // Non-transient (e.g. 401 Unauthorized): no retry, but still fall through to next model.
+                        // Only propagate when all models are exhausted.
+                        if (next >= models.size()) {
+                            log.warn("Non-transient error from model at index {} and no more models. Propagating: {}",
+                                    modelIndex, error.getMessage());
+                            return Flux.error(error);
+                        }
+                        log.warn("Non-transient error from model at index {}: {}. Trying next model...",
+                                modelIndex, error.getMessage());
+                        return streamWithFallback(prompt, next);
                     }
 
                     log.warn("Transient error from model at index {}: {}. Retrying after {}ms...",
@@ -83,10 +93,6 @@ public class FallbackChatModel implements ChatModel {
                                 return Flux.defer(() -> model.stream(prompt));
                             })
                             .onErrorResume(retryError -> {
-                                if (!isTransient(retryError)) {
-                                    return Flux.error(retryError);
-                                }
-                                int next = modelIndex + 1;
                                 if (next >= models.size()) {
                                     // All models exhausted — propagate the last real error
                                     log.warn("All models exhausted after retry at index {}. Propagating last error.", modelIndex);
@@ -105,12 +111,20 @@ public class FallbackChatModel implements ChatModel {
         var model = models.get(modelIndex);
         log.debug("Attempting call() with model at index {} ({})", modelIndex, model.getClass().getSimpleName());
 
+        int next = modelIndex + 1;
         try {
             return model.call(prompt);
         } catch (Exception error) {
             if (!isTransient(error)) {
-                log.warn("Non-transient error from model at index {}: {}", modelIndex, error.getMessage());
-                throw error;
+                // Non-transient (e.g. 401 Unauthorized): no retry, but still fall through to next model.
+                if (next >= models.size()) {
+                    log.warn("Non-transient error from model at index {} and no more models. Propagating: {}",
+                            modelIndex, error.getMessage());
+                    throw error;
+                }
+                log.warn("Non-transient error from model at index {}: {}. Trying next model...",
+                        modelIndex, error.getMessage());
+                return callWithFallback(prompt, next);
             }
 
             log.warn("Transient error from model at index {}: {}. Retrying after {}ms...",
@@ -122,10 +136,6 @@ public class FallbackChatModel implements ChatModel {
                 log.debug("Retrying call() with model at index {}", modelIndex);
                 return model.call(prompt);
             } catch (Exception retryError) {
-                if (!isTransient(retryError)) {
-                    throw retryError;
-                }
-                int next = modelIndex + 1;
                 if (next >= models.size()) {
                     // All models exhausted — propagate the last real error
                     log.warn("All models exhausted after retry at index {}. Propagating last error.", modelIndex);
