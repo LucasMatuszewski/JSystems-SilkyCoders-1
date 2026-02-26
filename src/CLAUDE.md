@@ -1,10 +1,26 @@
 # Backend Agent Guidelines (Java / Spring Boot)
 
 > **This file governs all AI agents working on the Spring Boot backend.**
-> It supplements — and does not replace — the root `AGENTS.md` (also accessible as `CLAUDE.md`).
+> It supplements — and does not replace — the root `CLAUDE.md`.
 > **All procedures defined here are mandatory. Non-compliance blocks commits and task completion.**
 
-**Stack**: Spring Boot 3.5.9 · Java 21 · Maven · Spring AI · Spring Data JPA · SQLite · OpenAI GPT-4o
+**Stack**: Spring Boot 3.5.9 · Java 21 · Maven · Spring WebFlux · LangGraph4j 1.6.2 · Spring AI 1.0.0 (OpenAI + Ollama) · Reactor · Lombok
+
+---
+
+## Key Dependencies (pom.xml)
+
+| Dependency                              | Version          | Purpose                                     |
+| --------------------------------------- | ---------------- | ------------------------------------------- |
+| `spring-boot-starter-webflux`           | (Boot 3.5.9)     | Reactive web server (Netty), SSE streaming  |
+| `langgraph4j-core`                      | 1.6.2            | Graph-based agent orchestration             |
+| `langgraph4j-spring-ai`                 | 1.6.2            | Spring AI integration for LangGraph4j       |
+| `langgraph4j-springai-agentexecutor`    | 1.6.2            | Agent executor with tool calling support    |
+| `spring-ai-openai`                      | 1.0.0            | OpenAI / GitHub Models chat model adapter   |
+| `spring-ai-ollama`                      | 1.0.0            | Ollama local LLM chat model adapter         |
+| `lombok`                                | (Boot-managed)   | Boilerplate reduction annotations           |
+| `spring-boot-starter-test`              | (Boot 3.5.9)     | JUnit 5, Mockito, AssertJ, Spring Test      |
+| `reactor-test`                          | (Boot-managed)   | Reactor Flux/Mono testing utilities         |
 
 ---
 
@@ -12,17 +28,58 @@
 
 ```
 src/
-├── main/java/com/silkycoders1/jsystemssilkycodders1/   # Spring Boot entry point and source
-│   ├── config/       # Spring configuration classes
-│   ├── controller/   # REST controllers
-│   ├── service/      # Business logic
-│   └── model/        # JPA entities and DTOs
+├── main/java/
+│   ├── com/silkycoders1/jsystemssilkycodders1/
+│   │   └── JSystemsSilkyCodders1Application.java   # Entry point + AGUIAgent bean definitions
+│   └── org/bsc/langgraph4j/agui/                   # AG-UI protocol implementation
+│       ├── AGUIAgent.java                           # Agent interface (returns Flux<AGUIEvent>)
+│       ├── AGUIEvent.java                           # AG-UI event types (polymorphic records)
+│       ├── AGUIType.java                            # AG-UI data types (RunAgentInput, Tool, etc.)
+│       ├── AGUIMessage.java                         # AG-UI message types (TextMessage, ResultMessage)
+│       ├── AGUILangGraphAgent.java                  # Abstract base: LangGraph4j → AG-UI event bridge
+│       ├── AGUIAgentExecutor.java                   # Concrete agent with tool calling + model fallback
+│       ├── AGUISampleAgent.java                     # Minimal "Hello World" test agent
+│       └── AGUISSEController.java                   # REST controller: POST /langgraph4j/copilotkit
 ├── main/resources/
-│   ├── application.properties
-│   ├── static/       # Frontend build output (bundled here)
-│   └── templates/
-└── test/java/com/silkycoders1/jsystemssilkycodders1/   # JUnit test classes (mirrored structure)
+│   └── application.properties                       # Server port, model config, agent selection
+└── test/java/
+    ├── com/silkycoders1/jsystemssilkycodders1/      # App-level tests (bean wiring, context)
+    └── org/bsc/langgraph4j/agui/                    # AG-UI unit tests (model resolution, etc.)
 ```
+
+---
+
+## Application Configuration (`application.properties`)
+
+```properties
+server.port=8085
+spring.main.web-application-type=reactive
+
+# Agent selection: "agentExecutor" (LangGraph4j with tools) or "sample" (echo agent)
+ag-ui.agent=agentExecutor
+
+# Primary AI model (enum name from AGUIAgentExecutor.AiModel)
+# Fallback chain: configured model → OPENAI → GITHUB_MODELS → OLLAMA_QWEN2_5
+# Available: OLLAMA_KIMI_K2_5_CLOUD, OLLAMA_QWEN2_5_7B, OLLAMA_QWEN3_14B,
+#            OPENAI_GPT_4O_MINI (needs OPENAI_API_KEY), GITHUB_MODELS_GPT_4O_MINI (needs GITHUB_MODELS_TOKEN)
+ag-ui.model=OLLAMA_KIMI_K2_5_CLOUD
+```
+
+---
+
+## Architecture: AG-UI Protocol Flow
+
+```
+Frontend (CopilotKit)  →  POST /api/langgraph4j (Next.js route)
+                       →  POST http://localhost:8085/langgraph4j/copilotkit (Spring Boot SSE)
+                       →  AGUISSEController → AGUIAgent.run(input) → Flux<AGUIEvent>
+                       →  LangGraph4j graph execution → streamed AG-UI events back to frontend
+```
+
+Key classes:
+- `AGUISSEController` — REST endpoint, deserializes `RunAgentInput`, delegates to `AGUIAgent` bean
+- `AGUIAgentExecutor` — builds LangGraph4j graph with tool support, resolves AI model with fallback chain
+- `AGUILangGraphAgent` — abstract base that converts LangGraph4j `NodeOutput`/`StreamingOutput` to AG-UI events
 
 ---
 
@@ -30,9 +87,7 @@ src/
 
 - All new Java classes must have corresponding JUnit 5 test classes
 - Test coverage must reflect the full documented behavior (happy path + edge cases + error cases)
-- The SSE `/api/chat` endpoint must be covered by integration tests verifying stream format compliance with the Vercel AI SDK Data Stream Protocol
-- AI model integration (Spring AI / OpenAI) must be tested with mocked responses — never call the live API in tests
-- Persistence layer (SQLite + JPA) must be tested with `@DataJpaTest` and an in-memory database
+- AI model integration (Spring AI / OpenAI / Ollama) must be tested with mocked responses — never call the live API in tests
 - No API keys or secrets may appear in any test or source file
 - All tests must pass (`./mvnw test`) before committing
 - Code must compile cleanly with no warnings (`./mvnw clean compile`)
@@ -41,18 +96,18 @@ src/
 
 ## Backend Implementation Rules (Critical)
 
-- **Streaming format**: SSE must emit Vercel Data Stream chunks (`0:"text"` and `8:[{...}]`), not raw JSON
-- **Endpoint**: `POST /api/chat` returns `text/event-stream` and maps the Spring AI stream to the Vercel format
-- **AI stack**: use `spring-ai-starter-model-openai` with chat model `gpt-4o` and `Media` attachments for images
-- **Prompt policy**: select system prompt based on `intent` (`return` vs `complaint`). Respond to users in Polish
-- **Persistence**: use SQLite with JPA; store request metadata, transcript, and verdicts. Never commit API keys
+- **Reactive stack**: this app uses WebFlux (not Spring MVC). All controllers return `Flux`/`Mono`, not blocking types
+- **Streaming format**: SSE via AG-UI protocol events (not Vercel Data Stream format). Events are typed JSON objects with `type` discriminator
+- **Endpoint**: `POST /langgraph4j/copilotkit` returns `text/event-stream` with AG-UI events
+- **AI models**: configured via `ag-ui.model` property in `application.properties`. Model fallback chain is in `AGUIAgentExecutor.resolveModel()`
+- **Two packages**: app entry + beans in `com.silkycoders1.jsystemssilkycodders1`; AG-UI protocol code in `org.bsc.langgraph4j.agui`. Both are component-scanned
 
 ---
 
 ## Java Coding Style & Naming Conventions
 
 - 4-space indentation; standard Spring Boot naming conventions
-- Packages: lowercase; keep package structure consistent with `com.silkycoders1...` or migrate to `com.sinsay` only if the ADR is implemented
+- Packages: `com.silkycoders1.jsystemssilkycodders1` (app), `org.bsc.langgraph4j.agui` (AG-UI protocol)
 - Classes: UpperCamelCase; methods/fields: lowerCamelCase
 - Tests: `*Tests` suffix, mirrored package structure under `src/test/`
 - Lombok annotations used consistently; do not mix manual getters/setters with Lombok
@@ -71,9 +126,13 @@ src/
 - **JUnit 5** (Jupiter) — test engine
 - **Mockito** — mocking framework
 - **AssertJ** — fluent assertions
-- **Spring Test** — `MockMvc`, `@SpringBootTest`, test slices
+- **Spring Test** — `@SpringBootTest`, `@WebFluxTest`, test slices
 - **Hamcrest** — matcher library (use AssertJ preferentially)
 - **JSONassert** and **JsonPath** — JSON response assertions
+
+`reactor-test` is included in `test` scope for:
+
+- **StepVerifier** — testing Reactor `Flux`/`Mono` streams
 
 ### Additional Dependencies to Add as Needed
 
@@ -84,18 +143,6 @@ When the task requires them, add to `pom.xml`:
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-testcontainers</artifactId>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.testcontainers</groupId>
-    <artifactId>junit-jupiter</artifactId>
-    <scope>test</scope>
-</dependency>
-
-<!-- SQLite in-memory for @DataJpaTest (if switching from file-based) -->
-<dependency>
-    <groupId>com.h2database</groupId>
-    <artifactId>h2</artifactId>
     <scope>test</scope>
 </dependency>
 
@@ -110,17 +157,16 @@ When the task requires them, add to `pom.xml`:
 ### Test Class Naming and Location
 
 - Test classes: `src/test/java/...` mirroring the main source package structure
-- Naming: `*Tests` suffix (e.g., `ChatControllerTests`, `OrderServiceTests`)
-- Unit tests: no Spring context — `@ExtendWith(MockitoExtension.class)`
-- API/slice tests: `@WebMvcTest(ControllerClass.class)`
+- Naming: `*Tests` suffix (e.g., `AGUIAgentExecutorModelResolutionTests`)
+- Unit tests: no Spring context — `@ExtendWith(MockitoExtension.class)` or plain JUnit
+- WebFlux API tests: `@WebFluxTest(ControllerClass.class)` with `WebTestClient`
 - Full integration tests: `@SpringBootTest(webEnvironment = RANDOM_PORT)`
-- Persistence tests: `@DataJpaTest`
 
 ---
 
 ## TDD Process (Backend)
 
-Follow the universal TDD process from the root `AGENTS.md`. Backend-specific commands:
+Follow the universal TDD process from the root `CLAUDE.md`. Backend-specific commands:
 
 ### Step 4 — Confirm Tests Fail
 
@@ -140,19 +186,19 @@ All tests must pass. If they don't, fix the implementation (not the test) unless
 
 ### Test Style
 
-Use BDD-style descriptive names and `given / when / then` structure with Mockito `BDDMockito`:
+Use BDD-style descriptive names and `given / when / then` structure:
 
 ```java
 @Test
-void shouldReturnStreamedVerdictForValidReturnRequest() {
-    // given
-    given(service.processRequest(any())).willReturn(mockFlux);
+void shouldFallbackToOllamaWhenNoEnvVarsAndNoPrimary() {
+    // given — no primary, no env vars
+    var executor = new TestableExecutor();
 
     // when
-    var result = controller.chat(request);
+    ChatModel model = executor.resolveModel();
 
     // then
-    assertThat(result).isNotNull();
+    assertThat(model).isInstanceOf(OllamaChatModel.class);
 }
 ```
 
@@ -161,7 +207,7 @@ void shouldReturnStreamedVerdictForValidReturnRequest() {
 ## Build and Development Commands
 
 ```bash
-./mvnw spring-boot:run              # run backend locally
+./mvnw spring-boot:run              # run backend locally (port 8085)
 ./mvnw test                         # run all JUnit tests
 ./mvnw test -Dtest=ClassName        # run a single test class
 ./mvnw clean compile                # compile only, check for warnings
@@ -169,32 +215,35 @@ void shouldReturnStreamedVerdictForValidReturnRequest() {
 ./mvnw clean verify                 # full build + test validation
 ```
 
+**When to compile/test**: Only run `./mvnw compile` or `./mvnw test` after changing compilable files (`.java`, `pom.xml`, `application.properties`). Do NOT compile or test after changing only non-compilable files (`.md`, `.txt`, frontend files, docs). This avoids wasting time on unnecessary builds.
+
 ---
 
 ## Pre-Commit Checklist (Backend)
 
-**In addition to the universal checklist in root `AGENTS.md`, verify:**
+**In addition to the universal checklist in root `CLAUDE.md`, verify:**
 
 ```
 □ All new Java classes have corresponding test classes
 □ All tests pass: ./mvnw test (zero failures, zero errors)
 □ Code compiles cleanly: ./mvnw clean compile (no warnings)
 □ No .db database files staged for commit
-□ If touching the SSE adapter: verified stream format matches Vercel AI SDK Data Stream Protocol
+□ If touching the SSE controller: verified AG-UI event format is correct
 □ If touching AI model calls: verified with mocked responses, not live API
-□ Context7 MCP used to check latest docs for Spring AI / Spring Boot APIs used
+□ If touching model config: verified fallback chain still works in tests
+□ Context7 MCP used to check latest docs for Spring AI / Spring Boot / LangGraph4j APIs used
 ```
 
 ---
 
 ## Task Completion Criteria (Backend)
 
-In addition to the universal criteria in root `AGENTS.md`, a backend task requires:
+In addition to the universal criteria in root `CLAUDE.md`, a backend task requires:
 
 - All new Java classes have test classes written before production code
 - `./mvnw test` exits with zero failures and zero errors
 - `./mvnw clean compile` produces no warnings
-- SSE endpoint (if touched) verified against the Vercel AI SDK Data Stream Protocol
+- SSE endpoint (if touched) verified against the AG-UI protocol event format
 - AI model calls (if touched) tested with mocked responses only — never against the live API
 
 ---
@@ -229,10 +278,10 @@ In addition to the universal criteria in root `AGENTS.md`, a backend task requir
 
 Fetch these before implementing features that depend on them:
 
-| Handler                                  | Use when                                        |
-| ---------------------------------------- | ----------------------------------------------- |
-| `/websites/spring_io_projects_spring-ai` | Implementing AI model calls, streaming, prompts |
-| `/spring-projects/spring-boot`           | Spring Boot configuration, auto-configuration   |
-| `/projectlombok/lombok`                  | Using Lombok annotations                        |
-| `/openai/openai-java`                    | OpenAI Java SDK usage                           |
-| `/websites/platform_openai`              | OpenAI platform API details                     |
+| Handler                                  | Use when                                              |
+| ---------------------------------------- | ----------------------------------------------------- |
+| `/websites/spring_io_projects_spring-ai` | Implementing AI model calls, streaming, prompts        |
+| `/spring-projects/spring-boot`           | Spring Boot configuration, auto-configuration          |
+| `/projectlombok/lombok`                  | Using Lombok annotations                               |
+| `/openai/openai-java`                    | OpenAI Java SDK usage                                  |
+| `/websites/platform_openai`              | OpenAI platform API details                            |
