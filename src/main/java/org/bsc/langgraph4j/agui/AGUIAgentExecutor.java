@@ -1,5 +1,7 @@
 package org.bsc.langgraph4j.agui;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.silkycoders1.jsystemssilkycodders1.service.PolicyService;
 import com.silkycoders1.jsystemssilkycodders1.tools.SinsayTools;
 import org.bsc.langgraph4j.CompileConfig;
@@ -16,16 +18,19 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.content.Media;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.util.MimeType;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-import static java.util.Optional.ofNullable;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.lastOf;
 
 //@org.springframework.stereotype.Component("AGUIAgent")
@@ -122,6 +127,13 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
 
             IMPORTANT: Ground all policy answers in the provided policy documents. Never fabricate policies not found in the documents.
             """;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Parsed form submission data from a showReturnForm tool result.
+     */
+    record FormSubmissionData(String productName, String type, String description, String photo, String photoMimeType) {}
 
     private final MemorySaver saver = new MemorySaver();
     private final AiModel primaryModel;
@@ -254,11 +266,81 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
 
         log.debug("LAST USER MESSAGE: {}", lastUserMessage);
 
-        // Detect intent from the latest message to pre-load relevant policies
-        String intent = detectIntent(lastUserMessage);
+        // Check if any messages contain a form submission result (JSON with photo)
+        Optional<FormSubmissionData> formSubmission = extractFormSubmission(input);
+
+        // Use intent from form data if available, otherwise detect from keywords
+        String intent = formSubmission.map(FormSubmissionData::type)
+                .orElseGet(() -> detectIntent(lastUserMessage));
         var systemMessage = new SystemMessage(buildSystemPrompt(intent));
 
-        return Map.of("messages", List.of(systemMessage, new UserMessage(lastUserMessage)));
+        List<Message> messages = new ArrayList<>();
+        messages.add(systemMessage);
+
+        // If we have a form submission with a photo, add the image as a multimodal message
+        formSubmission.ifPresent(data -> {
+            if (data.photo() != null && !data.photo().isBlank()) {
+                try {
+                    var imageBytes = Base64.getDecoder().decode(data.photo());
+                    var media = new Media(
+                            MimeType.valueOf(data.photoMimeType()),
+                            new ByteArrayResource(imageBytes)
+                    );
+                    var analysisPrompt = String.format(
+                            "Przeanalizuj zdjęcie produktu w kontekście %s. " +
+                            "Produkt: %s. Opis klienta: %s. " +
+                            "Sprawdź czy zdjęcie jest wyraźne i czy widać stan produktu. " +
+                            "Jeśli zdjęcie jest niewyraźne, poproś o lepsze zdjęcie.",
+                            data.type().equals("return") ? "zwrotu" : "reklamacji",
+                            data.productName(),
+                            data.description()
+                    );
+                    messages.add(UserMessage.builder()
+                            .text(analysisPrompt)
+                            .media(media)
+                            .build());
+                    log.info("Added multimodal image message for {} analysis", data.type());
+                } catch (IllegalArgumentException e) {
+                    log.warn("Could not decode base64 photo for multimodal analysis: {}", e.getMessage());
+                }
+            }
+        });
+
+        messages.add(new UserMessage(lastUserMessage));
+        return Map.of("messages", messages);
+    }
+
+    /**
+     * Extracts form submission data from ResultMessage entries in the input.
+     * Looks for a ResultMessage from the showReturnForm tool that contains
+     * form JSON with productName, type, description, and optionally photo fields.
+     *
+     * @param input the AG-UI run input containing all messages
+     * @return parsed form submission data if found, empty otherwise
+     */
+    Optional<FormSubmissionData> extractFormSubmission(AGUIType.RunAgentInput input) {
+        return input.messages().stream()
+                .filter(msg -> msg instanceof AGUIMessage.ResultMessage)
+                .map(msg -> (AGUIMessage.ResultMessage) msg)
+                .filter(msg -> msg.result() != null && msg.result().startsWith("{"))
+                .flatMap(msg -> {
+                    try {
+                        JsonNode node = objectMapper.readTree(msg.result());
+                        if (node.has("productName")) {
+                            return Stream.of(new FormSubmissionData(
+                                    node.path("productName").asText(),
+                                    node.path("type").asText("return"),
+                                    node.path("description").asText(),
+                                    node.has("photo") ? node.path("photo").asText() : null,
+                                    node.path("photoMimeType").asText("image/jpeg")
+                            ));
+                        }
+                    } catch (Exception e) {
+                        log.debug("Message content is not form JSON: {}", e.getMessage());
+                    }
+                    return Stream.empty();
+                })
+                .findFirst();
     }
 
     @Override
