@@ -83,11 +83,15 @@ public abstract class AGUILangGraphAgent implements AGUIAgent {
 
             if( graphData.interruption() ) {
 
-                var lastResultMessage = input.lastResultMessage()
-                        .map(AGUIMessage.ResultMessage::result)
+                // Verify that a ResultMessage exists (the frontend submitted form data)
+                input.lastResultMessage()
                         .orElseThrow( () -> new IllegalStateException( "last result message not found after interruption") );
 
-                runnableConfig = agent.updateState( runnableConfig, Map.of(AgentEx.APPROVAL_RESULT_PROPERTY, lastResultMessage ));
+                // Set approval_result to "APPROVED" so the conditional edge routes correctly.
+                // The form data itself is already accessible via input.lastResultMessage()
+                // and is processed by buildGraphInput() in the subclass.
+                runnableConfig = agent.updateState( runnableConfig,
+                        Map.of(AgentEx.APPROVAL_RESULT_PROPERTY, AgentEx.ApprovalState.APPROVED.name()) );
 
                 graphInput = null; // resume graph
             }
