@@ -1,12 +1,11 @@
-"use client";
-import Image from "next/image";
-import { SimpleChat } from "./component/chat";
-import { SimpleChatWithApproval } from "./component/chatApproval";
+'use client';
+
+import { SinsayChat } from './component/SinsayChat';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <SimpleChatWithApproval />
+    <main className="flex h-full flex-col">
+      <SinsayChat />
     </main>
   );
 }

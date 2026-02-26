@@ -5,9 +5,8 @@ import '@copilotkit/react-ui/styles.css';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>
-        {/* Make sure to use the URL you configured in the previous step  */}
+    <html lang="pl">
+      <body className="h-screen overflow-hidden">
         <CopilotKit runtimeUrl="/api/langgraph4j" agent="default">
           {children}
         </CopilotKit>
