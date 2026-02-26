@@ -29,4 +29,15 @@ describe('SinsayChat', () => {
     render(<SinsayChat />);
     expect(screen.getByText(/Cześć/)).toBeInTheDocument();
   });
+
+  it('renders branded header with Sinsay logo and AI Assistant label', () => {
+    render(<SinsayChat />);
+    const header = screen.getByRole('banner', { name: 'Sinsay AI Assistant' });
+    expect(header).toBeInTheDocument();
+    // Logo SVG should be present with accessible name
+    const logo = screen.getByRole('img', { name: 'Sinsay' });
+    expect(logo).toBeInTheDocument();
+    // "AI Assistant" text label should be present
+    expect(screen.getByText('AI Assistant')).toBeInTheDocument();
+  });
 });

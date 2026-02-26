@@ -23,23 +23,6 @@
   --color-border-input: #C7C8C9;
   --color-brand-dark: #16181D;
 
-  /* CopilotKit brand overrides — maps to actual CopilotKit CSS variable names */
-  /* Primary: dark brand colour used for send button, header, borders */
-  --copilot-kit-primary-color: #16181D;
-  /* Contrast: text/icon colour on primary backgrounds */
-  --copilot-kit-contrast-color: #FFFFFF;
-  /* Background: main chat panel background */
-  --copilot-kit-background-color: #FFFFFF;
-  /* Input area background */
-  --copilot-kit-input-background-color: #F1F2F4;
-  /* Secondary: user message bubble background */
-  --copilot-kit-secondary-color: #16181D;
-  /* Secondary contrast: text colour on secondary (user bubble) */
-  --copilot-kit-secondary-contrast-color: #FFFFFF;
-  /* Separator lines */
-  --copilot-kit-separator-color: #E3E4E5;
-  /* Muted icons, placeholders */
-  --copilot-kit-muted-color: #7B7D80;
 }
 
 @theme inline {
@@ -50,6 +33,27 @@
 html,
 body {
   height: 100%;
+}
+
+/* CopilotKit brand overrides — use html:root for higher specificity than CopilotKit's :root rules */
+/* This ensures our Sinsay brand colours override the CopilotKit defaults */
+html:root {
+  /* Primary: dark brand colour used for send button, icons, user message bubbles */
+  --copilot-kit-primary-color: #16181D;
+  /* Contrast: text/icon colour on primary backgrounds */
+  --copilot-kit-contrast-color: #FFFFFF;
+  /* Background: main chat panel background */
+  --copilot-kit-background-color: #FFFFFF;
+  /* Input area background */
+  --copilot-kit-input-background-color: #F1F2F4;
+  /* Secondary: assistant message background */
+  --copilot-kit-secondary-color: #FFFFFF;
+  /* Secondary contrast: text colour on secondary backgrounds */
+  --copilot-kit-secondary-contrast-color: #16181D;
+  /* Separator lines */
+  --copilot-kit-separator-color: #E3E4E5;
+  /* Muted icons, placeholders */
+  --copilot-kit-muted-color: #7B7D80;
 }
 
 body {
