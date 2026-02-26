@@ -2,13 +2,16 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './src/e2e',
+  outputDir: './src/e2e/test-results',
   timeout: 60000,
   retries: 0,
   use: {
     baseURL: 'http://localhost:3000',
     headless: true,
     viewport: { width: 390, height: 844 },
-    screenshot: 'only-on-failure',
+    screenshot: 'on',                          // always capture; saved to src/e2e/screenshots/
+    screenshotsPath: './src/e2e/screenshots',
+    video: 'off',
   },
   projects: [
     {

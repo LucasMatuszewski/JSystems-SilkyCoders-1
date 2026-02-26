@@ -281,41 +281,54 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
         return System.getenv(name);
     }
 
+    /**
+     * Builds a FallbackChatModel chain: primary model first, then OpenAI (if key present),
+     * then GitHub Models (if token present), then Ollama qwen2.5 as last resort.
+     *
+     * FallbackChatModel retries transient errors (broken pipe, connection refused, timeout)
+     * once after 1 second, then falls through to the next model in the chain.
+     * This handles Ollama cold-start failures and intermittent network issues at RUNTIME,
+     * not just at startup.
+     */
     ChatModel resolveModel() {
-        // 1. Try configured primary model
+        var models = new java.util.ArrayList<ChatModel>();
+
+        // 1. Configured primary model
         if (primaryModel != null) {
             try {
                 var model = primaryModel.model.get();
-                log.info("Using configured primary model: {}", primaryModel.name());
-                return model;
+                log.info("Primary model configured: {}", primaryModel.name());
+                models.add(model);
             } catch (Exception e) {
-                log.warn("Primary model {} failed to initialize: {}, falling back...", primaryModel.name(), e.getMessage());
+                log.warn("Primary model {} failed to initialize: {}", primaryModel.name(), e.getMessage());
             }
         }
 
-        // 2. Fallback: OpenAI if API key present
+        // 2. OpenAI if API key present
         if (getEnv("OPENAI_API_KEY") != null) {
             try {
-                log.info("Falling back to OPENAI_GPT_4O_MINI");
-                return AiModel.OPENAI_GPT_4O_MINI.model.get();
+                models.add(AiModel.OPENAI_GPT_4O_MINI.model.get());
+                log.info("OpenAI fallback added to chain");
             } catch (Exception e) {
-                log.warn("OpenAI fallback failed: {}", e.getMessage());
+                log.warn("OpenAI fallback could not be added: {}", e.getMessage());
             }
         }
 
-        // 3. Fallback: GitHub Models if token present
+        // 3. GitHub Models if token present
         if (getEnv("GITHUB_MODELS_TOKEN") != null) {
             try {
-                log.info("Falling back to GITHUB_MODELS_GPT_4O_MINI");
-                return AiModel.GITHUB_MODELS_GPT_4O_MINI.model.get();
+                models.add(AiModel.GITHUB_MODELS_GPT_4O_MINI.model.get());
+                log.info("GitHub Models fallback added to chain");
             } catch (Exception e) {
-                log.warn("GitHub Models fallback failed: {}", e.getMessage());
+                log.warn("GitHub Models fallback could not be added: {}", e.getMessage());
             }
         }
 
-        // 4. Last resort: Ollama qwen2.5
-        log.info("Falling back to OLLAMA_QWEN2_5_7B");
-        return AiModel.OLLAMA_QWEN2_5_7B.model.get();
+        // 4. Ollama qwen2.5 as last resort (always available when Ollama is running)
+        models.add(AiModel.OLLAMA_QWEN2_5_7B.model.get());
+        log.info("Ollama qwen2.5 added as final fallback. Fallback chain length: {}", models.size());
+
+        return new FallbackChatModel(models);
     }
 
     @Override

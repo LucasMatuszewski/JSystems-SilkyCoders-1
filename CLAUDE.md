@@ -118,13 +118,16 @@ A task is **complete** only when **all** of the following are true, regardless o
 
 1. **Tests written first** — test files exist and were written before production code
 2. **All tests pass** — the full test suite exits with zero failures and zero errors
-3. **Implementation matches specification** — verified against PRD/ADR, not just "code looks right"
-4. **No regressions** — the full test suite passes, not just the new tests
-5. **Build is clean** — compiles/transpiles with no errors or warnings
-6. **Security verified** — no secrets committed, no unsafe operations
-7. **Commit message is correct** — follows `Area: short summary` convention (e.g., `Feature: add chat SSE endpoint`)
+3. **E2E tests pass** — if the change touches any user-visible behavior: run `cd frontend && pnpm e2e` with the full stack running (backend + Ollama + frontend). Tests must pass with a live backend, not just mocks. A task is NOT complete if E2E tests are skipped.
+4. **Implementation matches specification** — verified against PRD/ADR, not just "code looks right"
+5. **No regressions** — the full test suite passes, not just the new tests
+6. **Build is clean** — compiles/transpiles with no errors or warnings
+7. **Security verified** — no secrets committed, no unsafe operations
+8. **Commit message is correct** — follows `Area: short summary` convention (e.g., `Feature: add chat SSE endpoint`)
 
 **If any criterion is not met, the task is NOT complete.** Do not mark it done or move to the next task.
+
+> **Critical**: "All tests pass" means the unit/integration test suite. It does NOT mean the app works. Unit tests use mocks and cannot detect runtime failures. E2E tests are the only verification that the actual running app works correctly. Both are required.
 
 ---
 
@@ -138,6 +141,7 @@ A task is **complete** only when **all** of the following are true, regardless o
 □ Tests were written BEFORE implementing production code (TDD)
 □ All new code has corresponding test files
 □ All tests pass (zero failures, zero errors)
+□ E2E tests run with full stack (pnpm e2e) — for any user-visible change
 □ Build is clean (no compiler/transpiler errors or warnings)
 □ No hardcoded secrets, API keys, or credentials in any file
 □ No .db or secret files staged for commit
@@ -175,7 +179,56 @@ For layer-specific checklist items, see `src/CLAUDE.md` (backend) or `frontend/C
 5. Run `/code-review` on all non-trivial PRs
 6. Before committing, always run linting and formatting fix (auto formatting)
 7. When adding new structure (backend/frontend), update the relevant CLAUDE.md files accordingly
-8. After every correction, end with: Update your CLAUDE.md so you don't make that mistake again.
-11. When you discover outdated, incorrect, or misaligned information in any project file (docs, config, code comments), remove or correct it directly. Do not document the change inside the file itself — report what was changed in the chat window only. All project files must remain internally consistent with no historical notes, divergence annotations, or correction markers left in the content.
+8. After every correction, update your CLAUDE.md so you don't make that mistake again.
 9. Create a new commit after each step, make commits granular and often with descriptive messages.
 10. Do not push changes to remote! Let user check changes locally.
+11. When you discover outdated, incorrect, or misaligned information in any project file (docs, config, code comments), remove or correct it directly. Do not document the change inside the file itself — report what was changed in the chat window only. All project files must remain internally consistent with no historical notes, divergence annotations, or correction markers left in the content.
+
+---
+
+## Logs and Screenshots
+
+### Log Files
+- Application logs are written to `logs/app.log` (daily rolling, git-ignored)
+- **Never load the full log file into context** — it can be 10k+ lines with large stack traces
+- Always use one of these approaches instead:
+  ```bash
+  tail -200 logs/app.log           # last 200 lines — start here
+  grep -n "ERROR\|WARN" logs/app.log | grep -v "at org\.\|at java\." | tail -100  # errors only, no stack trace noise
+  grep -n "keyword" logs/app.log | tail -50   # targeted search
+  ```
+- Stack traces in logs are long. If you need one, identify the first ERROR line then read ±20 lines around it
+
+### Screenshots
+- Playwright screenshots go to: `frontend/src/e2e/screenshots/` (git-ignored)
+- Always save screenshots to that folder — NOT to `/tmp/`
+- Playwright failure screenshots: configured via `playwright.config.ts` (`outputDir`)
+- After any frontend change: take a screenshot and save it to `frontend/src/e2e/screenshots/` for human review
+
+---
+
+## Sub-Agent Session Evaluation (Mandatory for Coordinating Agents)
+
+After any task delegated to a sub-agent completes, the coordinating agent **must** evaluate the sub-agent's decisions before accepting the work. Read the sub-agent's memory file and the code it produced.
+
+### What to Check
+
+**Test quality — most common failure mode:**
+- Did the sub-agent weaken tests to make them pass? (e.g., removed assertions, changed expected values to match wrong behavior, added `|| fallback` conditions)
+- Did the sub-agent write tests AFTER production code (violating TDD)?
+- Do the tests actually fail when the feature is broken? (Remove the implementation mentally — would the tests catch it?)
+- Are tests mocking the component under test? (e.g., mocking the class you're testing instead of its dependencies)
+
+**Coverage gaps:**
+- Are error paths tested? (not just happy path)
+- Do integration tests test real wiring, or just mock everything end-to-end?
+- Is there an E2E test that would catch a real runtime failure?
+
+**Code quality:**
+- Does the implementation match the spec, or did the sub-agent interpret requirements loosely?
+- Were any shortcuts taken that create hidden failures (e.g., swallowing exceptions, empty catch blocks)?
+
+### What to Do When Issues Are Found
+- Fix the bad test or code directly before accepting the work
+- Update the relevant agent's instructions (`.claude/agents/`) to prevent the same mistake
+- Note the pattern in this CLAUDE.md if it's project-wide

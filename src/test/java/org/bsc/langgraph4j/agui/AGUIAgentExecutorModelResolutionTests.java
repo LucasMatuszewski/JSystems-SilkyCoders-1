@@ -6,6 +6,7 @@ import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -45,16 +46,25 @@ class AGUIAgentExecutorModelResolutionTests {
 
     // -- Primary model tests --
 
+    // Helper: unwrap FallbackChatModel chain
+    private static List<ChatModel> chainOf(ChatModel model) {
+        assertThat(model).isInstanceOf(FallbackChatModel.class);
+        return ((FallbackChatModel) model).models;
+    }
+
     @Test
     void shouldUsePrimaryModelWhenConfigured() {
         // given
         var executor = new TestableExecutor(AGUIAgentExecutor.AiModel.OLLAMA_KIMI_K2_5_CLOUD);
 
         // when
-        ChatModel model = executor.resolveModel();
+        var chain = chainOf(executor.resolveModel());
 
-        // then
-        assertThat(model).isInstanceOf(OllamaChatModel.class);
+        // then — first model in chain is the configured primary (Ollama)
+        assertThat(chain).hasSizeGreaterThanOrEqualTo(2);
+        assertThat(chain.get(0)).isInstanceOf(OllamaChatModel.class);
+        // last model is always qwen2.5 as final fallback
+        assertThat(chain.get(chain.size() - 1)).isInstanceOf(OllamaChatModel.class);
     }
 
     @Test
@@ -64,10 +74,11 @@ class AGUIAgentExecutorModelResolutionTests {
         executor.setEnv("OPENAI_API_KEY", "sk-test-key");
 
         // when
-        ChatModel model = executor.resolveModel();
+        var chain = chainOf(executor.resolveModel());
 
-        // then — primary takes precedence
-        assertThat(model).isInstanceOf(OllamaChatModel.class);
+        // then — primary (Ollama kimi) is first in chain; OpenAI and qwen2.5 also present
+        assertThat(chain).hasSizeGreaterThanOrEqualTo(3);
+        assertThat(chain.get(0)).isInstanceOf(OllamaChatModel.class);
     }
 
     // -- Fallback chain tests --
@@ -79,54 +90,56 @@ class AGUIAgentExecutorModelResolutionTests {
         executor.setEnv("OPENAI_API_KEY", "sk-test-key");
 
         // when
-        ChatModel model = executor.resolveModel();
+        var chain = chainOf(executor.resolveModel());
 
-        // then
-        assertThat(model).isInstanceOf(OpenAiChatModel.class);
+        // then — no primary, so OpenAI is first; qwen2.5 is last resort
+        assertThat(chain).hasSizeGreaterThanOrEqualTo(2);
+        assertThat(chain.get(0)).isInstanceOf(OpenAiChatModel.class);
+        assertThat(chain.get(chain.size() - 1)).isInstanceOf(OllamaChatModel.class);
     }
 
     @Test
     void shouldFallbackToLastResortWhenGitHubTokenSetButSupplierFailsDueToNullRealEnv() {
         // given — getEnv returns token, but the enum supplier internally calls System.getenv()
-        // which returns null in test env, causing the supplier to fail.
-        // This verifies the fallback chain continues past a failing supplier.
+        // which returns null in test env, causing the GitHub Models supplier to fail.
+        // The qwen2.5 last-resort must always be present regardless of supplier failures.
         var executor = new TestableExecutor();
         executor.setEnv("GITHUB_MODELS_TOKEN", "ghp-test-token");
 
         // when
-        ChatModel model = executor.resolveModel();
+        var chain = chainOf(executor.resolveModel());
 
-        // then — supplier fails, falls through to last-resort Ollama
-        assertThat(model).isInstanceOf(OllamaChatModel.class);
+        // then — GitHub supplier fails at construction, but qwen2.5 is always in chain
+        assertThat(chain).isNotEmpty();
+        assertThat(chain.get(chain.size() - 1)).isInstanceOf(OllamaChatModel.class);
     }
 
     @Test
     void shouldFallbackFromOpenAiToLastResortWhenBothEnvSetButSuppliersFailInRealEnv() {
-        // given — both env vars set via override, but real System.getenv() returns null
-        // so both OpenAI and GitHub suppliers will fail during construction
+        // given — both env vars set, real System.getenv() returns null for GitHub but not OpenAI
         var executor = new TestableExecutor();
         executor.setEnv("OPENAI_API_KEY", "sk-test-key");
         executor.setEnv("GITHUB_MODELS_TOKEN", "ghp-test-token");
 
         // when
-        ChatModel model = executor.resolveModel();
+        var chain = chainOf(executor.resolveModel());
 
-        // then — both fail (null real env), falls to last-resort Ollama
-        // Note: OpenAI supplier *succeeds* because it accepts any non-null-looking key
-        // at build time (validation happens at call time). So OpenAI is returned.
-        assertThat(model).isNotNull();
+        // then — chain is non-empty, ends with qwen2.5 as last resort
+        assertThat(chain).isNotEmpty();
+        assertThat(chain.get(chain.size() - 1)).isInstanceOf(OllamaChatModel.class);
     }
 
     @Test
     void shouldFallbackToOllamaQwenWhenNoEnvVarsAndNoPrimary() {
-        // given — no primary, no env vars
+        // given — no primary, no env vars — qwen2.5 is the only model in chain
         var executor = new TestableExecutor();
 
         // when
-        ChatModel model = executor.resolveModel();
+        var chain = chainOf(executor.resolveModel());
 
-        // then
-        assertThat(model).isInstanceOf(OllamaChatModel.class);
+        // then — single model: qwen2.5
+        assertThat(chain).hasSize(1);
+        assertThat(chain.get(0)).isInstanceOf(OllamaChatModel.class);
     }
 
     // -- Failing primary model with fallback --

@@ -33,7 +33,19 @@ The application streams AI verdicts about Sinsay fashion returns/complaints via 
 5. **Implement minimum production code** — only what is needed to make tests green; do not add untested code
 6. **Confirm all tests pass** — run the full suite; fix implementation (not tests) if any fail
 7. **Refactor** — clean up while keeping all tests green
-8. **Commit** — follow `Area: short summary` convention (e.g., `Fix: trim base64 from logs`)
+8. **Verify the running app** — start the backend (`./mvnw spring-boot:run`) and test the feature manually or via Playwright. "All tests pass" does not mean "the app works" — unit tests mock away real failures.
+9. **Commit** — follow `Area: short summary` convention (e.g., `Fix: trim base64 from logs`)
+
+### Test Quality Gate (Apply Before Step 9)
+
+Before committing, answer these questions for every test you wrote:
+
+- **Would this test fail if I removed the production code I just wrote?** If no, the test proves nothing.
+- **What real failure scenario does this test catch?** If the answer is "none — it uses a mock that always succeeds", then you need either a complementary integration test with a real failure mock, or an E2E test.
+- **Is this an "integration test" or a "wiring test in disguise"?** An integration test with `@TestConfiguration` that mocks `ChatModel` to always succeed is a wiring test — it tests event structure, not real behavior. Name it honestly and note what it doesn't cover.
+- **For AI model calls**: after mocking the success path, also test the failure path — broken pipe, connection refused, timeout. If you only test success, you are hiding the most likely production failure.
+
+This check is not optional. A test that passes when the feature is broken is worse than no test: it provides false confidence.
 
 ---
 

@@ -247,7 +247,72 @@ given(chatModel.call(any())).willReturn(capturedRealResponse);
 To get real mock data:
 1. Enable `logging.level.org.springframework.ai=DEBUG` in `application.properties`
 2. Run the app and submit a real request (e.g., a chat message or a form with photo)
-3. Copy the logged AI response payload from `logs/app.log`
+3. Copy the logged AI response payload from `logs/app.log` — use `tail -200 logs/app.log` or `grep`, never load the full file
 4. Use that payload to construct your mock return value
 
 This ensures mocks reflect the real API contract, not invented structures.
+
+---
+
+## Test Quality Rules — Mandatory Before Every Commit
+
+### The fundamental test question
+**Before committing any test, ask: "If I deleted the production code I just wrote, would this test fail?"**
+
+If the answer is no — the test passes even without the implementation — delete or rewrite it. A passing test that doesn't catch a broken implementation is worse than no test: it creates false confidence.
+
+### Test anti-patterns that must never appear in this project
+
+**Anti-pattern 1: The wiring test disguised as an integration test**
+```java
+// WRONG — this is NOT an integration test. It's a unit test of event serialization.
+// ChatModel always succeeds. No real AI behavior is tested.
+@TestConfiguration
+static class MockConfig {
+    @Bean("AGUIAgent")
+    AGUIAgent agent(ChatModel mock) {
+        return new AGUIAgentExecutor(...) {
+            @Override ChatModel resolveModel() { return mock; }  // always returns success
+        };
+    }
+}
+// This test passes even if Ollama is broken, the fallback is missing, or the model format changed.
+```
+
+**What to do instead**: Test the wiring separately from the behavior. Have one test that verifies events are emitted correctly (with mock). Have a SEPARATE test that verifies the error path (mock throws broken pipe → correct RunError event emitted → correct Polish message).
+
+**Anti-pattern 2: Only testing the success path for AI model calls**
+```java
+// WRONG — only tests the happy path. Broken pipe, connection refused, timeout are the real failures.
+given(chatModel.call(any())).willReturn(successResponse);
+// Test passes. But when Ollama is sleeping, none of this is tested.
+```
+
+**Required**: Always add at least one test where the mock throws a transient error. Verify that the error is handled correctly (either fallback kicks in, or RUN_ERROR event is emitted with the correct Polish message).
+
+**Anti-pattern 3: Modifying the assertion to match wrong behavior**
+```java
+// WRONG — changed assertion to make test "pass" without fixing the actual problem
+// assertThat(message).contains("Ollama");      // original
+assertThat(message).isNotNull();                 // weakened to make it pass
+```
+
+If a test is failing and you find yourself weakening the assertion instead of fixing the code, STOP. The test is correct. The production code is wrong. Fix the code.
+
+**Anti-pattern 4: The "error is mapped correctly" test without end-to-end verification**
+
+Testing `mapErrorToUserMessage()` in isolation proves the method works. It does NOT prove the error is ever actually caught in the real flow. After writing the unit test, also verify: given a real Ollama failure, does the user actually see the Polish error message? If you can't run the full stack in a unit test, write an E2E Playwright test that proves it.
+
+### Test coverage requirements for AI model integration
+
+For any feature that calls an AI model (Ollama, OpenAI), you must have:
+
+| Scenario | Required test type |
+|---|---|
+| Success: model returns expected response | Integration test with mock ChatModel |
+| Transient failure: broken pipe / connection refused | Unit test of FallbackChatModel; integration test verifying RUN_ERROR event |
+| Non-transient failure: 401 Unauthorized | Unit test verifying error propagates without retry |
+| Recovery: primary fails, fallback succeeds | Unit test of FallbackChatModel |
+| End-to-end: full form submission → verdict visible | Playwright E2E test (pnpm e2e) |
+
+If any row in this table is missing, the feature is not properly tested.

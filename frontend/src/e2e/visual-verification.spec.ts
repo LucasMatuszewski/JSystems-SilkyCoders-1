@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
+import path from 'path';
 
 const BACKEND_HEALTH_URL = 'http://localhost:8085/langgraph4j/copilotkit';
 const APP_URL = 'http://localhost:3000';
-// Test fixture for photo upload tests (form submission / verdict):
-//   path.join(__dirname, 'fixtures', 'test-product.jpg')
+const FIXTURE_PHOTO = path.join(__dirname, 'fixtures', 'test-product.jpg');
 
 /**
  * Every test suite in this file requires a live backend.
@@ -107,7 +107,54 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Test 4 — No JavaScript errors on page load
+  // Test 4 — COMPLETE FLOW: form submission with photo produces a verdict
+  // This is the core feature test. It MUST FAIL if:
+  //   - Ollama is down or returns broken pipe on the multimodal call
+  //   - The verdict event is not emitted by the backend
+  //   - The frontend does not render the verdict component
+  // This test exercises the entire flow: chat → form → photo upload → verdict.
+  // ─────────────────────────────────────────────────────────────────────────
+  test('complete flow: form submission with photo produces an AI verdict', async ({ page }) => {
+    page.on('pageerror', (err) => {
+      throw err;
+    });
+
+    await page.goto(APP_URL);
+
+    const chatInput = page.getByTestId('chat-input');
+    await expect(chatInput).toBeVisible({ timeout: 15000 });
+
+    // Step 1: trigger the return form
+    await chatInput.fill('Chcę dokonać zwrotu towaru');
+    await page.getByTestId('chat-send-btn').click();
+
+    // Step 2: wait for form to appear
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 30000 });
+
+    // Step 3: fill form fields
+    await page.getByTestId('form-product-name').fill('Kurtka zimowa XL');
+    await page.getByTestId('form-description').fill(
+      'Kurtka posiada wadę fabryczną — rozerwany szew na lewym rękawie po pierwszym praniu.'
+    );
+
+    // Step 4: upload test photo
+    await page.getByTestId('form-photo-upload').setInputFiles(FIXTURE_PHOTO);
+
+    // Step 5: submit the form
+    await page.getByTestId('form-submit-btn').click();
+
+    // Step 6: a verdict MUST appear — either approved or rejected.
+    // This will time out (60s) and FAIL if:
+    //   - Ollama returns a broken pipe on the multimodal call
+    //   - The backend sends a RUN_ERROR instead of a verdict
+    //   - The frontend does not render the verdict component
+    const approved = page.getByTestId('verdict-approved');
+    const rejected = page.getByTestId('verdict-rejected');
+    await expect(approved.or(rejected)).toBeVisible({ timeout: 60000 });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test 5 — No JavaScript errors on page load
   // NO filtering — every error is a failure.
   // ─────────────────────────────────────────────────────────────────────────
   test('no JavaScript errors on page load', async ({ page }) => {
