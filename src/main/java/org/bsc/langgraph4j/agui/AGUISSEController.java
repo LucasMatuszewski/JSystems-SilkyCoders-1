@@ -1,18 +1,23 @@
 package org.bsc.langgraph4j.agui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
+import java.net.ConnectException;
 import java.time.Duration;
 import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/langgraph4j")
 public class AGUISSEController {
+
+    private static final Logger log = LoggerFactory.getLogger(AGUISSEController.class);
 
     final AGUIAgent uiAgent;
     final ObjectMapper mapper = new ObjectMapper();
@@ -25,11 +30,40 @@ public class AGUISSEController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.TEXT_EVENT_STREAM_VALUE
             )
-    public Flux<? extends AGUIEvent> copilotKit(@RequestBody String runAgentInputPayload) throws Exception {
+    @SuppressWarnings("unchecked")
+    public Flux<AGUIEvent> copilotKit(@RequestBody String runAgentInputPayload) throws Exception {
 
         var input = mapper.readValue(runAgentInputPayload, AGUIType.RunAgentInput.class);
 
-        return uiAgent.run( input );
+        Flux<AGUIEvent> agentFlux = (Flux<AGUIEvent>) uiAgent.run(input);
+        return agentFlux.onErrorResume(throwable -> {
+            log.error("Agent execution failed: {}", throwable.getMessage(), throwable);
+            return Flux.just(new AGUIEvent.RunErrorEvent(mapErrorToUserMessage(throwable), "AGENT_ERROR"));
+        });
+    }
+
+    private String mapErrorToUserMessage(Throwable throwable) {
+        String msg = throwable.getMessage() != null ? throwable.getMessage().toLowerCase() : "";
+        Throwable cause = throwable.getCause();
+        String causeMsg = (cause != null && cause.getMessage() != null) ? cause.getMessage().toLowerCase() : "";
+
+        if (throwable instanceof ConnectException
+                || msg.contains("connection refused")
+                || causeMsg.contains("connection refused")
+                || msg.contains("connect to")) {
+            return "Nie można połączyć się z modelem AI. Sprawdź czy Ollama jest uruchomiona i model jest dostępny (port 11434).";
+        }
+        if (msg.contains("401") || msg.contains("unauthorized") || msg.contains("api key")
+                || msg.contains("forbidden") || msg.contains("403")) {
+            return "Błąd autoryzacji do modelu AI. Sprawdź poprawność klucza API.";
+        }
+        if (msg.contains("503") || msg.contains("service unavailable") || msg.contains("overloaded")) {
+            return "Model AI jest chwilowo niedostępny. Spróbuj ponownie za chwilę.";
+        }
+        if (msg.contains("timeout") || msg.contains("timed out")) {
+            return "Odpowiedź modelu AI trwała zbyt długo. Spróbuj ponownie.";
+        }
+        return "Wystąpił błąd podczas przetwarzania wiadomości. Spróbuj ponownie.";
     }
 
     /**
