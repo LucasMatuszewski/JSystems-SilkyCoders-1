@@ -11,13 +11,14 @@ export function SinsayChat() {
     parameters: [
       { name: 'type', type: 'string', description: 'return or complaint' },
     ],
-    renderAndWaitForResponse: ({ args, status, respond }: {
-      args: { type?: string };
-      status: 'inProgress' | 'complete' | 'executing';
-      respond: (response: string) => void;
-    }) => (
-      <ReturnForm args={args} status={status} respond={respond} />
-    ),
+    renderAndWaitForResponse(props) {
+      const status = props.status as 'inProgress' | 'complete' | 'executing';
+      const args = props.args as { type?: string };
+      const respond = (props.respond ?? (() => undefined)) as (response: string) => void;
+      return (
+        <ReturnForm args={args} status={status} respond={respond} />
+      );
+    },
   });
 
   return (
