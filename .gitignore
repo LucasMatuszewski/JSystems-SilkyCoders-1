@@ -32,6 +32,11 @@ build/
 ### VS Code ###
 .vscode/
 
+### Database files ###
+data/
+*.mv.db
+*.trace.db
+
 ### FE ###
 node_modules/
 .vite

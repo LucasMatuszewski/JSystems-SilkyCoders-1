@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS sessions (
+    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS form_submissions (
+    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    session_id UUID NOT NULL,
+    intent VARCHAR(20) NOT NULL,
+    product_name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    photo_path VARCHAR(500),
+    verdict TEXT,
+    submitted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    verdict_at TIMESTAMP,
+    FOREIGN KEY (session_id) REFERENCES sessions(id)
+);
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    session_id UUID NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (session_id) REFERENCES sessions(id)
+);
