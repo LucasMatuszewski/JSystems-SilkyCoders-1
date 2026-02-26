@@ -28,11 +28,49 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<langgraph4j.version>1.6.2</langgraph4j.version>
+		<spring-ai.version>1.0.0</spring-ai.version>
 	</properties>
 	<dependencies>
+		<!-- Spring Boot WebFlux (reactive stack required for Reactor/Flux SSE) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
+		<!-- LangGraph4j core -->
+		<dependency>
+			<groupId>org.bsc.langgraph4j</groupId>
+			<artifactId>langgraph4j-core</artifactId>
+			<version>${langgraph4j.version}</version>
+		</dependency>
+
+		<!-- LangGraph4j Spring AI integration -->
+		<dependency>
+			<groupId>org.bsc.langgraph4j</groupId>
+			<artifactId>langgraph4j-spring-ai</artifactId>
+			<version>${langgraph4j.version}</version>
+		</dependency>
+
+		<!-- LangGraph4j Spring AI Agent Executor -->
+		<dependency>
+			<groupId>org.bsc.langgraph4j</groupId>
+			<artifactId>langgraph4j-springai-agentexecutor</artifactId>
+			<version>${langgraph4j.version}</version>
+		</dependency>
+
+		<!-- Spring AI - OpenAI -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-openai</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- Spring AI - Ollama -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-ollama</artifactId>
+			<version>${spring-ai.version}</version>
 		</dependency>
 
 		<dependency>
@@ -43,6 +81,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -75,5 +118,19 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>sonatype-central</id>
+			<name>sonatype snapshots</name>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+	</repositories>
 
 </project>
