@@ -45,7 +45,7 @@ public class AGUISSEController {
         });
     }
 
-    private String mapErrorToUserMessage(Throwable throwable) {
+    String mapErrorToUserMessage(Throwable throwable) {
         String msg = throwable.getMessage() != null ? throwable.getMessage().toLowerCase() : "";
         Throwable cause = throwable.getCause();
         String causeMsg = (cause != null && cause.getMessage() != null) ? cause.getMessage().toLowerCase() : "";
@@ -53,7 +53,9 @@ public class AGUISSEController {
         if (throwable instanceof ConnectException
                 || msg.contains("connection refused")
                 || causeMsg.contains("connection refused")
-                || msg.contains("connect to")) {
+                || msg.contains("connect to")
+                || msg.contains("broken pipe")
+                || causeMsg.contains("broken pipe")) {
             return "Nie można połączyć się z modelem AI. Sprawdź czy Ollama jest uruchomiona i model jest dostępny (port 11434).";
         }
         if (msg.contains("401") || msg.contains("unauthorized") || msg.contains("api key")

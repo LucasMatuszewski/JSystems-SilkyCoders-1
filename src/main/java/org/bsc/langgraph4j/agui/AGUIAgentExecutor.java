@@ -26,10 +26,20 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.MimeType;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import javax.imageio.ImageIO;
 
 import static org.bsc.langgraph4j.utils.CollectionsUtils.lastOf;
 
@@ -65,7 +75,13 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                         .build()),
         OLLAMA_QWEN2_5_7B( () ->
                 OllamaChatModel.builder()
-                        .ollamaApi( OllamaApi.builder().baseUrl("http://localhost:11434").build() )
+                        .ollamaApi(OllamaApi.builder()
+                                .baseUrl("http://localhost:11434")
+                                .webClientBuilder(WebClient.builder()
+                                        .clientConnector(new ReactorClientHttpConnector(
+                                                HttpClient.create().responseTimeout(Duration.ofSeconds(30))
+                                        )))
+                                .build())
                         .defaultOptions(OllamaOptions.builder()
                                 .model("qwen2.5:7b")
                                 .temperature(0.1)
@@ -73,20 +89,32 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                         .build()),
         OLLAMA_QWEN3_14B( () ->
                 OllamaChatModel.builder()
-                .ollamaApi( OllamaApi.builder().baseUrl("http://localhost:11434").build() )
-                .defaultOptions(OllamaOptions.builder()
+                        .ollamaApi(OllamaApi.builder()
+                                .baseUrl("http://localhost:11434")
+                                .webClientBuilder(WebClient.builder()
+                                        .clientConnector(new ReactorClientHttpConnector(
+                                                HttpClient.create().responseTimeout(Duration.ofSeconds(30))
+                                        )))
+                                .build())
+                        .defaultOptions(OllamaOptions.builder()
                                 .model("qwen3:14b")
                                 .temperature(0.1)
                                 .build())
-                .build()),
+                        .build()),
         OLLAMA_KIMI_K2_5_CLOUD( () ->
                 OllamaChatModel.builder()
-                .ollamaApi( OllamaApi.builder().baseUrl("http://localhost:11434").build() )
-                .defaultOptions(OllamaOptions.builder()
+                        .ollamaApi(OllamaApi.builder()
+                                .baseUrl("http://localhost:11434")
+                                .webClientBuilder(WebClient.builder()
+                                        .clientConnector(new ReactorClientHttpConnector(
+                                                HttpClient.create().responseTimeout(Duration.ofSeconds(30))
+                                        )))
+                                .build())
+                        .defaultOptions(OllamaOptions.builder()
                                 .model("kimi-k2.5:cloud")
                                 .temperature(0.1)
                                 .build())
-                .build());
+                        .build());
         ;
 
         public final Supplier<ChatModel> model;
@@ -207,6 +235,48 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
         return value.substring(0, 80) + "...[" + len + " chars]";
     }
 
+    /**
+     * Resizes an image to at most 800×800 pixels (maintaining aspect ratio) to prevent
+     * exceeding the Ollama model context window. If the image is already within the
+     * threshold, or if decoding fails, the original bytes are returned unchanged.
+     *
+     * @param imageBytes raw bytes of the image (JPEG or PNG)
+     * @param mimeType   MIME type string used to choose the output format
+     * @return resized image bytes, or the original bytes if resize was not needed or failed
+     */
+    static byte[] resizeImageIfNeeded(byte[] imageBytes, String mimeType) {
+        try {
+            BufferedImage original = ImageIO.read(new ByteArrayInputStream(imageBytes));
+            if (original == null) {
+                log.warn("Could not decode image for resize — using original bytes");
+                return imageBytes;
+            }
+            int w = original.getWidth();
+            int h = original.getHeight();
+            int maxDim = 800;
+            if (w <= maxDim && h <= maxDim) {
+                return imageBytes;
+            }
+            double scale = (double) maxDim / Math.max(w, h);
+            int newW = (int) (w * scale);
+            int newH = (int) (h * scale);
+            log.debug("Resizing image from {}x{} to {}x{} before sending to model", w, h, newW, newH);
+
+            BufferedImage resized = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_RGB);
+            var g = resized.createGraphics();
+            g.drawImage(original.getScaledInstance(newW, newH, Image.SCALE_SMOOTH), 0, 0, null);
+            g.dispose();
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            String format = mimeType.contains("png") ? "png" : "jpg";
+            ImageIO.write(resized, format, out);
+            return out.toByteArray();
+        } catch (Exception e) {
+            log.warn("Image resize failed, using original: {}", e.getMessage());
+            return imageBytes;
+        }
+    }
+
     String getEnv(String name) {
         return System.getenv(name);
     }
@@ -297,7 +367,8 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
         formSubmission.ifPresent(data -> {
             if (data.photo() != null && !data.photo().isBlank()) {
                 try {
-                    var imageBytes = Base64.getDecoder().decode(data.photo());
+                    var rawBytes = Base64.getDecoder().decode(data.photo());
+                    var imageBytes = resizeImageIfNeeded(rawBytes, data.photoMimeType());
                     var media = new Media(
                             MimeType.valueOf(data.photoMimeType()),
                             new ByteArrayResource(imageBytes)
