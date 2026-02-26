@@ -41,3 +41,9 @@ data/
 node_modules/
 .vite
 frontend/dist
+frontend/.next/
+frontend/test-results/
+frontend/playwright-report/
+
+### Claude ###
+.claude/agent-memory-local/
