@@ -160,7 +160,7 @@ For layer-specific checklist items, see `src/CLAUDE.md` (backend) or `frontend/C
 
 ## Security & Configuration
 
-- SQLite DB files must remain local-only; never commit `.db` files
+- H2 database files (`*.mv.db`) and the `data/` directory must remain local-only; never commit database files
 - No API keys, passwords, or tokens in any source or test file
 - AI model API keys are read from environment variables (`OPENAI_API_KEY`, `GITHUB_MODELS_TOKEN`) or use local Ollama (no key needed)
 

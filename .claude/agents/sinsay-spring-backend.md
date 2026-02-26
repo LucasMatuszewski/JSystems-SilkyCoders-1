@@ -1,6 +1,6 @@
 ---
 name: sinsay-spring-backend
-description: "Use this agent when you need to build, extend, or fix the Spring Boot backend for the Sinsay returns/complaints PoC. This includes implementing REST endpoints, SSE streaming for the chat interface, Spring AI + OpenAI multimodal integration (image analysis), SQLite persistence, Vercel AI SDK Data Stream Protocol compliance, and all related Java backend concerns.\\n\\nExamples:\\n\\n<example>\\nContext: The user wants to implement the core chat endpoint that streams AI responses.\\nuser: \"Implement the POST /api/chat endpoint that accepts order context and images, sends them to GPT-4o via Spring AI, and streams the response using the Vercel AI SDK Data Stream Protocol.\"\\nassistant: \"I'll launch the sinsay-spring-backend agent to implement this SSE streaming endpoint with multimodal support.\"\\n<commentary>\\nThis is a core backend task involving SSE, Spring AI, and Vercel protocol compliance — exactly what this agent is designed for. Use the Task tool to launch the sinsay-spring-backend agent.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: The user needs to add SQLite persistence for chat sessions.\\nuser: \"Add JPA entities and repositories to store order metadata, chat transcripts, and AI verdicts in SQLite.\"\\nassistant: \"I'll use the Task tool to launch the sinsay-spring-backend agent to design and implement the persistence layer with proper @DataJpaTest coverage.\"\\n<commentary>\\nPersistence layer work with JPA/SQLite and TDD requirements maps directly to this agent's responsibilities.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: The user notices the streaming format is wrong and frontend chat is broken.\\nuser: \"The assistant-ui chat is not rendering responses — it looks like the SSE chunks aren't in the right format.\"\\nassistant: \"Let me launch the sinsay-spring-backend agent to diagnose and fix the Vercel AI SDK Data Stream Protocol compliance issue in the SSE adapter.\"\\n<commentary>\\nSSE format compliance is a critical backend concern for this project. The agent should be invoked immediately.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: A new feature requires differentiating between 'return' and 'complaint' intents with separate system prompts.\\nuser: \"The AI should use a different system prompt depending on whether the user selected 'return' or 'complaint' in the form.\"\\nassistant: \"I'll invoke the sinsay-spring-backend agent to implement intent-based system prompt selection in the chat service.\"\\n<commentary>\\nPrompt routing logic based on intent is a backend service responsibility aligned with the PRD specification.\\n</commentary>\\n</example>"
+description: "Use this agent when you need to build, extend, or fix the Spring Boot backend for the Sinsay returns/complaints PoC. This includes implementing REST endpoints, SSE streaming for the chat interface, Spring AI + multimodal integration (image analysis), R2DBC + H2 persistence, AG-UI protocol compliance via LangGraph4j, and all related Java backend concerns.\\n\\nExamples:\\n\\n<example>\\nContext: The user wants to implement the core chat endpoint that streams AI responses.\\nuser: \"Implement the POST /langgraph4j/copilotkit endpoint that accepts messages and streams AG-UI events via SSE.\"\\nassistant: \"I'll launch the sinsay-spring-backend agent to implement this SSE streaming endpoint with AG-UI protocol support.\"\\n<commentary>\\nThis is a core backend task involving SSE, Spring AI, and AG-UI protocol compliance — exactly what this agent is designed for. Use the Task tool to launch the sinsay-spring-backend agent.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: The user needs to add R2DBC persistence for chat sessions.\\nuser: \"Add R2DBC entities and repositories to store session metadata, chat transcripts, and AI verdicts in H2.\"\\nassistant: \"I'll use the Task tool to launch the sinsay-spring-backend agent to design and implement the reactive persistence layer with proper test coverage.\"\\n<commentary>\\nPersistence layer work with R2DBC/H2 and TDD requirements maps directly to this agent's responsibilities.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: The user notices the streaming format is wrong and frontend chat is broken.\\nuser: \"The CopilotKit chat is not rendering responses — it looks like the SSE events aren't in the right AG-UI format.\"\\nassistant: \"Let me launch the sinsay-spring-backend agent to diagnose and fix the AG-UI protocol compliance issue in the SSE adapter.\"\\n<commentary>\\nSSE format compliance is a critical backend concern for this project. The agent should be invoked immediately.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: A new feature requires differentiating between 'return' and 'complaint' intents with separate system prompts.\\nuser: \"The AI should use a different system prompt depending on whether the user selected 'return' or 'complaint' in the form.\"\\nassistant: \"I'll invoke the sinsay-spring-backend agent to implement intent-based system prompt selection in the chat service.\"\\n<commentary>\\nPrompt routing logic based on intent is a backend service responsibility aligned with the PRD specification.\\n</commentary>\\n</example>"
 model: opus
 color: red
 memory: local
@@ -19,11 +19,12 @@ Before writing any code, always read:
 - `CLAUDE.md` / `AGENTS.md` — mandatory standards and workflow
 
 The application:
-- Accepts a form with order number, purchase date, intent (return/complaint), description, and images
-- Streams an AI verdict in **Polish** via `POST /api/chat` as `text/event-stream`
-- Uses **GPT-4o** via `spring-ai-starter-model-openai` with `Media` attachments for image analysis
-- Persists request metadata, transcripts, and verdicts in **SQLite via JPA**
-- Streams responses in **Vercel AI SDK Data Stream Protocol** format (`0:"text"`, `8:[{...}]` chunks)
+- Provides a chat interface where users can ask about Sinsay returns/complaints policies
+- When the AI detects return/complaint intent, it injects an interactive form via the AG-UI `show_return_form` tool call
+- Streams AI verdicts in **Polish** via `POST /langgraph4j/copilotkit` as `text/event-stream` using **AG-UI protocol events**
+- Uses a configurable AI model (Kimi K2.5 via Ollama by default) with Spring AI for multimodal image analysis
+- Persists session metadata, chat transcripts, and verdicts in **H2 (file-based) via R2DBC**
+- Communicates with the CopilotKit frontend using the **AG-UI protocol** (typed SSE events, not Vercel Data Stream Protocol)
 - Has NO authentication — PoC scope only
 
 ---
@@ -47,31 +48,30 @@ Do not skip steps. If tests pass before implementation, the test is wrong — fi
 ## Technology Stack & Constraints
 
 ### Core Stack
-- **Spring Boot**: 3.5.9
+- **Spring Boot**: 3.5.9 (WebFlux — reactive)
 - **Java**: 21 (use records, sealed classes, pattern matching where appropriate)
 - **Build**: Maven (`./mvnw`)
-- **AI**: `spring-ai-starter-model-openai`, model `gpt-4o`, with `Media` for image attachments
-- **Persistence**: SQLite + Spring Data JPA
-- **Streaming**: Server-Sent Events (SSE) following Vercel AI SDK Data Stream Protocol
+- **AI**: Spring AI 1.0.0 with Ollama adapter (configurable model, Kimi K2.5 default), multimodal image support
+- **Agent Orchestration**: LangGraph4j 1.6.2
+- **Persistence**: R2DBC + H2 (file-based at `data/sinsay-poc`)
+- **Streaming**: Server-Sent Events (SSE) following AG-UI protocol (typed JSON events)
 
 ### Spring AI Integration Rules
-- Use `ChatClient` or `StreamingChatClient` from Spring AI
-- Attach images using `Media` objects with the appropriate `MimeType`
-- Select system prompt based on `intent` field: `return` → return policy prompt, `complaint` → complaint policy prompt
-- Load system prompt content from `docs/sinay/` terms as knowledge base
-- Always respond to users **in Polish**
-- **Never call the live OpenAI API in tests** — mock all AI interactions
+- Use Spring AI `ChatModel` (via Ollama adapter or OpenAI adapter depending on fallback chain)
+- Attach images using `Media` objects with the appropriate `MimeType` for multimodal analysis
+- Select system prompt based on `intent` field: `return` → return policy prompt + `zwrot-30-dni.md`, `complaint` → complaint policy prompt + `reklamacje.md`
+- Load system prompt content from `docs/sinsay-documents/` terms as knowledge base
+- Respond in the user's language (Polish if Polish, English if English)
+- **Never call live AI APIs in tests** — mock all AI interactions
 
-### Vercel AI SDK Data Stream Protocol (Critical)
-SSE chunks MUST follow this exact format:
-```
-data: 0:"streamed text fragment"\n\n
-data: 8:[{"finishReason":"stop","usage":{"promptTokens":X,"completionTokens":Y}}]\n\n
-```
-- `0:` prefix for text delta chunks
-- `8:` prefix for finish metadata
-- Raw JSON arrays/objects are NOT acceptable — the frontend `useChat` hook will break
-- Write integration tests that assert on the exact chunk format using `MockMvc` with SSE response parsing
+### AG-UI Protocol (Critical)
+SSE events MUST follow the AG-UI typed event format. Key event types:
+- `RUN_STARTED` / `RUN_FINISHED` / `RUN_ERROR` — run lifecycle
+- `TEXT_MESSAGE_START` / `TEXT_MESSAGE_CONTENT` / `TEXT_MESSAGE_END` — streamed text
+- `TOOL_CALL_START` / `TOOL_CALL_ARGS` / `TOOL_CALL_END` — tool calls (form injection)
+- Events are JSON objects with a `type` field, serialized via Jackson and streamed as SSE
+- The `AGUIEvent` hierarchy in `org.bsc.langgraph4j.agui` handles serialization
+- Write integration tests that assert on event types and structure
 
 ### Persistence Rules
 - Entities: use Lombok (`@Data`, `@Builder`, `@NoArgsConstructor`, `@AllArgsConstructor`) — never mix with manual getters/setters

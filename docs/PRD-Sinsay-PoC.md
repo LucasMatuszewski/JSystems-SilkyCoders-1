@@ -33,7 +33,7 @@ When the conversation reveals that the user wants to initiate a return or file a
 4. **As a Customer**, I want to select whether I am making a "Return" or a "Complaint" so the system applies the correct rules (30 days vs. 2 years).
 5. **As a Customer**, I want to upload a photo of my product and receipt so the verification happens instantly without waiting for an email.
 6. **As a Customer**, I want to see a clear explanation of why my return was rejected (e.g., "The item appears worn").
-7. **As a Developer**, I want all chat sessions and verdicts saved to a local SQLite database so I can manually review the AI's performance later.
+7. **As a Developer**, I want all chat sessions and verdicts saved to a local database so I can manually review the AI's performance later.
 
 ---
 
@@ -195,18 +195,39 @@ The verdict message must contain: the conclusion (prominent), 2–4 sentence jus
 
 ### 5.4 Persistence
 
-Every session is stored in SQLite:
+Every session is stored in H2 (file-based, R2DBC) using a normalized schema across three tables:
 
-| Column            | Type      | Content                                                |
-| ----------------- | --------- | ------------------------------------------------------ |
-| `session_id`      | UUID      | Unique session identifier                              |
-| `created_at`      | Timestamp | Session start time                                     |
-| `intent`          | String    | `return` · `complaint` · `null` (if no form submitted) |
-| `product_name`    | String    | From submitted form                                    |
-| `description`     | String    | From submitted form                                    |
-| `photo_path`      | String    | Local path to saved photo file                         |
-| `verdict`         | String    | AI verdict text                                        |
-| `full_transcript` | JSON      | Complete message array for the session                 |
+**`sessions`** — One row per browser session:
+
+| Column       | Type      | Content                   |
+| ------------ | --------- | ------------------------- |
+| `id`         | UUID      | Unique session identifier |
+| `created_at` | Timestamp | Session start time        |
+| `updated_at` | Timestamp | Last activity time        |
+
+**`form_submissions`** — One row per form submission (a session may have 0..N):
+
+| Column         | Type      | Content                                                |
+| -------------- | --------- | ------------------------------------------------------ |
+| `id`           | UUID      | Unique submission identifier                           |
+| `session_id`   | UUID (FK) | References `sessions.id`                               |
+| `intent`       | String    | `return` · `complaint`                                 |
+| `product_name` | String    | From submitted form                                    |
+| `description`  | String    | From submitted form                                    |
+| `photo_path`   | String    | Local path to saved photo file                         |
+| `verdict`      | String    | AI verdict text (null until AI responds)               |
+| `submitted_at` | Timestamp | Form submission time                                   |
+| `verdict_at`   | Timestamp | Verdict generation time (null until AI responds)       |
+
+**`chat_messages`** — One row per message (full transcript reconstructed via query):
+
+| Column       | Type      | Content                           |
+| ------------ | --------- | --------------------------------- |
+| `id`         | UUID      | Unique message identifier         |
+| `session_id` | UUID (FK) | References `sessions.id`          |
+| `role`       | String    | `user` · `assistant` · `tool`     |
+| `content`    | String    | Message content                   |
+| `created_at` | Timestamp | Message timestamp                 |
 
 ---
 
@@ -261,7 +282,7 @@ Every session is stored in SQLite:
 
 ### Visual style
 
-- Sinsay brand: monochrome, clean, minimal. Shadcn UI components.
+- Sinsay brand: monochrome, clean, minimal. CopilotKit standard components themed with Tailwind CSS and Sinsay design tokens.
 - Follow strictly Sinsay Design System: `docs/sinsay-design-system.md`
 - Submit button: full-width, black fill, white text.
 - Verdict message: the conclusion line (e.g. "Reklamacja uzasadniona ✓") is visually prominent — bold or accented.
@@ -290,4 +311,4 @@ Every session is stored in SQLite:
 | Verdict accuracy          | Correct classification of photo evidence in ≥85% of test cases |
 | Form usability            | User completes and submits in ≤2 attempts                      |
 | Streaming latency         | First token within 3 seconds of form submission                |
-| Persistence               | 100% of sessions with submitted forms recoverable from SQLite  |
+| Persistence               | 100% of sessions with submitted forms recoverable from database |

@@ -38,7 +38,7 @@ Główne notatki i zasoby kursu znajdziesz w folderze `/docs`:
 
 - **Java 17** + **Spring Boot** + **Spring AI**
 - **Maven** (wrapper `./mvnw`)
-- **SQLite** (lokalna baza danych)
+- **H2** (lokalna baza danych, plik na dysku via R2DBC)
 - **OpenAI API** (GPT-4o, Codex)
 
 ### Uruchomienie
