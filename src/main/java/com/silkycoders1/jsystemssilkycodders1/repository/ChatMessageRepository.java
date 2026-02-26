@@ -1,0 +1,11 @@
+package com.silkycoders1.jsystemssilkycodders1.repository;
+
+import com.silkycoders1.jsystemssilkycodders1.domain.ChatMessage;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Flux;
+
+import java.util.UUID;
+
+public interface ChatMessageRepository extends ReactiveCrudRepository<ChatMessage, UUID> {
+    Flux<ChatMessage> findBySessionIdOrderByCreatedAt(UUID sessionId);
+}
