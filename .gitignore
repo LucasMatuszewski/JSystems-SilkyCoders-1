@@ -47,3 +47,7 @@ frontend/playwright-report/
 
 ### Claude ###
 .claude/agent-memory-local/
+.claude/agent-memory/
+
+### Logs ###
+logs/
