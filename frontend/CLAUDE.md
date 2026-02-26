@@ -33,8 +33,8 @@ frontend/
 │   ├── api/langgraph4j/
 │   │   └── route.ts               # API route: proxies CopilotKit → Spring Boot backend
 │   ├── component/
-│   │   ├── chat.tsx                # CopilotKit chat component
-│   │   └── chatApproval.tsx        # Tool call approval UI (human-in-the-loop)
+│   │   ├── SinsayChat.tsx          # CopilotKit chat component with Sinsay branding
+│   │   └── ReturnForm.tsx          # In-chat return/complaint form (rendered by agent action)
 │   ├── layout.tsx                  # Root layout
 │   ├── page.tsx                    # Home page
 │   ├── globals.css                 # Tailwind globals
@@ -61,8 +61,10 @@ User → CopilotKit Chat UI → POST /api/langgraph4j (Next.js API route)
 
 Key files:
 - `src/app/api/langgraph4j/route.ts` — CopilotKit runtime endpoint, creates `LangGraphHttpAgent` pointing to Spring Boot
-- `src/app/component/chat.tsx` — CopilotKit chat UI wrapper
-- `src/app/component/chatApproval.tsx` — Tool call approval component (human-in-the-loop for agent actions)
+- `src/app/component/SinsayChat.tsx` — CopilotKit chat UI with Sinsay branding and `showReturnForm` action
+- `src/app/component/ReturnForm.tsx` — In-chat form rendered when agent calls `showReturnForm`
+- `src/app/lib/imageResize.ts` — Client-side image resize (Canvas API, max 1024px)
+- `src/app/lib/schemas.ts` — Zod validation schema with Polish error messages
 
 The `NEXT_PUBLIC_LANGGRAPH_URL` env var overrides the backend URL (defaults to `http://localhost:8085/langgraph4j/copilotkit`).
 
@@ -157,8 +159,8 @@ cd frontend
 pnpm install                        # install dependencies
 pnpm dev                            # start dev server (Turbopack, ~localhost:3000)
 pnpm build                          # production build
-pnpm lint                           # run Next.js linter
-pnpm test                           # run unit tests (after test infra setup)
+pnpm lint                           # run ESLint (Note: Next.js 16 removed `next lint`; uses `eslint src` directly via eslint.config.mjs)
+pnpm test                           # run unit tests (Vitest)
 pnpm e2e                            # run Playwright E2E tests (after setup)
 ```
 
