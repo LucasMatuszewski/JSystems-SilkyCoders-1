@@ -176,5 +176,6 @@ For layer-specific checklist items, see `src/CLAUDE.md` (backend) or `frontend/C
 6. Before committing, always run linting and formatting fix (auto formatting)
 7. When adding new structure (backend/frontend), update the relevant CLAUDE.md files accordingly
 8. After every correction, end with: Update your CLAUDE.md so you don't make that mistake again.
+11. When you discover outdated, incorrect, or misaligned information in any project file (docs, config, code comments), remove or correct it directly. Do not document the change inside the file itself — report what was changed in the chat window only. All project files must remain internally consistent with no historical notes, divergence annotations, or correction markers left in the content.
 9. Create a new commit after each step, make commits granular and often with descriptive messages.
 10. Do not push changes to remote! Let user check changes locally.

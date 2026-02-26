@@ -24,6 +24,7 @@
 13. [Security Considerations](#13-security-considerations)
 14. [Future Production Path](#14-future-production-path)
 
+
 ---
 
 ## 1. Executive Summary
@@ -1046,14 +1047,3 @@ This section documents decisions made with production migration in mind, even th
 | Verdict display         | Not implemented                      | **Phase 4**                                   |
 
 ---
-
-## Appendix C: PRD Alignment Notes
-
-This appendix documents where the ADR intentionally diverges from the PRD and why.
-
-| PRD Specification | ADR Decision | Rationale |
-| --- | --- | --- |
-| SQLite database (§5.4) | R2DBC + H2 (file-based) | R2DBC has no production-quality SQLite driver; H2 provides equivalent file-based PoC persistence while staying reactive-compatible |
-| Flat single-table schema (§5.4) | Normalized 3-table schema | Better query flexibility, production-ready pattern, transcript can be reconstructed from `chat_messages` |
-| `full_transcript` JSON column (§5.4) | `chat_messages` table + `SessionService.getTranscript()` | Normalized storage is more useful; JSON transcript reconstructed on demand |
-| Shadcn UI components (§7) | CopilotKit standard components + Tailwind | CopilotKit already provides chat components; adding Shadcn would be redundant. Form card uses plain Tailwind matching Sinsay design system |
