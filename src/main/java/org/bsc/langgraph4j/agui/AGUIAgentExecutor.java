@@ -33,7 +33,7 @@ import static org.bsc.langgraph4j.utils.CollectionsUtils.lastOf;
 public class AGUIAgentExecutor extends AGUILangGraphAgent {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AGUIAgentExecutor.class);
 
-    enum AiModel {
+    public enum AiModel {
 
         OPENAI_GPT_4O_MINI( () ->
                 OpenAiChatModel.builder()
@@ -74,6 +74,14 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                                 .model("qwen3:14b")
                                 .temperature(0.1)
                                 .build())
+                .build()),
+        OLLAMA_KIMI_K2_5_CLOUD( () ->
+                OllamaChatModel.builder()
+                .ollamaApi( OllamaApi.builder().baseUrl("http://localhost:11434").build() )
+                .defaultOptions(OllamaOptions.builder()
+                                .model("kimi-k2.5:cloud")
+                                .temperature(0.1)
+                                .build())
                 .build());
         ;
 
@@ -104,18 +112,61 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
     }
 
     private final MemorySaver saver = new MemorySaver();
+    private final AiModel primaryModel;
 
-    public AGUIAgentExecutor() {}
+    public AGUIAgentExecutor() {
+        this(null);
+    }
+
+    public AGUIAgentExecutor(AiModel primaryModel) {
+        this.primaryModel = primaryModel;
+    }
+
+    String getEnv(String name) {
+        return System.getenv(name);
+    }
+
+    ChatModel resolveModel() {
+        // 1. Try configured primary model
+        if (primaryModel != null) {
+            try {
+                var model = primaryModel.model.get();
+                log.info("Using configured primary model: {}", primaryModel.name());
+                return model;
+            } catch (Exception e) {
+                log.warn("Primary model {} failed to initialize: {}, falling back...", primaryModel.name(), e.getMessage());
+            }
+        }
+
+        // 2. Fallback: OpenAI if API key present
+        if (getEnv("OPENAI_API_KEY") != null) {
+            try {
+                log.info("Falling back to OPENAI_GPT_4O_MINI");
+                return AiModel.OPENAI_GPT_4O_MINI.model.get();
+            } catch (Exception e) {
+                log.warn("OpenAI fallback failed: {}", e.getMessage());
+            }
+        }
+
+        // 3. Fallback: GitHub Models if token present
+        if (getEnv("GITHUB_MODELS_TOKEN") != null) {
+            try {
+                log.info("Falling back to GITHUB_MODELS_GPT_4O_MINI");
+                return AiModel.GITHUB_MODELS_GPT_4O_MINI.model.get();
+            } catch (Exception e) {
+                log.warn("GitHub Models fallback failed: {}", e.getMessage());
+            }
+        }
+
+        // 4. Last resort: Ollama qwen2.5
+        log.info("Falling back to OLLAMA_QWEN2_5_7B");
+        return AiModel.OLLAMA_QWEN2_5_7B.model.get();
+    }
 
     @Override
     protected GraphData buildStateGraph() throws GraphStateException {
 
-        var model = ofNullable(System.getenv("OPENAI_API_KEY"))
-                .map( key -> AiModel.OPENAI_GPT_4O_MINI.model.get())
-                .orElseGet( () ->
-                    ofNullable( System.getenv("GITHUB_MODELS_TOKEN") )
-                            .map( key -> AiModel.GITHUB_MODELS_GPT_4O_MINI.model.get() )
-                            .orElseGet( AiModel.OLLAMA_QWEN2_5_7B.model ));
+        var model = resolveModel();
 
         var agent =  AgentExecutorEx.builder()
                 .chatModel(model, true)

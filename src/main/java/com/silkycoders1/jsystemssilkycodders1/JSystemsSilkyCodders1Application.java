@@ -3,6 +3,7 @@ package com.silkycoders1.jsystemssilkycodders1;
 import org.bsc.langgraph4j.agui.AGUIAgent;
 import org.bsc.langgraph4j.agui.AGUIAgentExecutor;
 import org.bsc.langgraph4j.agui.AGUISampleAgent;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,8 +19,18 @@ public class JSystemsSilkyCodders1Application {
 
 	@Bean("AGUIAgent")
 	@ConditionalOnProperty(name = "ag-ui.agent", havingValue = "agentExecutor")
-	AGUIAgent createAgentExecutor() {
-		return new AGUIAgentExecutor();
+	AGUIAgent createAgentExecutor(@Value("${ag-ui.model:}") String modelName) {
+		AGUIAgentExecutor.AiModel primary = null;
+		if (modelName != null && !modelName.isBlank()) {
+			try {
+				primary = AGUIAgentExecutor.AiModel.valueOf(modelName);
+			} catch (IllegalArgumentException e) {
+				throw new IllegalArgumentException(
+					"Unknown ag-ui.model value: '" + modelName + "'. Available: " +
+					java.util.Arrays.toString(AGUIAgentExecutor.AiModel.values()));
+			}
+		}
+		return new AGUIAgentExecutor(primary);
 	}
 
 	@Bean("AGUIAgent")
