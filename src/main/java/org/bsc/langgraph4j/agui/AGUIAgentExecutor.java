@@ -1,5 +1,7 @@
 package org.bsc.langgraph4j.agui;
 
+import com.silkycoders1.jsystemssilkycodders1.service.PolicyService;
+import com.silkycoders1.jsystemssilkycodders1.tools.SinsayTools;
 import org.bsc.langgraph4j.CompileConfig;
 import org.bsc.langgraph4j.GraphRepresentation;
 import org.bsc.langgraph4j.GraphStateException;
@@ -11,6 +13,7 @@ import org.bsc.langgraph4j.spring.ai.util.MessageUtil;
 import org.bsc.langgraph4j.state.AgentState;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -19,13 +22,9 @@ import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
-
 import java.util.*;
 import java.util.function.Supplier;
 
-import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.lastOf;
 
@@ -92,34 +91,92 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
         }
     }
 
-    public static class Tools {
+    private static final String BASE_SYSTEM_PROMPT = """
+            You are a helpful and friendly customer service assistant for Sinsay, a fashion brand.
 
-        @Tool( description = "Send an email to someone")
-        public String sendEmail(
-                @ToolParam( description = "destination address") String to,
-                @ToolParam( description = "subject of the email") String subject,
-                @ToolParam( description = "body of the email") String body
-        ) {
-            // This is a placeholder for the actual implementation
-            return format("mail sent to %s with subject %s", to, subject);
-        }
+            Your responsibilities:
+            - Answer questions about returns, complaints, products, store locations, payment options
+            - Detect when a user wants to return a product or file a complaint
+            - Use the show_return_form tool when you detect clear return or complaint intent
+            - Analyze submitted form data and product photos against Sinsay's policies
+            - Respond in the user's language (Polish if they write in Polish, English if they write in English)
 
-        @Tool( description = "Get the weather in location")
-        public String queryWeather(@ToolParam( description = "The query to use in your search.") String query) {
-            // This is a placeholder for the actual implementation
-            return "Cold, with a low of 13 degrees";
-        }
-    }
+            On the VERY FIRST interaction: Send a short, friendly welcome message in Polish:
+            "Cześć! Jestem Twoim wirtualnym asystentem Sinsay. W czym mogę Ci dziś pomóc?"
+
+            Intent detection:
+            - Call show_return_form(type: "return") when user says: "chcę zwrócić", "zwrot", "oddać", "nie pasuje", "want to return", "return item", etc.
+            - Call show_return_form(type: "complaint") when user says: "reklamacja", "reklamować", "wadliwy", "uszkodzony", "defekt", "zepsuty", "complaint", "defective", etc.
+            - When intent is ambiguous, ask ONE clarifying question before showing the form.
+            - Do NOT show the form until you are confident about the intent.
+
+            After receiving form submission with a photo:
+            - Analyze the photo and form data carefully against Sinsay's policies below
+            - For returns: check for original tags, signs of use, verify the 30-day return window is applicable
+            - For complaints: identify the defect type, assess whether it is manufacturing vs user-caused damage, check 2-year complaint window
+            - Verdict format:
+              1. Start with a prominent conclusion line: "Zwrot możliwy ✓" / "Zwrot niemożliwy ✗" / "Reklamacja uzasadniona ✓" / "Reklamacja nieuzasadniona ✗"
+              2. Then 2-4 sentences justifying the decision, citing the specific applicable policy rule
+              3. Then one recommended next step for the customer
+            - If the photo is blurry, too dark, or cannot be properly analyzed: politely ask the user to send a clearer image before giving a verdict
+
+            IMPORTANT: Ground all policy answers in the provided policy documents. Never fabricate policies not found in the documents.
+            """;
 
     private final MemorySaver saver = new MemorySaver();
     private final AiModel primaryModel;
+    private final PolicyService policyService;
+    private final SinsayTools sinsayTools;
 
     public AGUIAgentExecutor() {
-        this(null);
+        this(null, null, null);
     }
 
     public AGUIAgentExecutor(AiModel primaryModel) {
+        this(primaryModel, null, null);
+    }
+
+    public AGUIAgentExecutor(AiModel primaryModel, PolicyService policyService, SinsayTools sinsayTools) {
         this.primaryModel = primaryModel;
+        this.policyService = policyService;
+        this.sinsayTools = sinsayTools;
+    }
+
+    /**
+     * Builds the system prompt by combining the base instructions with relevant policy documents.
+     *
+     * @param intent "return", "complaint", or "" for general conversation
+     * @return assembled system prompt string
+     */
+    String buildSystemPrompt(String intent) {
+        String policies = policyService != null ? policyService.getPoliciesForIntent(intent) : "";
+        if (policies.isBlank()) {
+            return BASE_SYSTEM_PROMPT;
+        }
+        return BASE_SYSTEM_PROMPT + """
+
+                --- POLICY DOCUMENTS ---
+                The following Sinsay policy documents apply to this conversation. Use them to ground your answers:
+
+                """ + policies;
+    }
+
+    /**
+     * Simple keyword-based intent detection from the user's latest message.
+     * Used to pre-load relevant policy documents into the system prompt.
+     */
+    private String detectIntent(String userMessage) {
+        String lower = userMessage.toLowerCase();
+        if (lower.contains("zwrot") || lower.contains("zwrócić") || lower.contains("oddać")
+                || lower.contains("return") || lower.contains("nie pasuje")) {
+            return "return";
+        }
+        if (lower.contains("reklamacja") || lower.contains("reklamować") || lower.contains("wadliwy")
+                || lower.contains("uszkodzony") || lower.contains("defekt") || lower.contains("zepsuty")
+                || lower.contains("complaint") || lower.contains("defective")) {
+            return "complaint";
+        }
+        return "";
     }
 
     String getEnv(String name) {
@@ -167,24 +224,25 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
     protected GraphData buildStateGraph() throws GraphStateException {
 
         var model = resolveModel();
+        var tools = sinsayTools != null ? sinsayTools : new SinsayTools();
 
-        var agent =  AgentExecutorEx.builder()
+        var agent = AgentExecutorEx.builder()
                 .chatModel(model, true)
-                .toolsFromObject(new Tools())
-                .approvalOn( "sendEmail",
-                         (nodeId, state ) ->
-                                        InterruptionMetadata.builder( nodeId, state )
+                .toolsFromObject(tools)
+                .approvalOn("showReturnForm",
+                        (nodeId, state) ->
+                                InterruptionMetadata.builder(nodeId, state)
                                         .build()
                 )
                 .build();
 
-        log.info( "REPRESENTATION:\n{}",
+        log.info("REPRESENTATION:\n{}",
                 agent.getGraph(GraphRepresentation.Type.PLANTUML, "Agent Executor", false).content()
         );
 
         var compileConfig = CompileConfig.builder().checkpointSaver(saver).build();
 
-        return new GraphData( agent.compile(compileConfig) ) ;
+        return new GraphData(agent.compile(compileConfig));
     }
 
     @Override
@@ -192,11 +250,15 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
 
         var lastUserMessage = input.lastUserMessage()
                 .map(AGUIMessage.TextMessage::content)
-                .orElseThrow( () -> new IllegalStateException("last user message not found"));
+                .orElseThrow(() -> new IllegalStateException("last user message not found"));
 
-        log.debug( "LAST USER MESSAGE: {}", lastUserMessage );
+        log.debug("LAST USER MESSAGE: {}", lastUserMessage);
 
-        return Map.of("messages", new UserMessage(lastUserMessage));
+        // Detect intent from the latest message to pre-load relevant policies
+        String intent = detectIntent(lastUserMessage);
+        var systemMessage = new SystemMessage(buildSystemPrompt(intent));
+
+        return Map.of("messages", List.of(systemMessage, new UserMessage(lastUserMessage)));
     }
 
     @Override

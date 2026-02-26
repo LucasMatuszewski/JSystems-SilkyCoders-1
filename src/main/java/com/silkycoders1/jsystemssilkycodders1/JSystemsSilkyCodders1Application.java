@@ -1,5 +1,7 @@
 package com.silkycoders1.jsystemssilkycodders1;
 
+import com.silkycoders1.jsystemssilkycodders1.service.PolicyService;
+import com.silkycoders1.jsystemssilkycodders1.tools.SinsayTools;
 import org.bsc.langgraph4j.agui.AGUIAgent;
 import org.bsc.langgraph4j.agui.AGUIAgentExecutor;
 import org.bsc.langgraph4j.agui.AGUISampleAgent;
@@ -19,7 +21,10 @@ public class JSystemsSilkyCodders1Application {
 
 	@Bean("AGUIAgent")
 	@ConditionalOnProperty(name = "ag-ui.agent", havingValue = "agentExecutor")
-	AGUIAgent createAgentExecutor(@Value("${ag-ui.model:}") String modelName) {
+	AGUIAgent createAgentExecutor(
+			@Value("${ag-ui.model:}") String modelName,
+			PolicyService policyService,
+			SinsayTools sinsayTools) {
 		AGUIAgentExecutor.AiModel primary = null;
 		if (modelName != null && !modelName.isBlank()) {
 			try {
@@ -30,7 +35,7 @@ public class JSystemsSilkyCodders1Application {
 					java.util.Arrays.toString(AGUIAgentExecutor.AiModel.values()));
 			}
 		}
-		return new AGUIAgentExecutor(primary);
+		return new AGUIAgentExecutor(primary, policyService, sinsayTools);
 	}
 
 	@Bean("AGUIAgent")
