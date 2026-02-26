@@ -106,9 +106,42 @@ For layer-specific quality standards, see `src/CLAUDE.md` or `frontend/CLAUDE.md
 4. **Confirm tests fail** — run the test suite; if tests pass at this stage, they test nothing
 5. **Implement minimum production code** — write only what is needed to make tests pass
 6. **Confirm all tests pass** — run the full test suite; fix the implementation, not the tests
-7. **Refactor** — clean up while keeping all tests green
+7. **Prove test honesty** — see "Test Honesty Verification" below; skip this and the task is not complete
+8. **Refactor** — clean up while keeping all tests green
 
 For language-specific TDD commands and tooling, see `src/CLAUDE.md` (backend) or `frontend/CLAUDE.md` (frontend).
+
+---
+
+## Test Honesty Verification (Mandatory — Not Optional)
+
+This project has a documented problem: agents make tests pass by weakening them instead of fixing the code. This is called "specification gaming" and it destroys the value of the test suite. **Every agent working on this project must follow these rules.**
+
+### Prove your tests are honest
+
+After all tests pass (step 6 of TDD), do this for every new or modified test:
+
+**Step 1 — Sabotage your own code**: Comment out, rename, or intentionally break the production code you just wrote. Run the tests. **They must fail.** If they pass with your code removed, the tests don't actually test your implementation — delete them and write real ones.
+
+**Step 2 — Name the failure**: For each test, write one sentence: "This test would fail if [specific production code change]." If you can't complete this sentence, the test is not testing anything specific.
+
+**Step 3 — Test the failure path**: For every success-path test, write at least one failure-path test. If your feature handles AI model errors, write a test where the mock throws an error and verify the right error handling fires. A feature with only happy-path tests is half-tested.
+
+### Forbidden actions — these are test dishonesty
+
+**You are NEVER allowed to do any of the following to make a test pass:**
+- Change an expected value to match wrong output (`assertThat(x).isEqualTo("wrong")` → `assertThat(x).isEqualTo("also-wrong")`)
+- Remove an assertion that was catching a real bug
+- Add `|| alternative` conditions to assertions that hide the real failure
+- Increase a timeout to mask slow or flaky behavior
+- Mock away the component you are supposed to be testing
+- Skip or ignore a test case without leaving a comment explaining why and a tracking issue
+
+**If a test is failing, there are exactly two acceptable responses:**
+1. Fix the production code so the test passes (preferred — the code is wrong)
+2. Delete the test entirely and rewrite it because the requirements changed (rare)
+
+**Changing the test to match broken behavior is never acceptable.** If you find yourself wanting to change a test assertion, ask "is the code wrong or is the test wrong?" If the code is wrong, fix the code.
 
 ---
 
@@ -211,24 +244,33 @@ For layer-specific checklist items, see `src/CLAUDE.md` (backend) or `frontend/C
 
 After any task delegated to a sub-agent completes, the coordinating agent **must** evaluate the sub-agent's decisions before accepting the work. Read the sub-agent's memory file and the code it produced.
 
-### What to Check
+### What to Check (checklist — run after every delegated task)
 
-**Test quality — most common failure mode:**
-- Did the sub-agent weaken tests to make them pass? (e.g., removed assertions, changed expected values to match wrong behavior, added `|| fallback` conditions)
-- Did the sub-agent write tests AFTER production code (violating TDD)?
-- Do the tests actually fail when the feature is broken? (Remove the implementation mentally — would the tests catch it?)
-- Are tests mocking the component under test? (e.g., mocking the class you're testing instead of its dependencies)
+**Test gaming — the most critical failure mode:**
+- Did the sub-agent change an expected value to match wrong output?
+- Did the sub-agent remove an assertion or add `|| fallback` to make a test pass?
+- Did the sub-agent mock away the thing it was supposed to be testing?
+- Did tests pass before the production code existed? (sign: test written after code, or mock always returns success regardless of input)
+- Are all mocks returning success only? Is there even ONE mock that simulates the failure path?
 
 **Coverage gaps:**
-- Are error paths tested? (not just happy path)
-- Do integration tests test real wiring, or just mock everything end-to-end?
-- Is there an E2E test that would catch a real runtime failure?
+- For every AI model call in the feature: is there a test where the model throws? Does that test verify the user sees the right error?
+- Is there an E2E Playwright test that exercises the full feature with the real stack?
+- Can any test be satisfied by an empty implementation? (if so, it's useless)
+
+**Process violations:**
+- Did the sub-agent run E2E tests? Quote the output — not just "I ran the tests"
+- Did tests come before production code? Check the git history if uncertain
+- Did the sub-agent verify the running app actually works (not just that tests pass)?
 
 **Code quality:**
-- Does the implementation match the spec, or did the sub-agent interpret requirements loosely?
-- Were any shortcuts taken that create hidden failures (e.g., swallowing exceptions, empty catch blocks)?
+- Were exceptions swallowed (empty catch, log and ignore)?
+- Are error messages user-visible? (Backend errors in Polish, shown to user in frontend)
+- Does the implementation actually handle the failure scenario described in the task?
 
 ### What to Do When Issues Are Found
-- Fix the bad test or code directly before accepting the work
-- Update the relevant agent's instructions (`.claude/agents/`) to prevent the same mistake
-- Note the pattern in this CLAUDE.md if it's project-wide
+1. Fix the bad test or code BEFORE accepting the work — do not merge hollow tests
+2. Update the relevant agent's instructions (`.claude/agents/`) to prevent the same mistake next time
+3. If the pattern is project-wide, update this file
+
+> **Note**: This evaluation is not bureaucracy — it is the only reliable way to catch specification gaming before it accumulates. A passing test suite that doesn't catch real failures is more dangerous than no tests at all, because it provides false confidence.
