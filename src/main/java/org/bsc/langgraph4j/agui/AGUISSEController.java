@@ -37,7 +37,10 @@ public class AGUISSEController {
 
         Flux<AGUIEvent> agentFlux = (Flux<AGUIEvent>) uiAgent.run(input);
         return agentFlux.onErrorResume(throwable -> {
-            log.error("Agent execution failed: {}", throwable.getMessage(), throwable);
+            String causeMessage = throwable.getCause() != null
+                    ? throwable.getCause().getMessage()
+                    : "no cause";
+            log.error("Agent execution failed: {} | cause: {}", throwable.getMessage(), causeMessage, throwable);
             return Flux.just(new AGUIEvent.RunErrorEvent(mapErrorToUserMessage(throwable), "AGENT_ERROR"));
         });
     }

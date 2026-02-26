@@ -191,6 +191,22 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
         return "";
     }
 
+    /**
+     * Truncates a value that may contain a large base64 payload for safe logging.
+     * Values longer than 80 characters are replaced with the first 80 chars followed
+     * by a size annotation, e.g. {@code "/9j/4AAQ...[45231 chars]"}.
+     * This prevents multi-kilobyte base64 image data from polluting log output.
+     *
+     * @param value the string to truncate; may be null
+     * @return the original value if {@code null} or <= 80 chars; a truncated form otherwise
+     */
+    static String truncateBase64(String value) {
+        if (value == null) return null;
+        int len = value.length();
+        if (len <= 80) return value;
+        return value.substring(0, 80) + "...[" + len + " chars]";
+    }
+
     String getEnv(String name) {
         return System.getenv(name);
     }
@@ -264,7 +280,7 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                 .map(AGUIMessage.TextMessage::content)
                 .orElseThrow(() -> new IllegalStateException("last user message not found"));
 
-        log.debug("LAST USER MESSAGE: {}", lastUserMessage);
+        log.debug("LAST USER MESSAGE: {}", truncateBase64(lastUserMessage));
 
         // Check if any messages contain a form submission result (JSON with photo)
         Optional<FormSubmissionData> formSubmission = extractFormSubmission(input);
