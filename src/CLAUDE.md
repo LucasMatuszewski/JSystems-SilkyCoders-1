@@ -115,92 +115,31 @@ Key classes:
 
 ---
 
-## Testing Infrastructure
+## Testing
 
-> Spring Boot: **3.5.9** | Java: **21** | Build: Maven
+**For how to write tests, patterns, library details, and project-specific conventions, see [`src/test/CLAUDE.md`](../src/test/CLAUDE.md).**
 
-### Current Test Dependencies (already in `pom.xml`)
+TDD is mandatory for all backend work. See the root `CLAUDE.md` for the full TDD process.
 
-`spring-boot-starter-test` is included in `test` scope and transitively provides:
-
-- **JUnit 5** (Jupiter) — test engine
-- **Mockito** — mocking framework
-- **AssertJ** — fluent assertions
-- **Spring Test** — `@SpringBootTest`, `@WebFluxTest`, test slices
-- **Hamcrest** — matcher library (use AssertJ preferentially)
-- **JSONassert** and **JsonPath** — JSON response assertions
-
-`reactor-test` is included in `test` scope for:
-
-- **StepVerifier** — testing Reactor `Flux`/`Mono` streams
-
-### Additional Dependencies to Add as Needed
-
-When the task requires them, add to `pom.xml`:
-
-```xml
-<!-- Testcontainers (for integration tests with real DBs) -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-testcontainers</artifactId>
-    <scope>test</scope>
-</dependency>
-
-<!-- Awaitility (for async/SSE stream testing) -->
-<dependency>
-    <groupId>org.awaitility</groupId>
-    <artifactId>awaitility</artifactId>
-    <scope>test</scope>
-</dependency>
-```
-
-### Test Class Naming and Location
-
-- Test classes: `src/test/java/...` mirroring the main source package structure
-- Naming: `*Tests` suffix (e.g., `AGUIAgentExecutorModelResolutionTests`)
-- Unit tests: no Spring context — `@ExtendWith(MockitoExtension.class)` or plain JUnit
-- WebFlux API tests: `@WebFluxTest(ControllerClass.class)` with `WebTestClient`
-- Full integration tests: `@SpringBootTest(webEnvironment = RANDOM_PORT)`
-
----
-
-## TDD Process (Backend)
-
-Follow the universal TDD process from the root `CLAUDE.md`. Backend-specific commands:
-
-### Step 4 — Confirm Tests Fail
+### Test Commands
 
 ```bash
-./mvnw test -Dtest=YourTestClass
+./mvnw test                          # run all tests
+./mvnw test -Dtest=ClassName         # run a single test class
+./mvnw test -Dtest=ClassName#method  # run a single test method
+./mvnw clean compile                 # compile only, check for warnings
+./mvnw clean verify                  # full build + all tests
 ```
 
-Tests must fail at this point (no functionality implemented yet). If they pass, the test is not testing anything.
+Run tests after changing `.java` or `pom.xml` files only. Do NOT run after changing only `.md` or frontend files.
 
-### Step 6 — Confirm All Tests Pass
+### Always Run the Full Test Suite Before Committing
 
 ```bash
 ./mvnw test
 ```
 
 All tests must pass. If they don't, fix the implementation (not the test) unless the test itself was wrong.
-
-### Test Style
-
-Use BDD-style descriptive names and `given / when / then` structure:
-
-```java
-@Test
-void shouldFallbackToOllamaWhenNoEnvVarsAndNoPrimary() {
-    // given — no primary, no env vars
-    var executor = new TestableExecutor();
-
-    // when
-    ChatModel model = executor.resolveModel();
-
-    // then
-    assertThat(model).isInstanceOf(OllamaChatModel.class);
-}
-```
 
 ---
 

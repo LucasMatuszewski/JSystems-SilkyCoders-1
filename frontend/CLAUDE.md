@@ -87,68 +87,11 @@ The following standards define acceptable work for all frontend code. Every item
 
 ---
 
-## Testing Infrastructure Setup (Frontend — Greenfield)
+## Testing Infrastructure
 
-> This is a new project. Set up the testing stack from scratch using current best practices.
-
-### Recommended Stack
-
-| Tool                            | Purpose                                         | Version target                               |
-| ------------------------------- | ----------------------------------------------- | -------------------------------------------- |
-| **Vitest**                      | Unit and integration test runner                | latest stable                                |
-| **React Testing Library**       | Component testing with user-centric queries     | latest stable                                |
-| **@testing-library/user-event** | Realistic user interaction simulation           | latest stable                                |
-| **jsdom**                       | DOM environment for Vitest                      | via Vitest config                            |
-| **MSW (Mock Service Worker)**   | Mock API calls in tests (including SSE streams) | v2+                                          |
-| **Playwright**                  | End-to-end and visual verification              | latest stable (already available via plugin) |
-
-### Initial Setup Commands
-
-```bash
-# Inside the frontend/ directory — use pnpm (not npm)
-pnpm add -D vitest @vitest/ui jsdom
-pnpm add -D @testing-library/react @testing-library/user-event @testing-library/jest-dom
-pnpm add -D msw
-
-# Playwright (for E2E and visual verification)
-pnpm add -D @playwright/test
-pnpm exec playwright install chromium
-```
-
-### Vitest Configuration
-
-Add to `next.config.ts` or create `vitest.config.ts`:
-
-```typescript
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
-
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-  },
-});
-```
-
-### NPM Scripts (add to `package.json`)
-
-```json
-{
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "e2e": "playwright test"
-  }
-}
-```
+For test library details, patterns, and code examples:
+- Unit & integration tests: [`frontend/src/test/CLAUDE.md`](src/test/CLAUDE.md)
+- Playwright E2E tests: [`frontend/src/e2e/CLAUDE.md`](src/e2e/CLAUDE.md)
 
 ---
 
