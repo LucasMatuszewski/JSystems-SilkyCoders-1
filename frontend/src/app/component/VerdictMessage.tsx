@@ -30,7 +30,10 @@ export function VerdictMessage({ text }: VerdictMessageProps) {
   const verdictType = isApproved ? 'approved' : 'rejected';
 
   return (
-    <div className="rounded-lg border border-[#E3E4E5] p-4 my-2 bg-white shadow-sm max-w-sm">
+    <div
+      data-testid={isApproved ? 'verdict-approved' : 'verdict-rejected'}
+      className="rounded-lg border border-[#E3E4E5] p-4 my-2 bg-white shadow-sm max-w-sm"
+    >
       {/* Conclusion line */}
       <p
         data-verdict={verdictType}

@@ -75,6 +75,7 @@ export function ReturnForm({ args, status, respond }: ReturnFormProps) {
 
   return (
     <form
+      data-testid="return-form"
       onSubmit={handleSubmit}
       aria-label="Formularz zwrotu lub reklamacji"
       className="border border-[#C7C8C9] rounded-lg p-4 shadow-sm bg-white w-full max-w-md"
@@ -89,6 +90,7 @@ export function ReturnForm({ args, status, respond }: ReturnFormProps) {
           Nazwa produktu *
         </label>
         <input
+          data-testid="form-product-name"
           id="productName"
           type="text"
           value={productName}
@@ -108,6 +110,7 @@ export function ReturnForm({ args, status, respond }: ReturnFormProps) {
           Typ zgłoszenia *
         </label>
         <select
+          data-testid="form-type"
           id="type"
           value={type}
           onChange={e => setType(e.target.value as 'return' | 'complaint')}
@@ -125,6 +128,7 @@ export function ReturnForm({ args, status, respond }: ReturnFormProps) {
           Opis problemu *
         </label>
         <textarea
+          data-testid="form-description"
           id="description"
           value={description}
           onChange={e => setDescription(e.target.value)}
@@ -145,6 +149,7 @@ export function ReturnForm({ args, status, respond }: ReturnFormProps) {
         </label>
         {!isReadOnly && (
           <input
+            data-testid="form-photo-upload"
             id="photo"
             type="file"
             accept="image/jpeg,image/png,image/webp"
@@ -167,6 +172,7 @@ export function ReturnForm({ args, status, respond }: ReturnFormProps) {
       {/* Submit */}
       {!isReadOnly && (
         <button
+          data-testid="form-submit-btn"
           type="submit"
           disabled={!isComplete || isProcessingPhoto}
           className="w-full bg-[#16181D] text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#303133] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"

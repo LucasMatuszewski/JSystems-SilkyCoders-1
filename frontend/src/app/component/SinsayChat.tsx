@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import { useCopilotAction } from '@copilotkit/react-core';
 import { CopilotChat } from '@copilotkit/react-ui';
 import { ReturnForm } from './ReturnForm';
@@ -24,6 +25,40 @@ function SinsayLogo() {
 }
 
 export function SinsayChat() {
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    function applyTestIds(): void {
+      if (!container) return;
+      const textarea = container.querySelector<HTMLTextAreaElement>('.copilotKitInput textarea');
+      if (textarea && !textarea.dataset['testid']) {
+        textarea.dataset['testid'] = 'chat-input';
+      }
+      const sendBtn = container.querySelector<HTMLButtonElement>(
+        '.copilotKitInputControls button[aria-label="Send"]'
+      );
+      if (sendBtn && !sendBtn.dataset['testid']) {
+        sendBtn.dataset['testid'] = 'chat-send-btn';
+      }
+      const messages = container.querySelector<HTMLElement>('.copilotKitMessages');
+      if (messages && !messages.dataset['testid']) {
+        messages.dataset['testid'] = 'chat-messages';
+      }
+    }
+
+    // Apply once immediately (elements may already be in the DOM)
+    applyTestIds();
+
+    // Observe for dynamic DOM changes (CopilotKit may render asynchronously)
+    const observer = new MutationObserver(applyTestIds);
+    observer.observe(container, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
   useCopilotAction({
     name: 'showReturnForm',
     description: 'Display return/complaint form in chat',
@@ -41,7 +76,7 @@ export function SinsayChat() {
   });
 
   return (
-    <div className="flex flex-1 flex-col min-h-0">
+    <div ref={chatContainerRef} className="flex flex-1 flex-col min-h-0">
       {/* Sinsay branded header */}
       <header
         role="banner"
