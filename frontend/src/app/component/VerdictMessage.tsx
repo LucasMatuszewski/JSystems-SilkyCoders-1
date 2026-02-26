@@ -30,23 +30,23 @@ export function VerdictMessage({ text }: VerdictMessageProps) {
   const verdictType = isApproved ? 'approved' : 'rejected';
 
   return (
-    <div className="rounded-lg border p-4 my-2 bg-white shadow-sm max-w-sm">
+    <div className="rounded-lg border border-[#E3E4E5] p-4 my-2 bg-white shadow-sm max-w-sm">
       {/* Conclusion line */}
       <p
         data-verdict={verdictType}
         className={`text-base font-semibold mb-2 ${
-          isApproved ? 'text-green-700' : 'text-red-700'
+          isApproved ? 'text-[#0A8C07]' : 'text-[#CC001C]'
         }`}
       >
         {conclusionLine}
       </p>
 
       {/* Divider */}
-      <hr className={`mb-2 ${isApproved ? 'border-green-200' : 'border-red-200'}`} />
+      <hr className={`mb-2 ${isApproved ? 'border-[#0DB209]/30' : 'border-[#FF0023]/30'}`} />
 
       {/* Justification + next steps */}
       {restLines.map((line, i) => (
-        <p key={i} className="text-sm text-gray-700 mb-1 last:mb-0">
+        <p key={i} className="text-sm text-[#494A4D] mb-1 last:mb-0">
           {line}
         </p>
       ))}

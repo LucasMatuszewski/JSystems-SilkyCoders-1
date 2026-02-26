@@ -29,7 +29,7 @@ export function SinsayChat() {
         initial: 'Cześć! Jestem Twoim wirtualnym asystentem Sinsay. W czym mogę Ci dziś pomóc?',
         placeholder: 'Napisz wiadomość...',
       }}
-      className="h-full"
+      className="flex-1 min-h-0"
     />
   );
 }

@@ -23,19 +23,33 @@
   --color-border-input: #C7C8C9;
   --color-brand-dark: #16181D;
 
-  /* CopilotKit brand overrides */
+  /* CopilotKit brand overrides — maps to actual CopilotKit CSS variable names */
+  /* Primary: dark brand colour used for send button, header, borders */
   --copilot-kit-primary-color: #16181D;
-  --copilot-kit-secondary-color: #F1F2F4;
+  /* Contrast: text/icon colour on primary backgrounds */
+  --copilot-kit-contrast-color: #FFFFFF;
+  /* Background: main chat panel background */
   --copilot-kit-background-color: #FFFFFF;
-  --copilot-kit-response-button-background-color: #16181D;
-  --copilot-kit-response-button-color: #FFFFFF;
+  /* Input area background */
+  --copilot-kit-input-background-color: #F1F2F4;
+  /* Secondary: user message bubble background */
+  --copilot-kit-secondary-color: #16181D;
+  /* Secondary contrast: text colour on secondary (user bubble) */
+  --copilot-kit-secondary-contrast-color: #FFFFFF;
+  /* Separator lines */
   --copilot-kit-separator-color: #E3E4E5;
-  --copilot-kit-scrollbar-color: #C8C9CC;
+  /* Muted icons, placeholders */
+  --copilot-kit-muted-color: #7B7D80;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {

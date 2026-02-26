@@ -6,7 +6,7 @@ import '@copilotkit/react-ui/styles.css';
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pl">
-      <body className="h-screen overflow-hidden">
+      <body className="h-screen overflow-hidden flex flex-col">
         <CopilotKit runtimeUrl="/api/langgraph4j" agent="default">
           {children}
         </CopilotKit>
