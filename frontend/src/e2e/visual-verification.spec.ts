@@ -148,22 +148,21 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
     // Step 5: submit the form
     await page.getByTestId('form-submit-btn').click();
 
-    // Step 6: a verdict MUST appear. If an error toast appears first, fail immediately.
-    // This is better than waiting 60s for a verdict that will never arrive.
+    // Step 6: a verdict MUST appear. If an error banner appears first, fail immediately
+    // instead of waiting the full 60s timeout.
+    // The CopilotKit error banner contains Polish text starting with "Błąd" — select by text.
     const approved = page.getByTestId('verdict-approved');
     const rejected = page.getByTestId('verdict-rejected');
-    const errorToast = page.getByTestId('error-toast');
+    const errorBanner = page.getByText(/Błąd/, { exact: false });
 
-    // Wait for whichever appears first: verdict or error
     const result = await Promise.race([
       approved.waitFor({ timeout: 60000 }).then(() => 'approved' as const),
       rejected.waitFor({ timeout: 60000 }).then(() => 'rejected' as const),
-      errorToast.waitFor({ timeout: 60000 }).then(() => 'error' as const),
+      errorBanner.waitFor({ timeout: 60000 }).then(() => 'error' as const),
     ]);
 
-    // An error toast means the backend failed (auth/model error) — this must fail the test.
     if (result === 'error') {
-      const errorText = await errorToast.textContent();
+      const errorText = await errorBanner.first().textContent();
       throw new Error(`Backend returned an error instead of a verdict: "${errorText}"`);
     }
 
@@ -202,16 +201,16 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     const approved = page.getByTestId('verdict-approved');
     const rejected = page.getByTestId('verdict-rejected');
-    const errorToast = page.getByTestId('error-toast');
+    const errorBanner = page.getByText(/Błąd/, { exact: false });
 
     const result = await Promise.race([
       approved.waitFor({ timeout: 60000 }).then(() => 'approved' as const),
       rejected.waitFor({ timeout: 60000 }).then(() => 'rejected' as const),
-      errorToast.waitFor({ timeout: 60000 }).then(() => 'error' as const),
+      errorBanner.waitFor({ timeout: 60000 }).then(() => 'error' as const),
     ]);
 
     if (result === 'error') {
-      const errorText = await errorToast.textContent();
+      const errorText = await errorBanner.first().textContent();
       throw new Error(`Backend returned an error instead of a verdict: "${errorText}"`);
     }
 
