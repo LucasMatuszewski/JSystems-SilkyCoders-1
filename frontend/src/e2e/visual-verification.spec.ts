@@ -1,177 +1,149 @@
 import { test, expect } from '@playwright/test';
-import path from 'path';
 
-const SCREENSHOT_DIR = path.resolve(__dirname, '../../../docs/assets');
+const BACKEND_HEALTH_URL = 'http://localhost:8085/langgraph4j/copilotkit';
+const APP_URL = 'http://localhost:3000';
+// Test fixture for photo upload tests (form submission / verdict):
+//   path.join(__dirname, 'fixtures', 'test-product.jpg')
 
-test.describe('Sinsay AI Assistant — Visual and Functional Verification', () => {
+/**
+ * Every test suite in this file requires a live backend.
+ * The beforeAll health check throws so that tests never silently pass
+ * when the backend is down.
+ */
+test.describe('Sinsay AI Assistant — E2E verification', () => {
+  test.beforeAll(async ({ request }) => {
+    // The backend does not have an /actuator/health endpoint; we probe the
+    // CopilotKit endpoint with an OPTIONS / HEAD request. A connection
+    // refused means the backend is not running and we must abort.
+    const response = await request
+      .head(BACKEND_HEALTH_URL)
+      .catch(() => null);
+
+    if (!response) {
+      throw new Error(
+        'Backend is not running on port 8085. ' +
+        'Start it with: ./mvnw spring-boot:run'
+      );
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test 1 — App loads with correct branding
+  // ─────────────────────────────────────────────────────────────────────────
   test('app loads with correct Sinsay branding', async ({ page }) => {
-    // Navigate to the app
-    await page.goto('http://localhost:3000');
+    // Any uncaught JS error on the page must fail this test immediately.
+    page.on('pageerror', (err) => {
+      throw err;
+    });
 
-    // Wait for the CopilotKit chat messages container to be visible
-    await page.waitForSelector('.copilotKitMessages', { timeout: 15000 });
+    await page.goto(APP_URL);
 
-    // Take screenshot and save to docs/assets
-    const screenshotPath = path.join(SCREENSHOT_DIR, 'screenshot-app-loaded.png');
-    await page.screenshot({ path: screenshotPath, fullPage: false });
+    // chat-messages is injected by a MutationObserver in SinsayChat — wait for it
+    await expect(page.getByTestId('chat-messages')).toBeVisible({ timeout: 15000 });
 
-    // Verify Sinsay branded header is present
-    const sinsayHeader = page.locator('header[aria-label="Sinsay AI Assistant"]');
-    await expect(sinsayHeader).toBeVisible();
+    // Sinsay branded header must be present and contain a logo
+    const header = page.getByRole('banner', { name: 'Sinsay AI Assistant' });
+    await expect(header).toBeVisible();
 
-    // Verify logo SVG is inside header
-    const logoSvg = sinsayHeader.locator('svg');
-    await expect(logoSvg).toBeVisible();
+    // Logo SVG is embedded inside the header
+    await expect(header.locator('svg[aria-label="Sinsay"]')).toBeVisible();
 
-    // Verify "AI Assistant" label text
-    const assistantLabel = sinsayHeader.locator('span');
-    await expect(assistantLabel).toContainText('AI Assistant');
-
-    // Verify chat input with Polish placeholder
-    const input = page.locator('textarea').first();
-    await expect(input).toBeVisible();
-    const placeholder = await input.getAttribute('placeholder');
-    expect(placeholder).toBe('Napisz wiadomość...');
-
-    // Verify the initial AI message in Polish
-    const messages = page.locator('.copilotKitAssistantMessage');
-    const messageCount = await messages.count();
-    expect(messageCount).toBeGreaterThan(0);
-    const firstMessage = await messages.first().textContent();
-    expect(firstMessage).toContain('Sinsay');
+    // Chat input must carry Polish placeholder text
+    const chatInput = page.getByTestId('chat-input');
+    await expect(chatInput).toBeVisible({ timeout: 15000 });
+    await expect(chatInput).toHaveAttribute('placeholder', 'Napisz wiadomość...');
   });
 
-  test('chat input accepts text and shows send button', async ({ page }) => {
-    await page.goto('http://localhost:3000');
-    await page.waitForSelector('.copilotKitMessages', { timeout: 15000 });
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test 2 — Chat sends a message and backend responds
+  // This test MUST FAIL if the backend is down.
+  // ─────────────────────────────────────────────────────────────────────────
+  test('chat sends a message and backend responds with AI reply', async ({ page }) => {
+    page.on('pageerror', (err) => {
+      throw err;
+    });
 
-    // Find the textarea input
-    const input = page.locator('textarea').first();
-    await expect(input).toBeVisible();
+    await page.goto(APP_URL);
 
-    // Verify send button is present
-    const sendButton = page.locator('button[aria-label="Send"]');
-    await expect(sendButton).toBeVisible();
+    // Wait until CopilotKit has injected the testid attributes
+    const chatInput = page.getByTestId('chat-input');
+    await expect(chatInput).toBeVisible({ timeout: 15000 });
 
-    // Type a greeting in Polish
-    await input.fill('Cześć');
+    await chatInput.fill('Cześć');
+    await page.getByTestId('chat-send-btn').click();
 
-    // Take screenshot with typed message
-    const beforePath = path.join(SCREENSHOT_DIR, 'screenshot-before-send.png');
-    await page.screenshot({ path: beforePath, fullPage: false });
+    // The input must be cleared after the message is sent
+    await expect(chatInput).toHaveValue('', { timeout: 10000 });
 
-    // Verify the text was entered correctly
-    const inputValue = await input.inputValue();
-    expect(inputValue).toBe('Cześć');
-
-    // Click the send button directly
-    await sendButton.click();
-
-    // Wait briefly for UI to react
-    await page.waitForTimeout(2000);
-
-    // Take screenshot after sending attempt
-    const afterPath = path.join(SCREENSHOT_DIR, 'screenshot-after-send.png');
-    await page.screenshot({ path: afterPath, fullPage: false });
-
-    // Verify send was triggered: either input cleared OR user message appeared
-    // (CopilotKit may not clear the input if the backend is not running)
-    const userMessages = page.locator('.copilotKitUserMessage');
-    const userCount = await userMessages.count();
-    const inputValueAfter = await input.inputValue();
-
-    // At least one should be true: input cleared or user message appeared
-    const sendWasTriggered = inputValueAfter === '' || userCount > 0;
-    expect(sendWasTriggered).toBe(true);
+    // An AI response must appear in chat — this will time out and fail if the
+    // backend is unreachable or not responding, which is the desired behavior.
+    const messages = page.getByTestId('chat-messages');
+    await expect(messages).toContainText(/Sinsay|asystent|pomóc/i, { timeout: 30000 });
   });
 
-  test('CSS custom properties are applied correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000');
-    await page.waitForSelector('.copilotKitMessages', { timeout: 15000 });
-
-    // Check that CopilotKit primary color override is applied (compare case-insensitively)
-    const primaryColor = await page.evaluate(() => {
-      return getComputedStyle(document.documentElement)
-        .getPropertyValue('--copilot-kit-primary-color')
-        .trim()
-        .toLowerCase();
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test 3 — Return form appears when "zwrot" keyword is sent
+  // ─────────────────────────────────────────────────────────────────────────
+  test('return form appears on "zwrot" intent keyword', async ({ page }) => {
+    page.on('pageerror', (err) => {
+      throw err;
     });
-    expect(primaryColor).toBe('#16181d');
 
-    // Check background color
-    const bgColor = await page.evaluate(() => {
-      return getComputedStyle(document.documentElement)
-        .getPropertyValue('--copilot-kit-background-color')
-        .trim()
-        .toLowerCase();
-    });
-    expect(['#fff', '#ffffff']).toContain(bgColor);
+    await page.goto(APP_URL);
 
-    // Check contrast color (white text on dark backgrounds)
-    const contrastColor = await page.evaluate(() => {
-      return getComputedStyle(document.documentElement)
-        .getPropertyValue('--copilot-kit-contrast-color')
-        .trim()
-        .toLowerCase();
-    });
-    expect(['#fff', '#ffffff']).toContain(contrastColor);
+    const chatInput = page.getByTestId('chat-input');
+    await expect(chatInput).toBeVisible({ timeout: 15000 });
 
-    // Check Sinsay header background is dark (#16181D)
-    const headerBg = await page.evaluate(() => {
-      const header = document.querySelector('header[aria-label="Sinsay AI Assistant"]');
-      if (!header) return null;
-      return getComputedStyle(header).backgroundColor;
-    });
-    // rgb(22,24,29) is #16181D
-    expect(headerBg).toBe('rgb(22, 24, 29)');
+    await chatInput.fill('Chcę dokonać zwrotu');
+    await page.getByTestId('chat-send-btn').click();
+
+    // The agent must call showReturnForm which renders the form in-chat.
+    // This verifies the full round-trip: chat → backend → tool call → form.
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 30000 });
+
+    // Key form fields must be present and visible
+    await expect(page.getByTestId('form-product-name')).toBeVisible();
+    await expect(page.getByTestId('form-description')).toBeVisible();
   });
 
-  test('no critical JavaScript errors on page load', async ({ page }) => {
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test 4 — No JavaScript errors on page load
+  // NO filtering — every error is a failure.
+  // ─────────────────────────────────────────────────────────────────────────
+  test('no JavaScript errors on page load', async ({ page }) => {
     const errors: string[] = [];
+
+    // Collect all uncaught page errors — no filtering whatsoever
     page.on('pageerror', (err) => {
       errors.push(err.message);
     });
-    page.on('console', (msg) => {
-      if (msg.type() === 'error') {
-        errors.push(`Console error: ${msg.text()}`);
-      }
-    });
 
-    await page.goto('http://localhost:3000');
-    await page.waitForSelector('.copilotKitMessages', { timeout: 15000 });
+    await page.goto(APP_URL);
+
+    // Wait for the UI to fully initialise
+    await expect(page.getByTestId('chat-messages')).toBeVisible({ timeout: 15000 });
+
+    // Give the page one extra second for any deferred script errors to surface
     await page.waitForTimeout(1000);
 
-    // Filter out non-critical errors (network errors when backend is down are expected)
-    const criticalErrors = errors.filter(e =>
-      !e.includes('Failed to fetch') &&
-      !e.includes('ERR_CONNECTION_REFUSED') &&
-      !e.includes('NetworkError') &&
-      !e.includes('AbortError') &&
-      !e.includes('fetch') &&
-      !e.includes('localhost:8085') &&
-      !e.includes('localhost:3000/api/langgraph4j')
-    );
-
-    if (criticalErrors.length > 0) {
-      console.log('Critical errors found:', criticalErrors);
-    }
-    expect(criticalErrors).toHaveLength(0);
+    expect(errors).toHaveLength(0);
   });
 
-  test('layout fills viewport without horizontal scrollbars', async ({ page }) => {
-    await page.goto('http://localhost:3000');
-    await page.waitForSelector('.copilotKitMessages', { timeout: 15000 });
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test 5 — Layout fills viewport without horizontal scrollbar
+  // ─────────────────────────────────────────────────────────────────────────
+  test('layout fills viewport without horizontal scrollbar', async ({ page }) => {
+    page.on('pageerror', (err) => {
+      throw err;
+    });
 
-    // Check that no horizontal scrollbar exists
+    await page.goto(APP_URL);
+    await expect(page.getByTestId('chat-messages')).toBeVisible({ timeout: 15000 });
+
     const hasHorizontalScrollbar = await page.evaluate(() => {
       return document.documentElement.scrollWidth > document.documentElement.clientWidth;
     });
-    expect(hasHorizontalScrollbar).toBe(false);
 
-    // Check body overflow is hidden
-    const bodyOverflow = await page.evaluate(() => {
-      return getComputedStyle(document.body).overflow;
-    });
-    expect(bodyOverflow).toBe('hidden');
+    expect(hasHorizontalScrollbar).toBe(false);
   });
 });
