@@ -168,9 +168,7 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
     // text such as "Zwrot możliwy", "Zwrot niemożliwy", "Reklamacja uzasadniona", etc.
     // We look for any of these phrases in the chat messages container.
     // kimi-k2.5:cloud can take up to 120s for a multimodal verdict.
-    const messages = page.getByTestId('chat-messages');
     const verdictPattern = /Zwrot możliwy|Zwrot niemożliwy|Reklamacja uzasadniona|Reklamacja nieuzasadniona/i;
-
     await expect(messages).toContainText(verdictPattern, { timeout: 120000 });
   });
 
@@ -212,7 +210,6 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
     // data-testid="verdict-approved" / "verdict-rejected" elements. The model returns
     // text such as "Zwrot możliwy", "Zwrot niemożliwy", "Reklamacja uzasadniona", etc.
     // kimi-k2.5:cloud can take up to 120s for a multimodal verdict.
-    const messages = page.getByTestId('chat-messages');
     const verdictPattern = /Zwrot możliwy|Zwrot niemożliwy|Reklamacja uzasadniona|Reklamacja nieuzasadniona/i;
 
     await expect(messages).toContainText(verdictPattern, { timeout: 120000 });
