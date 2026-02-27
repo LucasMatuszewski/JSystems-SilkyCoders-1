@@ -18,6 +18,8 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.content.Media;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
@@ -29,6 +31,8 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.MimeType;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -107,7 +111,8 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                                 .baseUrl("http://localhost:11434")
                                 .webClientBuilder(WebClient.builder()
                                         .clientConnector(new ReactorClientHttpConnector(
-                                                HttpClient.create().responseTimeout(Duration.ofSeconds(30))
+                                                // Cloud model — 60s to handle image upload + remote inference
+                                                HttpClient.create().responseTimeout(Duration.ofSeconds(60))
                                         )))
                                 .build())
                         .defaultOptions(OllamaOptions.builder()
@@ -191,6 +196,8 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
     private final AiModel primaryModel;
     private final PolicyService policyService;
     private final SinsayTools sinsayTools;
+    /** Resolved model chain, stored during buildStateGraph() for direct Phase 2 calls. */
+    private volatile ChatModel resolvedModel;
 
     public AGUIAgentExecutor() {
         this(null, null, null);
@@ -380,6 +387,7 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
     protected GraphData buildStateGraph() throws GraphStateException {
 
         var model = resolveModel();
+        this.resolvedModel = model;
         var tools = sinsayTools != null ? sinsayTools : new SinsayTools();
 
         var agent = AgentExecutorEx.builder()
@@ -399,6 +407,38 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
         var compileConfig = CompileConfig.builder().checkpointSaver(saver).build();
 
         return new GraphData(agent.compile(compileConfig));
+    }
+
+    /**
+     * Phase 2: call the model DIRECTLY, bypassing LangGraph4j state serialization.
+     * LangGraph4j's cloneState() uses UserMessageSerializer which silently drops Media (byte[])
+     * from UserMessage objects, so the photo never reaches OllamaChatModel if we use the graph.
+     * By calling resolvedModel.stream() directly with messages built here, Media is intact.
+     */
+    @Override
+    protected Flux<AGUIEvent> streamVerdict(AGUIType.RunAgentInput input) {
+        if (resolvedModel == null) {
+            log.warn("streamVerdict: resolvedModel not set yet, falling back to graph");
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        var messages = (List<Message>) buildGraphInput(input).get("messages");
+
+        var messageId = String.valueOf(System.currentTimeMillis());
+        var prompt = new Prompt(messages);
+
+        log.debug("Phase 2 direct call: {} messages to model", messages.size());
+
+        return resolvedModel.stream(prompt)
+                .flatMap(response -> {
+                    var output = response.getResult();
+                    if (output == null) return Flux.empty();
+                    String text = output.getOutput().getText();
+                    if (text == null || text.isEmpty()) return Flux.empty();
+                    return Flux.just((AGUIEvent) new AGUIEvent.TextMessageContentEvent(messageId, text));
+                })
+                .<AGUIEvent>startWith(new AGUIEvent.TextMessageStartEvent(messageId))
+                .concatWith(Mono.just(new AGUIEvent.TextMessageEndEvent(messageId)));
     }
 
     @Override
@@ -435,7 +475,7 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                 try {
                     var rawBytes = Base64.getDecoder().decode(data.photo());
                     var imageBytes = resizeImageIfNeeded(rawBytes, data.photoMimeType());
-                    log.info("Phase 2 image: rawBytes={}, resizedBytes={}, mimeType={}",
+                    log.debug("Phase 2 image: rawBytes={}, resizedBytes={}, mimeType={}",
                             rawBytes.length, imageBytes.length, data.photoMimeType());
                     var media = new Media(
                             MimeType.valueOf(data.photoMimeType()),
@@ -452,7 +492,7 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                             .text(analysisPrompt)
                             .media(media)
                             .build());
-                    log.info("Added multimodal image message for {} analysis (media attached)", data.type());
+                    log.debug("Added multimodal image message for {} analysis (media attached)", data.type());
                 } catch (IllegalArgumentException e) {
                     log.warn("Could not decode base64 photo — will proceed with text-only verdict: {}", e.getMessage());
                     // Fall through: text-only verdict message will be added below
@@ -467,7 +507,7 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                 }
             } else {
                 // Form submitted without photo — text-only verdict
-                log.info("Phase 2: no photo in form submission — building text-only verdict message");
+                log.debug("Phase 2: no photo in form submission — building text-only verdict message");
                 var textOnlyPrompt = String.format(
                         "Formularz %s został złożony. Produkt: %s. Opis klienta: %s. " +
                         "Brak zdjęcia — wydaj werdykt na podstawie opisu.",
@@ -487,7 +527,7 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
         } else {
             messages.add(new UserMessage(lastUserMessage));
         }
-        log.info("buildGraphInput done: messages={}, isPhase2={}", messages.size(), formSubmission.isPresent());
+        log.debug("buildGraphInput done: messages={}, isPhase2={}", messages.size(), formSubmission.isPresent());
         return Map.of("messages", messages);
     }
 
@@ -509,7 +549,7 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                         JsonNode node = objectMapper.readTree(msg.result());
                         if (node.has("productName")) {
                             String photoValue = node.has("photo") ? node.path("photo").asText() : null;
-                            log.info("extractFormSubmission: found form — product='{}', type='{}', " +
+                            log.debug("extractFormSubmission: found form — product='{}', type='{}', " +
                                      "resultContentLen={}, photoFieldPresent={}, photoLen={}",
                                     node.path("productName").asText(),
                                     node.path("type").asText("return"),

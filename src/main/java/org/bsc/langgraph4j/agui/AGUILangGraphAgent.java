@@ -58,6 +58,15 @@ public abstract class AGUILangGraphAgent implements AGUIAgent {
 
     protected abstract  Optional<String> nodeOutputToText( NodeOutput<? extends AgentState> output );
 
+    /**
+     * Override to stream the Phase 2 verdict by calling the model directly,
+     * bypassing LangGraph4j state serialization which silently drops Media (images).
+     * Return null to fall back to graph-based execution.
+     */
+    protected Flux<AGUIEvent> streamVerdict(AGUIType.RunAgentInput input) {
+        return null;
+    }
+
     private final AtomicReference<String> streamingId = new AtomicReference<>();
 
     private String newMessageId() {
@@ -90,12 +99,19 @@ public abstract class AGUILangGraphAgent implements AGUIAgent {
                 // Reset interruption flag — this conversation turn is the verdict run.
                 graphByThread.put(input.threadId(), graphData.withInterruption(false));
 
-                // Run a FRESH graph call (not a checkpoint resume) so that buildGraphInput()
-                // can inject the photo from the ResultMessage as a multimodal UserMessage.
-                // Resuming from checkpoint would break the tool-dispatch node because
-                // agentex's dispatchTools reads lastMessage() expecting an AssistantMessage
-                // with tool calls — injecting a UserMessage before resume would corrupt that.
-                // Using a verdict-specific threadId ensures no checkpoint conflict.
+                // Phase 2: bypass LangGraph4j to preserve Media (images).
+                // LangGraph4j's cloneState() uses UserMessageSerializer which drops Media,
+                // so the photo never reaches the model if we go through the graph.
+                // Instead, call the model directly with messages built from buildGraphInput().
+                var verdictFlux = streamVerdict(input);
+                if (verdictFlux != null) {
+                    log.debug("Phase 2: direct model call (bypassing LangGraph4j serialization)");
+                    return Mono.<AGUIEvent>just(new AGUIEvent.RunStartedEvent(input.threadId(), input.runId()))
+                            .concatWith(verdictFlux.subscribeOn(Schedulers.single()))
+                            .concatWith(Mono.just(new AGUIEvent.RunFinishedEvent(input.threadId(), input.runId())));
+                }
+
+                // Fallback: use fresh graph thread (loses Media, but keeps compatibility)
                 runnableConfig = RunnableConfig.builder()
                         .threadId(input.threadId() + "_verdict")
                         .build();

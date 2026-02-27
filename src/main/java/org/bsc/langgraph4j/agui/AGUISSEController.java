@@ -33,11 +33,12 @@ public class AGUISSEController {
     @SuppressWarnings("unchecked")
     public Flux<AGUIEvent> copilotKit(@RequestBody String runAgentInputPayload) throws Exception {
 
-        // Log raw payload summary so we can confirm photo arrives from CopilotKit's LangGraphHttpAgent
-        boolean payloadHasPhoto = runAgentInputPayload.contains("\"photo\"") &&
-                                   runAgentInputPayload.contains("\"photoMimeType\"");
+        // Log raw payload summary. Photo field is inside an escaped JSON string (ResultMessage.content),
+        // so it appears as \"photo\" (backslash-escaped) in the outer JSON — must search for that.
         boolean payloadHasToolRole = runAgentInputPayload.contains("\"role\":\"tool\"");
-        log.info("SSE /copilotkit received: payloadLen={}, hasToolMessage={}, hasPhotoField={}",
+        boolean payloadHasPhoto = runAgentInputPayload.contains("\\\"photo\\\"") // escaped inside content string
+                                || runAgentInputPayload.contains("\"photo\":");    // direct field (fallback)
+        log.info("SSE /copilotkit received: payloadLen={}, hasToolMessage={}, hasPhotoInContent={}",
                 runAgentInputPayload.length(), payloadHasToolRole, payloadHasPhoto);
 
         var input = mapper.readValue(runAgentInputPayload, AGUIType.RunAgentInput.class);

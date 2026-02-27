@@ -2,6 +2,7 @@ package org.bsc.langgraph4j.agui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -9,6 +10,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import io.netty.handler.timeout.ReadTimeoutException;
 import java.net.ConnectException;
 import java.time.Duration;
 import java.util.List;
@@ -47,7 +49,39 @@ public class FallbackChatModel implements ChatModel {
 
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
+        logOllamaPayload(prompt);
         return streamWithFallback(prompt, 0);
+    }
+
+    /**
+     * Logs exactly what will be sent to Ollama: message types, text previews, and image byte counts.
+     * Image bytes are counted but NOT logged to keep logs manageable.
+     */
+    private void logOllamaPayload(Prompt prompt) {
+        var instructions = prompt.getInstructions();
+        long totalImageBytes = 0;
+        for (int i = 0; i < instructions.size(); i++) {
+            var msg = instructions.get(i);
+            if (msg instanceof UserMessage um) {
+                var media = um.getMedia();
+                int mediaCount = media != null ? media.size() : 0;
+                long mediaBytes = 0;
+                if (media != null) {
+                    for (var m : media) {
+                        Object data = m.getData();
+                        if (data instanceof byte[] b) mediaBytes += b.length;
+                    }
+                }
+                totalImageBytes += mediaBytes;
+                String preview = um.getText() == null ? "<null>" : um.getText().substring(0, Math.min(um.getText().length(), 80));
+                log.debug("[OLLAMA_SEND] msg[{}]=UserMessage text='{}' mediaCount={} imageBytes={}",
+                        i, preview, mediaCount, mediaBytes);
+            } else {
+                String text = msg.getText() == null ? "<null>" : msg.getText().substring(0, Math.min(msg.getText().length(), 80));
+                log.debug("[OLLAMA_SEND] msg[{}]={} text='{}'", i, msg.getMessageType(), text);
+            }
+        }
+        log.debug("[OLLAMA_SEND] TOTAL: {} messages, {} image bytes", instructions.size(), totalImageBytes);
     }
 
     @Override
@@ -162,6 +196,11 @@ public class FallbackChatModel implements ChatModel {
      */
     static boolean isTransient(Throwable error) {
         if (error instanceof ConnectException) {
+            return true;
+        }
+        // ReadTimeoutException has null message — check by type before string checks
+        if (error instanceof ReadTimeoutException
+                || (error.getCause() instanceof ReadTimeoutException)) {
             return true;
         }
 
