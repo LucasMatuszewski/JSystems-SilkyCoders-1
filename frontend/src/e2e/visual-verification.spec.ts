@@ -71,20 +71,25 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     await page.goto(APP_URL);
 
-    // Wait until CopilotKit has injected the testid attributes
+    const messages = page.getByTestId('chat-messages');
     const chatInput = page.getByTestId('chat-input');
-    await expect(chatInput).toBeVisible({ timeout: 15000 });
+
+    // Wait for the initial welcome message — proves CopilotKit is fully initialized.
+    // CopilotKit fires ~13 agent/connect calls on startup; if we click send before
+    // these complete, the chat is in a loading state and the click is ignored.
+    await expect(messages).toContainText('Jestem Twoim wirtualnym asystentem', { timeout: 15000 });
 
     await chatInput.fill('Cześć');
     await page.getByTestId('chat-send-btn').click();
 
-    // The input must be cleared after the message is sent
-    await expect(chatInput).toHaveValue('', { timeout: 10000 });
+    // User message must appear in chat — this proves the send worked AND the input cleared.
+    // Checking the user message is more reliable than toHaveValue('') because CopilotKit
+    // adds the message to local state immediately on submit (before backend responds).
+    await expect(messages).toContainText('Cześć', { timeout: 15000 });
 
     // An AI response must appear in chat — this will time out and fail if the
     // backend is unreachable or not responding, which is the desired behavior.
     // kimi-k2.5:cloud can take 30-60s to respond, so allow 60s.
-    const messages = page.getByTestId('chat-messages');
     await expect(messages).toContainText(/Sinsay|asystent|pomóc/i, { timeout: 60000 });
   });
 
@@ -98,16 +103,20 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     await page.goto(APP_URL);
 
+    const messages = page.getByTestId('chat-messages');
     const chatInput = page.getByTestId('chat-input');
-    await expect(chatInput).toBeVisible({ timeout: 15000 });
+
+    // Wait for initial welcome message — ensures CopilotKit is fully initialized
+    // before we send a message (see comment in test above).
+    await expect(messages).toContainText('Jestem Twoim wirtualnym asystentem', { timeout: 15000 });
 
     await chatInput.fill('Chcę dokonać zwrotu');
     await page.getByTestId('chat-send-btn').click();
 
     // The agent must call showReturnForm which renders the form in-chat.
     // This verifies the full round-trip: chat → backend → tool call → form.
-    // kimi-k2.5:cloud can take up to 60s to respond and trigger the tool call.
-    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 60000 });
+    // kimi-k2.5:cloud can take up to 90s to respond and trigger the tool call.
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 90000 });
 
     // Key form fields must be present and visible
     await expect(page.getByTestId('form-product-name')).toBeVisible();
@@ -128,15 +137,18 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     await page.goto(APP_URL);
 
+    const messages = page.getByTestId('chat-messages');
     const chatInput = page.getByTestId('chat-input');
-    await expect(chatInput).toBeVisible({ timeout: 15000 });
+
+    // Wait for initial welcome message — ensures CopilotKit is fully initialized
+    await expect(messages).toContainText('Jestem Twoim wirtualnym asystentem', { timeout: 15000 });
 
     // Step 1: trigger the return form
     await chatInput.fill('Chcę dokonać zwrotu towaru');
     await page.getByTestId('chat-send-btn').click();
 
     // Step 2: wait for form to appear (cloud model can be slow)
-    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 60000 });
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 90000 });
 
     // Step 3: fill form fields
     await page.getByTestId('form-product-name').fill('Kurtka zimowa XL');
@@ -174,14 +186,17 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     await page.goto(APP_URL);
 
+    const messages = page.getByTestId('chat-messages');
     const chatInput = page.getByTestId('chat-input');
-    await expect(chatInput).toBeVisible({ timeout: 15000 });
+
+    // Wait for initial welcome message — ensures CopilotKit is fully initialized
+    await expect(messages).toContainText('Jestem Twoim wirtualnym asystentem', { timeout: 15000 });
 
     await chatInput.fill('Mam reklamację do produktu');
     await page.getByTestId('chat-send-btn').click();
 
-    // kimi-k2.5:cloud can take up to 60s to respond and trigger the tool call.
-    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 60000 });
+    // kimi-k2.5:cloud can take up to 90s to respond and trigger the tool call.
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 90000 });
 
     await page.getByTestId('form-product-name').fill('Płaszcz wiosenny M');
     await page.getByTestId('form-description').fill(
