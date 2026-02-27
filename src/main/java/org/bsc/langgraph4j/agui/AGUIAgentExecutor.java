@@ -156,6 +156,30 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
             IMPORTANT: Ground all policy answers in the provided policy documents. Never fabricate policies not found in the documents.
             """;
 
+    /**
+     * System prompt used in Phase 2 (after the customer submits the return/complaint form).
+     * Deliberately omits showReturnForm instructions — the form has already been shown.
+     * The model must provide a verdict and must not call any tools.
+     */
+    private static final String VERDICT_SYSTEM_PROMPT = """
+            You are a Sinsay customer service assistant processing a submitted return or complaint form.
+
+            The customer has ALREADY submitted the form. DO NOT call showReturnForm or any other tool.
+            Your only task is to analyze the submitted information and provide a verdict.
+
+            If a product photo is attached to this conversation, analyze it carefully.
+            If no photo is visible to you, base your verdict on the text description alone — do not ask for a photo again.
+
+            Verdict format (mandatory — provide this in every response):
+            1. Start with: "Zwrot możliwy ✓" / "Zwrot niemożliwy ✗" / "Reklamacja uzasadniona ✓" / "Reklamacja nieuzasadniona ✗"
+            2. 2-4 sentences citing the specific applicable policy rule
+            3. One recommended next step for the customer
+
+            Respond in Polish.
+
+            IMPORTANT: Ground all policy answers in the provided policy documents. Never fabricate policies not found in the documents.
+            """;
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -183,7 +207,7 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
     }
 
     /**
-     * Builds the system prompt by combining the base instructions with relevant policy documents.
+     * Builds the system prompt for Phase 1 (intent detection + form trigger).
      *
      * @param intent "return", "complaint", or "" for general conversation
      * @return assembled system prompt string
@@ -194,6 +218,27 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
             return BASE_SYSTEM_PROMPT;
         }
         return BASE_SYSTEM_PROMPT + """
+
+                --- POLICY DOCUMENTS ---
+                The following Sinsay policy documents apply to this conversation. Use them to ground your answers:
+
+                """ + policies;
+    }
+
+    /**
+     * Builds the system prompt for Phase 2 (verdict after form submission).
+     * Uses VERDICT_SYSTEM_PROMPT which omits showReturnForm tool instructions,
+     * preventing the model from calling the form tool again.
+     *
+     * @param intent "return" or "complaint" from the submitted form
+     * @return assembled verdict system prompt string
+     */
+    String buildVerdictSystemPrompt(String intent) {
+        String policies = policyService != null ? policyService.getPoliciesForIntent(intent) : "";
+        if (policies.isBlank()) {
+            return VERDICT_SYSTEM_PROMPT;
+        }
+        return VERDICT_SYSTEM_PROMPT + """
 
                 --- POLICY DOCUMENTS ---
                 The following Sinsay policy documents apply to this conversation. Use them to ground your answers:
@@ -368,10 +413,18 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
         // Check if any messages contain a form submission result (JSON with photo)
         Optional<FormSubmissionData> formSubmission = extractFormSubmission(input);
 
-        // Use intent from form data if available, otherwise detect from keywords
-        String intent = formSubmission.map(FormSubmissionData::type)
-                .orElseGet(() -> detectIntent(lastUserMessage));
-        var systemMessage = new SystemMessage(buildSystemPrompt(intent));
+        final SystemMessage systemMessage;
+        if (formSubmission.isPresent()) {
+            // Phase 2: use the verdict prompt — explicitly omits showReturnForm instructions
+            // so the model cannot call the form tool again.
+            var intent = formSubmission.get().type();
+            log.debug("Phase 2 system prompt: using VERDICT_SYSTEM_PROMPT for intent={}", intent);
+            systemMessage = new SystemMessage(buildVerdictSystemPrompt(intent));
+        } else {
+            // Phase 1: normal intent detection + possible showReturnForm
+            var intent = detectIntent(lastUserMessage);
+            systemMessage = new SystemMessage(buildSystemPrompt(intent));
+        }
 
         List<Message> messages = new ArrayList<>();
         messages.add(systemMessage);
@@ -382,15 +435,15 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                 try {
                     var rawBytes = Base64.getDecoder().decode(data.photo());
                     var imageBytes = resizeImageIfNeeded(rawBytes, data.photoMimeType());
+                    log.info("Phase 2 image: rawBytes={}, resizedBytes={}, mimeType={}",
+                            rawBytes.length, imageBytes.length, data.photoMimeType());
                     var media = new Media(
                             MimeType.valueOf(data.photoMimeType()),
                             new ByteArrayResource(imageBytes)
                     );
                     var analysisPrompt = String.format(
-                            "Przeanalizuj zdjęcie produktu w kontekście %s. " +
-                            "Produkt: %s. Opis klienta: %s. " +
-                            "Sprawdź czy zdjęcie jest wyraźne i czy widać stan produktu. " +
-                            "Jeśli zdjęcie jest niewyraźne, poproś o lepsze zdjęcie.",
+                            "Formularz %s został złożony. Produkt: %s. Opis klienta: %s. " +
+                            "Zdjęcie produktu jest dołączone do tej wiadomości — przeanalizuj je i wydaj werdykt.",
                             data.type().equals("return") ? "zwrotu" : "reklamacji",
                             data.productName(),
                             data.description()
@@ -399,14 +452,35 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                             .text(analysisPrompt)
                             .media(media)
                             .build());
-                    log.info("Added multimodal image message for {} analysis", data.type());
+                    log.info("Added multimodal image message for {} analysis (media attached)", data.type());
                 } catch (IllegalArgumentException e) {
-                    log.warn("Could not decode base64 photo for multimodal analysis: {}", e.getMessage());
+                    log.warn("Could not decode base64 photo — will proceed with text-only verdict: {}", e.getMessage());
+                    // Fall through: text-only verdict message will be added below
+                    var textOnlyPrompt = String.format(
+                            "Formularz %s został złożony. Produkt: %s. Opis klienta: %s. " +
+                            "Zdjęcie nie mogło zostać przetworzone — wydaj werdykt na podstawie opisu.",
+                            data.type().equals("return") ? "zwrotu" : "reklamacji",
+                            data.productName(),
+                            data.description()
+                    );
+                    messages.add(new UserMessage(textOnlyPrompt));
                 }
+            } else {
+                // Form submitted without photo — text-only verdict
+                log.info("Phase 2: no photo in form submission — building text-only verdict message");
+                var textOnlyPrompt = String.format(
+                        "Formularz %s został złożony. Produkt: %s. Opis klienta: %s. " +
+                        "Brak zdjęcia — wydaj werdykt na podstawie opisu.",
+                        data.type().equals("return") ? "zwrotu" : "reklamacji",
+                        data.productName(),
+                        data.description()
+                );
+                messages.add(new UserMessage(textOnlyPrompt));
             }
         });
 
         messages.add(new UserMessage(lastUserMessage));
+        log.debug("buildGraphInput: total messages={}, isPhase2={}", messages.size(), formSubmission.isPresent());
         return Map.of("messages", messages);
     }
 

@@ -75,6 +75,53 @@ class AGUIAgentExecutorVerdictFlowTests {
         assertThat(systemMsg.getText()).contains("COMPLAINT_POLICY");
     }
 
+    // --- Phase 2: system prompt switching ---
+
+    @Test
+    void shouldUseVerdictSystemPromptWhenFormSubmitted_notShowReturnFormPrompt() {
+        // This test guards the core bug: Phase 2 was using the Phase 1 system prompt
+        // which instructs the model to call showReturnForm → model calls it again.
+        when(policyService.getPoliciesForIntent("return")).thenReturn("");
+
+        String formJson = "{\"productName\":\"Kurtka\",\"type\":\"return\",\"description\":\"Wadliwy zamek\"}";
+        var resultMsg = new AGUIMessage.ResultMessage("r-1", new Date(), "tc-1", "showReturnForm", formJson);
+
+        var input = buildInput("zwrot proszę", List.of(resultMsg));
+        var graphInput = sut.buildGraphInput(input);
+
+        @SuppressWarnings("unchecked")
+        var messages = (List<Message>) graphInput.get("messages");
+        var systemText = ((SystemMessage) messages.get(0)).getText();
+
+        // Must NOT tell the model to call showReturnForm
+        assertThat(systemText)
+                .as("Phase 2 system prompt must not contain showReturnForm instructions")
+                .doesNotContain("Call showReturnForm")
+                .doesNotContain("Use the showReturnForm tool");
+
+        // Must instruct the model NOT to call the tool
+        assertThat(systemText)
+                .as("Phase 2 system prompt must explicitly forbid calling tools")
+                .containsIgnoringCase("DO NOT call showReturnForm");
+    }
+
+    @Test
+    void shouldUsePhase1SystemPromptWhenNoFormSubmitted() {
+        when(policyService.getPoliciesForIntent("return")).thenReturn("");
+
+        var input = buildInput("zwrot proszę", List.of());
+        var graphInput = sut.buildGraphInput(input);
+
+        @SuppressWarnings("unchecked")
+        var messages = (List<Message>) graphInput.get("messages");
+        var systemText = ((SystemMessage) messages.get(0)).getText();
+
+        // Phase 1 prompt SHOULD tell the model to call showReturnForm
+        assertThat(systemText)
+                .as("Phase 1 system prompt must contain showReturnForm tool instructions")
+                .contains("showReturnForm");
+    }
+
     // --- Form submission detection ---
 
     @Test
@@ -168,11 +215,15 @@ class AGUIAgentExecutorVerdictFlowTests {
         var input = buildInput("Check this", List.of(resultMsg));
         var graphInput = sut.buildGraphInput(input);
 
-        // Should not throw; gracefully degrades to no multimodal message
+        // Should not throw; gracefully degrades to text-only verdict message
         @SuppressWarnings("unchecked")
         var messages = (List<Message>) graphInput.get("messages");
-        // Only system + user = 2 (no multimodal message due to decode failure)
-        assertThat(messages).hasSize(2);
+        // system + text-only verdict fallback + user = 3
+        assertThat(messages).hasSize(3);
+        // The text-only fallback message should mention the product and form type
+        var textMsg = (UserMessage) messages.get(1);
+        assertThat(textMsg.getText()).containsIgnoringCase("Shirt");
+        assertThat(textMsg.getMedia()).isEmpty();
     }
 
     @Test
@@ -194,10 +245,10 @@ class AGUIAgentExecutorVerdictFlowTests {
     }
 
     @Test
-    void shouldIgnoreFormJsonWithoutPhoto() {
+    void shouldBuildTextOnlyVerdictWhenFormHasNoPhoto() {
         when(policyService.getPoliciesForIntent("return")).thenReturn("RETURN_POLICY");
 
-        // Form JSON without photo field
+        // Form JSON without photo field — text-only verdict must still be requested
         String formJson = "{\"productName\":\"Spodnie\",\"type\":\"return\",\"description\":\"Złe rozmiar\"}";
 
         var resultMsg = new AGUIMessage.ResultMessage(
@@ -209,12 +260,15 @@ class AGUIAgentExecutorVerdictFlowTests {
 
         @SuppressWarnings("unchecked")
         var messages = (List<Message>) graphInput.get("messages");
-        // No multimodal message since no photo, but intent still detected from form
-        assertThat(messages).hasSize(2);
+        // system + text-only verdict + user = 3
+        assertThat(messages).hasSize(3);
+        var textMsg = (UserMessage) messages.get(1);
+        assertThat(textMsg.getText()).containsIgnoringCase("Spodnie");
+        assertThat(textMsg.getMedia()).isEmpty();
     }
 
     @Test
-    void shouldHandleFormJsonWithEmptyPhoto() {
+    void shouldBuildTextOnlyVerdictWhenFormHasEmptyPhoto() {
         when(policyService.getPoliciesForIntent("return")).thenReturn("RETURN_POLICY");
 
         String formJson = "{\"productName\":\"Bluza\",\"type\":\"return\",\"description\":\"Za mała\",\"photo\":\"\",\"photoMimeType\":\"image/jpeg\"}";
@@ -228,8 +282,11 @@ class AGUIAgentExecutorVerdictFlowTests {
 
         @SuppressWarnings("unchecked")
         var messages = (List<Message>) graphInput.get("messages");
-        // Empty photo means no multimodal message
-        assertThat(messages).hasSize(2);
+        // system + text-only verdict + user = 3
+        assertThat(messages).hasSize(3);
+        var textMsg = (UserMessage) messages.get(1);
+        assertThat(textMsg.getText()).containsIgnoringCase("Bluza");
+        assertThat(textMsg.getMedia()).isEmpty();
     }
 
     @Test
