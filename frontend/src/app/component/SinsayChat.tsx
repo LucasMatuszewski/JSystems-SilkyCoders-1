@@ -37,9 +37,14 @@ export function SinsayChat() {
       if (textarea && !textarea.dataset['testid']) {
         textarea.dataset['testid'] = 'chat-input';
       }
-      const sendBtn = container.querySelector<HTMLButtonElement>(
-        '.copilotKitInputControls button[aria-label="Send"]'
-      );
+      // CopilotKit reuses the same DOM element for Send/Stop — React in-place updates the
+      // aria-label without removing our data-testid. Clean up any stale assignment so
+      // chat-send-btn only appears on the actual Send (idle) button, never on Stop.
+      const staleBtn = container.querySelector<HTMLButtonElement>('[data-testid="chat-send-btn"]');
+      if (staleBtn && staleBtn.getAttribute('aria-label') !== 'Send') {
+        delete staleBtn.dataset['testid'];
+      }
+      const sendBtn = container.querySelector<HTMLButtonElement>('button[aria-label="Send"]');
       if (sendBtn && !sendBtn.dataset['testid']) {
         sendBtn.dataset['testid'] = 'chat-send-btn';
       }
