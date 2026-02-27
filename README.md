@@ -7,6 +7,9 @@
 
 **Opis szkolenia:** [AI dla Programistów — Od Pomysłu do MVP](https://jsystems.pl/szkolenia-ai;ai_dla_programistow_od_pomyslu_do_mvp.szczegoly)
 
+**Repozytorium dla AI w CI/CD:**
+[GitLab + Jenkins + basic scripts](https://github.com/LucasMatuszewski/gitlab-jenkins-demo)
+
 ---
 
 ## O repozytorium
