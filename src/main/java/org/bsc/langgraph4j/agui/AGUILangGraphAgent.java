@@ -87,13 +87,21 @@ public abstract class AGUILangGraphAgent implements AGUIAgent {
                 input.lastResultMessage()
                         .orElseThrow( () -> new IllegalStateException( "last result message not found after interruption") );
 
-                // Set approval_result to "APPROVED" so the conditional edge routes correctly.
-                // The form data itself is already accessible via input.lastResultMessage()
-                // and is processed by buildGraphInput() in the subclass.
-                runnableConfig = agent.updateState( runnableConfig,
-                        Map.of(AgentEx.APPROVAL_RESULT_PROPERTY, AgentEx.ApprovalState.APPROVED.name()) );
+                // Reset interruption flag — this conversation turn is the verdict run.
+                graphByThread.put(input.threadId(), graphData.withInterruption(false));
 
-                graphInput = null; // resume graph
+                // Run a FRESH graph call (not a checkpoint resume) so that buildGraphInput()
+                // can inject the photo from the ResultMessage as a multimodal UserMessage.
+                // Resuming from checkpoint would break the tool-dispatch node because
+                // agentex's dispatchTools reads lastMessage() expecting an AssistantMessage
+                // with tool calls — injecting a UserMessage before resume would corrupt that.
+                // Using a verdict-specific threadId ensures no checkpoint conflict.
+                runnableConfig = RunnableConfig.builder()
+                        .threadId(input.threadId() + "_verdict")
+                        .build();
+
+                graphInput = buildGraphInput(input);
+                log.debug("Phase 2 (form submit): fresh verdict run on thread '{}'", runnableConfig.threadId().orElse("?"));
             }
             else {
                 graphInput = buildGraphInput(input);

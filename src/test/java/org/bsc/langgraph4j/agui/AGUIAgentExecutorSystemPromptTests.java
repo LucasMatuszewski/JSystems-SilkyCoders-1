@@ -51,7 +51,7 @@ class AGUIAgentExecutorSystemPromptTests {
 
         String prompt = sut.buildSystemPrompt("");
 
-        assertThat(prompt).containsIgnoringCase("show_return_form");
+        assertThat(prompt).contains("showReturnForm");
     }
 
     @Test

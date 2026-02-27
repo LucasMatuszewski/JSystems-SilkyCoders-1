@@ -28,6 +28,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
 
 /**
  * Integration test for the form submission -> graph resume -> verdict flow.
@@ -251,5 +253,82 @@ class AGUIFormResumeTests {
         assertThat(phase2Events)
                 .as("Phase 2 must produce RUN_FINISHED event — the graph completed successfully")
                 .anyMatch(e -> e.type() == AGUIEvent.EventType.RUN_FINISHED);
+    }
+
+    @Test
+    @DisplayName("Phase 2: model is called at least twice — once for tool detection, once for verdict after form submit")
+    void shouldCallModelAtLeastTwiceWhenFormIsSubmittedWithContext() {
+        // given: first call triggers tool call interruption (Phase 1)
+        given(mockChatModel.call(any(Prompt.class))).willReturn(toolCallResponse());
+        given(mockChatModel.stream(any(Prompt.class))).willReturn(streamingToolCallResponse());
+
+        // Phase 1: trigger interruption
+        var phase1Events = webTestClient.post()
+                .uri("/langgraph4j/copilotkit")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "threadId": "form-resume-thread-3",
+                          "runId":    "form-resume-run-3a",
+                          "messages": [
+                            {"role": "user", "id": "msg-1", "content": "Chce zwrocic produkt"}
+                          ]
+                        }
+                        """)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(AGUIEvent.class)
+                .getResponseBody()
+                .collectList()
+                .block();
+
+        // Verify phase 1 produced tool call events (precondition for phase 2)
+        assertThat(phase1Events)
+                .as("Phase 1 must produce TOOL_CALL_START")
+                .anyMatch(e -> e.type() == AGUIEvent.EventType.TOOL_CALL_START);
+
+        // Reset mock invocation count so we can verify Phase 2 calls independently
+        org.mockito.Mockito.clearInvocations(mockChatModel);
+
+        // given: after form submission, model should return a verdict text (Phase 2)
+        given(mockChatModel.call(any(Prompt.class))).willReturn(verdictResponse());
+        given(mockChatModel.stream(any(Prompt.class))).willReturn(streamingVerdictResponse());
+
+        // when: Phase 2 — submit form data with same threadId to resume graph
+        var phase2Events = webTestClient.post()
+                .uri("/langgraph4j/copilotkit")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "threadId": "form-resume-thread-3",
+                          "runId":    "form-resume-run-3b",
+                          "messages": [
+                            {"role": "user", "id": "msg-1", "content": "Chce zwrocic produkt"},
+                            {"role": "tool", "id": "result-1", "toolCallId": "call-123", "name": "showReturnForm", "content": "{\\"productName\\":\\"Sukienka\\",\\"type\\":\\"return\\",\\"description\\":\\"Za duza\\"}"}
+                          ]
+                        }
+                        """)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(AGUIEvent.class)
+                .getResponseBody()
+                .collectList()
+                .block();
+
+        // then: no errors
+        assertThat(phase2Events)
+                .as("Phase 2 must NOT produce RUN_ERROR")
+                .noneMatch(e -> e.type() == AGUIEvent.EventType.RUN_ERROR);
+
+        // and: Phase 2 must produce text message content (the verdict)
+        assertThat(phase2Events)
+                .as("Phase 2 must produce TEXT_MESSAGE_CONTENT — the model generated a verdict")
+                .anyMatch(e -> e.type() == AGUIEvent.EventType.TEXT_MESSAGE_CONTENT);
+
+        // and: the model must have been called at least once during Phase 2
+        // (the graph resumes from the approval node, executes the tool, then calls the model for verdict)
+        verify(mockChatModel, atLeast(1)).stream(any(Prompt.class));
     }
 }
