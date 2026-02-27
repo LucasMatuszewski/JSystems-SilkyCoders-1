@@ -57,7 +57,7 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
     // Chat input must carry Polish placeholder text
     const chatInput = page.getByTestId('chat-input');
     await expect(chatInput).toBeVisible({ timeout: 15000 });
-    await expect(chatInput).toHaveAttribute('placeholder', 'Napisz wiadomość...');
+    await expect(chatInput).toHaveAttribute('placeholder', 'Napisz wiadomość…');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -105,7 +105,6 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     await page.goto(APP_URL);
 
-    const messages = page.getByTestId('chat-messages');
     const chatInput = page.getByTestId('chat-input');
 
     // Wait for CopilotKit to finish its initial backend call and signal ready state.

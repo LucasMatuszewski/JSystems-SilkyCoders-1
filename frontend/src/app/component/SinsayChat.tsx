@@ -9,8 +9,8 @@ function SinsayLogo() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="63"
-      height="23"
+      width="70"
+      height="26"
       viewBox="0 0 84 31"
       fill="none"
       aria-label="Sinsay"
@@ -22,6 +22,11 @@ function SinsayLogo() {
       />
     </svg>
   );
+}
+
+/** Vertical separator between logo and label */
+function HeaderSeparator() {
+  return <span className="w-px h-5 bg-white/25" aria-hidden="true" />;
 }
 
 export function SinsayChat() {
@@ -54,14 +59,42 @@ export function SinsayChat() {
       }
     }
 
+    /** Remove CopilotKit chrome that conflicts with the Sinsay brand.
+     *  CSS alone is not enough because CopilotKit also sets inline styles on
+     *  these elements via its JS runtime; removing from DOM is the reliable fallback. */
+    function removeUnbrandedChrome(): void {
+      // "Powered by CopilotKit" paragraph — inline display:block overrides CSS
+      const poweredBy = document.querySelector<HTMLElement>('.poweredBy');
+      if (poweredBy) {
+        poweredBy.style.setProperty('display', 'none', 'important');
+        poweredBy.style.setProperty('visibility', 'hidden', 'important');
+        poweredBy.style.setProperty('height', '0', 'important');
+        poweredBy.style.setProperty('padding', '0', 'important');
+      }
+      // cpk-web-inspector is the CopilotKit debug "N" button — remove from DOM entirely
+      document
+        .querySelectorAll<HTMLElement>('cpk-web-inspector')
+        .forEach(el => el.remove());
+    }
+
     // Apply once immediately (elements may already be in the DOM)
     applyTestIds();
+    removeUnbrandedChrome();
 
     // Observe for dynamic DOM changes (CopilotKit may render asynchronously)
-    const observer = new MutationObserver(applyTestIds);
+    const observer = new MutationObserver(() => {
+      applyTestIds();
+      removeUnbrandedChrome();
+    });
     observer.observe(container, { childList: true, subtree: true });
+    // Also observe document.body for cpk-web-inspector which lives outside container
+    const bodyObserver = new MutationObserver(removeUnbrandedChrome);
+    bodyObserver.observe(document.body, { childList: true, subtree: true });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      bodyObserver.disconnect();
+    };
   }, []);
 
   useCopilotAction({
@@ -86,13 +119,28 @@ export function SinsayChat() {
       <header
         role="banner"
         aria-label="Sinsay AI Assistant"
-        className="flex items-center justify-center gap-3 bg-[#16181D] px-4 py-3 shrink-0"
+        className="flex items-center justify-center gap-3 shrink-0 px-6 py-0"
+        style={{
+          background: 'linear-gradient(135deg, #16181D 0%, #2a2c33 100%)',
+          height: '56px',
+        }}
       >
         <SinsayLogo />
-        <span className="text-white text-sm font-medium tracking-wide">
-          AI Assistant
-        </span>
+        <HeaderSeparator />
+        <div className="flex flex-col items-start">
+          <span className="text-white text-xs font-medium tracking-widest uppercase leading-none opacity-90">
+            AI&nbsp;Assistant
+          </span>
+        </div>
       </header>
+
+      {/* Online indicator strip */}
+      <div className="bg-[#16181D] shrink-0 flex items-center justify-center gap-1.5 py-1.5 border-b border-white/5">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#0DB209] animate-pulse" aria-hidden="true" />
+        <span className="text-[10px] text-white/50 uppercase tracking-wider font-medium">
+          Asystent online
+        </span>
+      </div>
 
       {/* CopilotKit chat fills remaining space */}
       <CopilotChat
@@ -100,7 +148,7 @@ export function SinsayChat() {
         labels={{
           title: 'Sinsay AI Assistant',
           initial: 'Cześć! Jestem Twoim wirtualnym asystentem Sinsay. W czym mogę Ci dziś pomóc?',
-          placeholder: 'Napisz wiadomość...',
+          placeholder: 'Napisz wiadomość…',
         }}
         className="flex-1 min-h-0"
       />

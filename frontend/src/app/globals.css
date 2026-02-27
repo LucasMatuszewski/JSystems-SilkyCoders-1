@@ -22,7 +22,6 @@
   --color-green-50: #0DB209;
   --color-border-input: #C7C8C9;
   --color-brand-dark: #16181D;
-
 }
 
 @theme inline {
@@ -36,7 +35,6 @@ body {
 }
 
 /* CopilotKit brand overrides — use html:root for higher specificity than CopilotKit's :root rules */
-/* This ensures our Sinsay brand colours override the CopilotKit defaults */
 html:root {
   /* Primary: dark brand colour used for send button, icons, user message bubbles */
   --copilot-kit-primary-color: #16181D;
@@ -44,7 +42,7 @@ html:root {
   --copilot-kit-contrast-color: #FFFFFF;
   /* Background: main chat panel background */
   --copilot-kit-background-color: #FFFFFF;
-  /* Input area background */
+  /* Input area background — subtle grey */
   --copilot-kit-input-background-color: #F1F2F4;
   /* Secondary: assistant message background */
   --copilot-kit-secondary-color: #FFFFFF;
@@ -53,11 +51,171 @@ html:root {
   /* Separator lines */
   --copilot-kit-separator-color: #E3E4E5;
   /* Muted icons, placeholders */
-  --copilot-kit-muted-color: #7B7D80;
+  --copilot-kit-muted-color: #AFB0B2;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'Euclid Circular B', Arial, Helvetica, 'Helvetica Neue', sans-serif;
+}
+
+/* ============================================================
+   COPILOTKIT DESIGN SYSTEM OVERRIDES
+   All overrides use class-level specificity (no !important where avoidable)
+   to cleanly override CopilotKit defaults.
+   ============================================================ */
+
+/* --- Font family: apply Sinsay brand font throughout the chat --- */
+.copilotKitChat,
+.copilotKitMessages,
+.copilotKitMessage,
+.copilotKitInput,
+.copilotKitInput > textarea,
+.copilotKitInputContainer {
+  font-family: 'Euclid Circular B', Arial, Helvetica, 'Helvetica Neue', sans-serif !important;
+}
+
+/* --- Hide "Powered by CopilotKit" watermark ---
+   CopilotKit injects BOTH a CSS class with !important AND inline styles.
+   We counter with !important on the class (wins over inline non-important)
+   and the JS remover in SinsayChat covers any remaining edge cases. */
+.poweredBy {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+/* --- Hide CopilotKit developer web inspector (the "N" debug button) ---
+   cpk-web-inspector is a custom element added in dev mode; hide it globally */
+cpk-web-inspector {
+  display: none !important;
+}
+
+/* --- Fix markdown link color: override CopilotKit's hardcoded blue --- */
+a.copilotKitMarkdownElement {
+  color: #E09243 !important; /* Sinsay brand orange */
+  text-decoration: underline;
+}
+
+/* --- Message action buttons: subtle muted tone, smaller visual weight --- */
+.copilotKitMessageControlButton {
+  color: #C8C9CC; /* --color-dark-20: very subtle by default */
+  opacity: 0.7;
+}
+.copilotKitMessageControlButton:hover {
+  color: #7B7D80 !important; /* --color-dark-50: visible on hover */
+  opacity: 1;
+}
+.copilotKitMessageControlButton.active {
+  background-color: #16181D !important;
+  color: #FFFFFF !important;
+  opacity: 1;
+}
+
+/* --- Message controls: only show on hover for desktop, always show on mobile --- */
+@media (min-width: 769px) {
+  .copilotKitMessage.copilotKitAssistantMessage .copilotKitMessageControls {
+    opacity: 0;
+  }
+  .copilotKitMessage.copilotKitAssistantMessage:hover .copilotKitMessageControls {
+    opacity: 1;
+  }
+}
+
+/* --- Input area: tighter, cleaner look --- */
+.copilotKitInput {
+  min-height: 48px !important;
+  border-radius: 24px !important;
+  border-color: #E3E4E5 !important;
+  padding: 10px 14px !important;
+}
+
+.copilotKitInput:focus-within {
+  border-color: #16181D !important;
+}
+
+.copilotKitInputContainer {
+  padding-bottom: 12px !important;
+  padding-top: 8px !important;
+}
+
+/* --- Input placeholder text: lighter, more subtle --- */
+.copilotKitInput > textarea::placeholder {
+  color: #AFB0B2 !important; /* --color-dark-30 */
+  opacity: 1;
+}
+
+/* --- Input textarea: proper font size --- */
+.copilotKitInput > textarea {
+  font-size: 0.9375rem !important; /* 15px — slightly larger than default 14px */
+  line-height: 1.5 !important;
+  color: #16181D !important;
+}
+
+/* --- User message bubble: proper styling --- */
+.copilotKitMessage.copilotKitUserMessage {
+  background-color: #16181D !important;
+  color: #FFFFFF !important;
+  border-radius: 18px !important;
+  padding: 10px 16px !important;
+  font-size: 0.9375rem !important;
+}
+
+/* --- Assistant message: clean with proper line height --- */
+.copilotKitMessage.copilotKitAssistantMessage {
+  font-size: 0.9375rem !important;
+  line-height: 1.625 !important;
+  color: #16181D !important;
+  padding-bottom: 28px !important; /* space for action buttons */
+}
+
+/* --- Messages container: better vertical padding --- */
+.copilotKitMessagesContainer {
+  padding: 16px 20px !important;
+  gap: 4px;
+}
+
+/* --- Scrollbar styling for messages --- */
+.copilotKitMessages::-webkit-scrollbar {
+  width: 4px;
+}
+.copilotKitMessages::-webkit-scrollbar-thumb {
+  background-color: #C8C9CC !important;
+  border-radius: 2px;
+}
+
+/* --- Suggestion pills: Sinsay style --- */
+.copilotKitMessages footer .suggestions .suggestion {
+  border-color: #E3E4E5 !important;
+  color: #16181D !important;
+  font-size: 0.8125rem !important;
+  border-radius: 999px !important;
+  padding: 5px 12px !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.copilotKitMessages footer .suggestions .suggestion:hover {
+  border-color: #16181D !important;
+  background-color: #F1F2F4 !important;
+}
+
+/* --- Markdown paragraph spacing --- */
+p.copilotKitMarkdownElement {
+  line-height: 1.625 !important;
+  font-size: 0.9375rem !important;
+}
+
+p.copilotKitMarkdownElement:not(:last-child) {
+  margin-bottom: 0.75em !important;
+}
+
+/* --- Send/Stop button control: use brand dark --- */
+.copilotKitInputControlButton:not([disabled]) {
+  color: #16181D !important;
 }
