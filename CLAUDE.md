@@ -18,11 +18,11 @@ This repo hosts a Proof of Concept for Sinsay (fashion brand) returns/complaints
 
 ## Tech Stack Summary
 
-| Layer    | Technologies                                                                                          |
-| -------- | ----------------------------------------------------------------------------------------------------- |
+| Layer    | Technologies                                                                                        |
+| -------- | --------------------------------------------------------------------------------------------------- |
 | Backend  | Spring Boot 3.5.9 · Java 21 · Maven · Spring WebFlux · LangGraph4j 1.6.2 · Spring AI 1.0.0 · Ollama |
-| Frontend | Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · CopilotKit 1.51 · pnpm                         |
-| Protocol | AG-UI (Agent-UI) via SSE · CopilotKit runtime adapter · LangGraphHttpAgent                            |
+| Frontend | Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · CopilotKit 1.51 · pnpm                        |
+| Protocol | AG-UI (Agent-UI) via SSE · CopilotKit runtime adapter · LangGraphHttpAgent                          |
 
 ---
 
@@ -56,10 +56,10 @@ This repo hosts a Proof of Concept for Sinsay (fashion brand) returns/complaints
 
 **Specialist guidelines — read before working in each area:**
 
-| Area                          | File                                         |
-| ----------------------------- | -------------------------------------------- |
-| Backend (Java / Spring Boot)  | [`src/CLAUDE.md`](src/CLAUDE.md)             |
-| Frontend (React / TypeScript) | [`frontend/CLAUDE.md`](frontend/CLAUDE.md)   |
+| Area                          | File                                       |
+| ----------------------------- | ------------------------------------------ |
+| Backend (Java / Spring Boot)  | [`src/CLAUDE.md`](src/CLAUDE.md)           |
+| Frontend (React / TypeScript) | [`frontend/CLAUDE.md`](frontend/CLAUDE.md) |
 
 ---
 
@@ -130,6 +130,7 @@ After all tests pass (step 6 of TDD), do this for every new or modified test:
 ### Forbidden actions — these are test dishonesty
 
 **You are NEVER allowed to do any of the following to make a test pass:**
+
 - Change an expected value to match wrong output (`assertThat(x).isEqualTo("wrong")` → `assertThat(x).isEqualTo("also-wrong")`)
 - Remove an assertion that was catching a real bug
 - Add `|| alternative` conditions to assertions that hide the real failure
@@ -138,6 +139,7 @@ After all tests pass (step 6 of TDD), do this for every new or modified test:
 - Skip or ignore a test case without leaving a comment explaining why and a tracking issue
 
 **If a test is failing, there are exactly two acceptable responses:**
+
 1. Fix the production code so the test passes (preferred — the code is wrong)
 2. Delete the test entirely and rewrite it because the requirements changed (rare)
 
@@ -222,6 +224,7 @@ For layer-specific checklist items, see `src/CLAUDE.md` (backend) or `frontend/C
 ## Logs and Screenshots
 
 ### Log Files
+
 - Application logs are written to `logs/app.log` (daily rolling, git-ignored)
 - **Never load the full log file into context** — it can be 10k+ lines with large stack traces
 - Always use one of these approaches instead:
@@ -233,10 +236,11 @@ For layer-specific checklist items, see `src/CLAUDE.md` (backend) or `frontend/C
 - Stack traces in logs are long. If you need one, identify the first ERROR line then read ±20 lines around it
 
 ### Screenshots
-- Playwright screenshots go to: `frontend/src/e2e/screenshots/` (git-ignored)
+
+- Playwright screenshots go to: `frontend/src/e2e/test-results/` (git-ignored)
 - Always save screenshots to that folder — NOT to `/tmp/`
 - Playwright failure screenshots: configured via `playwright.config.ts` (`outputDir`)
-- After any frontend change: take a screenshot and save it to `frontend/src/e2e/screenshots/` for human review
+- After any frontend change: take a screenshot and save it to `frontend/src/e2e/test-results/` for human review
 
 ---
 
@@ -247,6 +251,7 @@ After any task delegated to a sub-agent completes, the coordinating agent **must
 ### What to Check (checklist — run after every delegated task)
 
 **Test gaming — the most critical failure mode:**
+
 - Did the sub-agent change an expected value to match wrong output?
 - Did the sub-agent remove an assertion or add `|| fallback` to make a test pass?
 - Did the sub-agent mock away the thing it was supposed to be testing?
@@ -254,21 +259,25 @@ After any task delegated to a sub-agent completes, the coordinating agent **must
 - Are all mocks returning success only? Is there even ONE mock that simulates the failure path?
 
 **Coverage gaps:**
+
 - For every AI model call in the feature: is there a test where the model throws? Does that test verify the user sees the right error?
 - Is there an E2E Playwright test that exercises the full feature with the real stack?
 - Can any test be satisfied by an empty implementation? (if so, it's useless)
 
 **Process violations:**
+
 - Did the sub-agent run E2E tests? Quote the output — not just "I ran the tests"
 - Did tests come before production code? Check the git history if uncertain
 - Did the sub-agent verify the running app actually works (not just that tests pass)?
 
 **Code quality:**
+
 - Were exceptions swallowed (empty catch, log and ignore)?
 - Are error messages user-visible? (Backend errors in Polish, shown to user in frontend)
 - Does the implementation actually handle the failure scenario described in the task?
 
 ### What to Do When Issues Are Found
+
 1. Fix the bad test or code BEFORE accepting the work — do not merge hollow tests
 2. Update the relevant agent's instructions (`.claude/agents/`) to prevent the same mistake next time
 3. If the pattern is project-wide, update this file
