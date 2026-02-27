@@ -33,6 +33,13 @@ public class AGUISSEController {
     @SuppressWarnings("unchecked")
     public Flux<AGUIEvent> copilotKit(@RequestBody String runAgentInputPayload) throws Exception {
 
+        // Log raw payload summary so we can confirm photo arrives from CopilotKit's LangGraphHttpAgent
+        boolean payloadHasPhoto = runAgentInputPayload.contains("\"photo\"") &&
+                                   runAgentInputPayload.contains("\"photoMimeType\"");
+        boolean payloadHasToolRole = runAgentInputPayload.contains("\"role\":\"tool\"");
+        log.info("SSE /copilotkit received: payloadLen={}, hasToolMessage={}, hasPhotoField={}",
+                runAgentInputPayload.length(), payloadHasToolRole, payloadHasPhoto);
+
         var input = mapper.readValue(runAgentInputPayload, AGUIType.RunAgentInput.class);
 
         Flux<AGUIEvent> agentFlux = (Flux<AGUIEvent>) uiAgent.run(input);

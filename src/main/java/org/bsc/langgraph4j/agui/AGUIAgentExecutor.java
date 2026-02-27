@@ -479,8 +479,15 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
             }
         });
 
-        messages.add(new UserMessage(lastUserMessage));
-        log.debug("buildGraphInput: total messages={}, isPhase2={}", messages.size(), formSubmission.isPresent());
+        if (formSubmission.isPresent()) {
+            // Phase 2: do NOT add the original user message — it contains "zwrot"/"reklamacja"
+            // trigger words that cause the model to call showReturnForm again despite VERDICT_SYSTEM_PROMPT.
+            // Instead, use a neutral verdict-request message.
+            messages.add(new UserMessage("Formularz został już przesłany. Proszę o werdykt."));
+        } else {
+            messages.add(new UserMessage(lastUserMessage));
+        }
+        log.info("buildGraphInput done: messages={}, isPhase2={}", messages.size(), formSubmission.isPresent());
         return Map.of("messages", messages);
     }
 
@@ -501,11 +508,19 @@ public class AGUIAgentExecutor extends AGUILangGraphAgent {
                     try {
                         JsonNode node = objectMapper.readTree(msg.result());
                         if (node.has("productName")) {
+                            String photoValue = node.has("photo") ? node.path("photo").asText() : null;
+                            log.info("extractFormSubmission: found form — product='{}', type='{}', " +
+                                     "resultContentLen={}, photoFieldPresent={}, photoLen={}",
+                                    node.path("productName").asText(),
+                                    node.path("type").asText("return"),
+                                    msg.result().length(),
+                                    node.has("photo"),
+                                    photoValue != null ? photoValue.length() : 0);
                             return Stream.of(new FormSubmissionData(
                                     node.path("productName").asText(),
                                     node.path("type").asText("return"),
                                     node.path("description").asText(),
-                                    node.has("photo") ? node.path("photo").asText() : null,
+                                    photoValue,
                                     node.path("photoMimeType").asText("image/jpeg")
                             ));
                         }
