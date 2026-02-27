@@ -83,8 +83,9 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     // An AI response must appear in chat — this will time out and fail if the
     // backend is unreachable or not responding, which is the desired behavior.
+    // kimi-k2.5:cloud can take 30-60s to respond, so allow 60s.
     const messages = page.getByTestId('chat-messages');
-    await expect(messages).toContainText(/Sinsay|asystent|pomóc/i, { timeout: 30000 });
+    await expect(messages).toContainText(/Sinsay|asystent|pomóc/i, { timeout: 60000 });
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -105,7 +106,8 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     // The agent must call showReturnForm which renders the form in-chat.
     // This verifies the full round-trip: chat → backend → tool call → form.
-    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 30000 });
+    // kimi-k2.5:cloud can take up to 60s to respond and trigger the tool call.
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 60000 });
 
     // Key form fields must be present and visible
     await expect(page.getByTestId('form-product-name')).toBeVisible();
@@ -133,8 +135,8 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
     await chatInput.fill('Chcę dokonać zwrotu towaru');
     await page.getByTestId('chat-send-btn').click();
 
-    // Step 2: wait for form to appear
-    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 30000 });
+    // Step 2: wait for form to appear (cloud model can be slow)
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 60000 });
 
     // Step 3: fill form fields
     await page.getByTestId('form-product-name').fill('Kurtka zimowa XL');
@@ -148,25 +150,16 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
     // Step 5: submit the form
     await page.getByTestId('form-submit-btn').click();
 
-    // Step 6: a verdict MUST appear. If an error banner appears first, fail immediately
-    // instead of waiting the full 60s timeout.
-    // The CopilotKit error banner contains Polish text starting with "Błąd" — select by text.
-    const approved = page.getByTestId('verdict-approved');
-    const rejected = page.getByTestId('verdict-rejected');
-    const errorBanner = page.getByText(/Błąd/, { exact: false });
+    // Step 6: a verdict MUST appear in the chat messages.
+    // The verdict is streamed as plain text into the CopilotKit chat UI — there are no
+    // data-testid="verdict-approved" / "verdict-rejected" elements. The model returns
+    // text such as "Zwrot możliwy", "Zwrot niemożliwy", "Reklamacja uzasadniona", etc.
+    // We look for any of these phrases in the chat messages container.
+    // kimi-k2.5:cloud can take up to 120s for a multimodal verdict.
+    const messages = page.getByTestId('chat-messages');
+    const verdictPattern = /Zwrot możliwy|Zwrot niemożliwy|Reklamacja uzasadniona|Reklamacja nieuzasadniona/i;
 
-    const result = await Promise.race([
-      approved.waitFor({ timeout: 60000 }).then(() => 'approved' as const),
-      rejected.waitFor({ timeout: 60000 }).then(() => 'rejected' as const),
-      errorBanner.waitFor({ timeout: 60000 }).then(() => 'error' as const),
-    ]);
-
-    if (result === 'error') {
-      const errorText = await errorBanner.first().textContent();
-      throw new Error(`Backend returned an error instead of a verdict: "${errorText}"`);
-    }
-
-    expect(['approved', 'rejected']).toContain(result);
+    await expect(messages).toContainText(verdictPattern, { timeout: 120000 });
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -187,7 +180,8 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
     await chatInput.fill('Mam reklamację do produktu');
     await page.getByTestId('chat-send-btn').click();
 
-    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 30000 });
+    // kimi-k2.5:cloud can take up to 60s to respond and trigger the tool call.
+    await expect(page.getByTestId('return-form')).toBeVisible({ timeout: 60000 });
 
     await page.getByTestId('form-product-name').fill('Płaszcz wiosenny M');
     await page.getByTestId('form-description').fill(
@@ -199,22 +193,14 @@ test.describe('Sinsay AI Assistant — E2E verification', () => {
 
     await page.getByTestId('form-submit-btn').click();
 
-    const approved = page.getByTestId('verdict-approved');
-    const rejected = page.getByTestId('verdict-rejected');
-    const errorBanner = page.getByText(/Błąd/, { exact: false });
+    // The verdict is streamed as plain text into the CopilotKit chat UI — there are no
+    // data-testid="verdict-approved" / "verdict-rejected" elements. The model returns
+    // text such as "Zwrot możliwy", "Zwrot niemożliwy", "Reklamacja uzasadniona", etc.
+    // kimi-k2.5:cloud can take up to 120s for a multimodal verdict.
+    const messages = page.getByTestId('chat-messages');
+    const verdictPattern = /Zwrot możliwy|Zwrot niemożliwy|Reklamacja uzasadniona|Reklamacja nieuzasadniona/i;
 
-    const result = await Promise.race([
-      approved.waitFor({ timeout: 60000 }).then(() => 'approved' as const),
-      rejected.waitFor({ timeout: 60000 }).then(() => 'rejected' as const),
-      errorBanner.waitFor({ timeout: 60000 }).then(() => 'error' as const),
-    ]);
-
-    if (result === 'error') {
-      const errorText = await errorBanner.first().textContent();
-      throw new Error(`Backend returned an error instead of a verdict: "${errorText}"`);
-    }
-
-    expect(['approved', 'rejected']).toContain(result);
+    await expect(messages).toContainText(verdictPattern, { timeout: 120000 });
   });
 
   // ─────────────────────────────────────────────────────────────────────────
