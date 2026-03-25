@@ -7,7 +7,8 @@
 > 💬 = wklejam na chat (Zoom / Teams / Slack — gotowy tekst do skopiowania)
 > 🏋️ = ćwiczenie dla uczestników
 > ⏱️ = czas bloku
-> 💡 = wskazówka / uwaga dla prowadzącego
+> 💡 = wskazówka / uwaga dla prowadzącego (nie mów tego głośno)
+> 🔵 = zadanie dodatkowe dla zaawansowanych (opcjonalne, równolegle)
 
 ---
 
@@ -41,7 +42,8 @@ Dzień 1 – agenda:
 🎬 **CO MÓWIĘ:**
 
 „Cześć, Dzień dobry! Dajcie znać czy mnie słychać i widać.
-Powoli zaczynamy. Jeśli jesteście online — będę wdzięczny za włączenie kamerek, dużo łatwiej mi wyczuć tempo i zasymulujemy lepiej pracę w grupie. Jeśli nie możecie — spoko, rozumiem.
+Powoli zaczynamy. Jeśli jesteście online — włączcie kamerki, jeśli możecie. Dużo łatwiej mi wyczuć tempo i zasymulujemy lepiej pracę w gr
+-upie. I szczerze mówiąc — żebym wiedział, czy ktoś nie zasnął. Żartuję. Prawie. Jeśli nie możecie — spoko, rozumiem.
 
 Szybko o zasadach, żebyśmy nie tracili czasu potem.
 
@@ -70,8 +72,9 @@ OK — kciuki, jeśli zasady jasne?"
 Zasady pracy:
 👍 = jasne / działa / jestem z wami
 ❓ = pytanie (wrzuć na chat lub powiedz głosem)
-🐛 = coś nie działa / blokada - mów od razu!
-Pytania od razu, nie czekamy.
+🐛 = coś nie działa / blokada — mów od razu!
+🔵 = zadanie dla zaawansowanych (opcjonalne, równolegle)
+Pytania od razu. Przerywajcie.
 ```
 
 ---
@@ -163,6 +166,17 @@ Runda intro (2-3 min / osoba):
 - Te cztery pytania na ekranie
 - Notuję pain pointy uczestników — wracam do nich przez tydzień
 
+🔵 **Dla zaawansowanych — pytanie otwierające dyskusję (wrzuć na chat przed rundą):**
+
+💬 WKLEJ NA CHAT:
+```
+Pytanie otwarte — wrócimy do niego na koniec tygodnia:
+
+"Czy 20 000 linii kodu w 3 dni to dla Ciebie nowa norma?
+A może już jest? Co by to zmieniło w Twoim zespole?"
+— inspiracja: Kubryński, DevTalk Trio
+```
+
 🎬 „To nie jest autoprezentacja. To jest szybki radar dla mnie — żebym wiedział gdzie zwolnić, gdzie przyspieszyć, i które przykłady będą dla Was najbardziej trafne.
 
 *[Słuchaj aktywnie. Notuj konkretne problemy. Np.: 'halucynacje w Spring Boot', 'agent nadpisał mi konfigurację', 'nie wiem jak dawać mu kontekst'. Wróć do tych przykładów w ciągu dnia.]*
@@ -178,30 +192,27 @@ Runda intro (2-3 min / osoba):
 
 „Teraz mały quiz. To nie egzamin — nikt nie ocenia. Celem jest żebym wiedział które pojęcia z materiałów pre-work wymagają więcej omówienia, a które możemy przeskoczyć.
 
-Dostaliście przed szkoleniem materiały z podstawowymi pojęciami AI — zakładam że część z Was przeczytała, część przejrzała, część... no, tutaj jesteśmy. Bez oceniania.
+Dostaliście przed szkoleniem materiały z podstawowymi pojęciami AI — zakładam, że część z Was przeczytała, część przejrzała, część... no, tutaj jesteśmy. Bez oceniania.
 
 Zaznaczajcie proszę intuicyjnie — nie szukajcie w Google. Jeśli czegoś nie wiecie — super, właśnie po to tu jesteście."
 
+💡 **Wskazówka:** Przeprowadź w rundce — zapytaj 2-3 osoby o każde pojęcie. Cel: wyczuć gdzie jest luka, nie sprawdzić wszystkich ze wszystkiego. Nie musisz przejść przez każde z 8 punktów — skup się na tych, gdzie był rozstrzał lub cisza.
+
 💬 WKLEJ NA CHAT:
 ```
-Quiz — oceń swoją znajomość (1 = nie wiem, 5 = wiem dobrze):
+Quiz kalibracyjny — odpowiedz własnymi słowami:
 
-1) Token / tokenizacja
-2) Context window (okno kontekstowe)
-3) Halucynacja LLM
-4) Prompt engineering
-5) Context engineering (różnica od prompt eng.)
-6) Agent vs Assistant — fundamentalna różnica
-7) MCP (Model Context Protocol)
-8) RAG (Retrieval-Augmented Generation)
-9) CLAUDE.md / AGENTS.md
-10) Vibe Coding vs Vibe Engineering
+1) Token — co to jest i dlaczego ma znaczenie dla kosztów?
+2) Context Window — czym różni się od pamięci długoterminowej?
+3) Hallucination — dlaczego LLM halucynuje z definicji?
+4) Prompt Engineering vs Context Engineering — jaka różnica?
+5) Agent vs Assistant — jaka fundamentalna różnica?
+6) Sandbox w Claude Code — co izoluje i dlaczego ważne?
+7) MCP (Model Context Protocol) — do czego służy?
+8) Vibe Coding vs Vibe Engineering — jeden przykład różnicy?
 
-Wrzuć na chat: np. "3,4,2,5,1,3,1,2,1,3"
-(10 liczb po przecinku, dla każdego pojęcia)
+Odpowiadajcie na chat lub głos — nie ma złych odpowiedzi!
 ```
-
-💡 Alternatywnie: użyj Mentimeter, Slido, lub po prostu poproś o odpowiedź głosową w rundce.
 
 🎬 *[Po zebraniu odpowiedzi — omów TYLKO pojęcia gdzie widzisz największy rozjazd. Nie rób pełnego wykładu — 1 zdanie + 1 przykład na pojęcie.]*
 
@@ -296,6 +307,33 @@ Strategia: kombinacja AI + algorytmów do przepisywania codebase'ów.
 
 LinkedIn: https://www.linkedin.com/posts/galenh_principal-software-engineer-coreai-microsoft-activity-7407863239289729024-WTzf
 ```
+
+🎬 „I trzeci case study — celowo zostawiłem go na koniec, bo to jest z waszego podwórka.
+
+Jakub Kubryński, Łukasz Szydło i Jakub Pilimon. Ekipa DNA — Droga Nowoczesnego Architekta. Jeśli jesteście w świecie Java enterprise — znacie ich. Na ich szkolenia czeka się z rocznym wyprzedzeniem.
+
+Trzy tygodnie temu nagrali live: '6 mitów o AI w SDLC'.
+
+Kubryński powiedział wprost: w jego firmie Skill Panel od ponad dwóch lat **100% kodu powstaje z pomocą AI. Żadna linijka nie jest pisana ręcznie przez programistę**.
+
+Jak to możliwe bez chaosu? Bo mają dojrzały workflow. Spec-driven development, dobre CLAUDE.md, code review, testy. Nie 'vibe coding' — świadomy proces. Dokładnie to co budujemy przez ten tydzień.
+
+Nie możecie im zarzucić braku doświadczenia. To są osoby które uczyły was jak robić architekturę porządnie."
+
+💬 WKLEJ NA CHAT:
+```
+Case study PL: Kubryński, Szydło, Pilimon — Architekt Jutra
+
+"6 mitów o AI w SDLC" (live, 2026):
+https://www.youtube.com/watch?v=ioJkmqNFjwk
+
+Skill Panel (Kubryński): 100% kodu z AI od >2 lat.
+Podejście: spec-driven + Claude + code review.
+
+Architekt Jutra: https://architektjutra.pl
+```
+
+🔵 **Dla zaawansowanych:** Obejrzyjcie live przed jutrem — szczególnie sekcję o micie "agentowi wystarczy dostęp do danych i narzędzi". Wrócimy do tego w kontekście CLAUDE.md na Dzień 2.
 
 🎬 „A teraz wpływ na szerszy ekosystem. Co się dzieje z narzędziami które wygrywały przez *wizyty* programistów?"
 
@@ -572,7 +610,38 @@ https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agent
 
 🎬 „Wyobraźcie sobie dwóch snajperów. Jeden ma krótki i precyzyjny brief — strzela w punkt. Drugi dostał 50 plików, historię projektu od 3 lat i paste ze StackOverflow. Który trafi?
 
-Context Engineering to bycie tym pierwszym snajperem. To jest główna praca inżynierów budujących narzędzia jak Claude Code — jak dobrze dostarczyć modelowi kontekst. Wrócimy do tego kiedy będziemy tworzyć CLAUDE.md dla naszego projektu.
+Context Engineering to bycie tym pierwszym snajperem. To jest główna praca inżynierów budujących narzędzia jak Claude Code — jak dobrze dostarczyć modelowi kontekst.
+
+Pilimon z ekipy Architekta Jutra mówił o tym wprost: 'Agentowi wystarczy dać dostęp do danych i narzędzi' — to jest jeden z największych mitów. Bez opisu projektu, konwencji, wcześniejszych decyzji i ograniczeń — agent strzela. Pewnie, płynnie, z przekonaniem — ale strzela. CLAUDE.md to wasze antidotum na tę entropię.
+
+Wrócimy do tego praktycznie, kiedy będziemy tworzyć CLAUDE.md dla projektu.
+
+Ale najpierw — pułapka, na którą wpadają wszyscy przy dłuższej pracy z agentem: **Context Rot**."
+
+💬 WKLEJ NA CHAT:
+```
+Context Rot — pułapka długich sesji:
+
+Co to: model gubi się w bardzo długim kontekście.
+"Lost in the Middle" — instrukcje z początku sesji
+bywają ignorowane po 50+ wiadomościach.
+
+Objawy:
+• agent "zapomina" o wcześniejszych ustaleniach
+• zaczyna robić rzeczy których zakazaliście
+• wyniki gorsze mimo że nic nie zmieniliście
+
+Rozwiązania:
+• /compact w Claude Code — kompresuje historię sesji
+• nowa sesja + CLAUDE.md — agent odbudowuje kontekst
+  z pliku, nie z historii
+• commituj regularnie → możesz wrócić do dobrego stanu
+• małe zadania > jedna mega-sesja
+
+Zasada: wolę 5 czystych sesji niż 1 mega-sesję.
+```
+
+🎬 „CLAUDE.md to nasz główny mechanizm przeciw context rot. Agent czyta go na początku każdej sesji — więc nawet przy nowej sesji, od razu wie o projekcie. Do tego wrócimy szczegółowo na Dzień 2.
 
 Teraz — Vibe Coding vs Vibe Engineering. To jest serce tego kursu."
 
@@ -622,6 +691,8 @@ Vibe Engineering — 4 filary:
 ```
 
 🎬 „Inaczej mówiąc: w Vibe Engineering budujesz system. AI nie jest luzem puszczonym na produkcję. Agent może zrobić błąd — ale system to wyłapie zanim dojdzie do maina.
+
+Szydło z ekipy Architekta Jutra powiedział o tym świetnie: 'AI to nie junior developer któremu możesz zaufać po 6 miesiącach. To ekspert który może napisać 1000 linii idealnego kodu i jedną linię która zniszczy cały system — i nawet nie mrugnął okiem.' Dlatego weryfikacja jest konieczna — nie dlatego że AI jest głupie, ale dlatego że tak działają systemy probabilistyczne.
 
 To jest różnica między juniorem który 'pisze kod' a seniorem który 'projektuje system wytwarzania kodu'. I to jest właśnie wasza przewaga.
 
@@ -778,7 +849,44 @@ Rekomendacja: CLI jest głównym narzędziem.
 Desktop App jako uzupełnienie do eksploracji i analizy.
 ```
 
-🎬 „Zacznijmy od CLI — bo to jest fundament.
+🎬 „Zanim przejdziemy do komend — ważna kwestia bezpieczeństwa: **sandbox**. Szczególnie ważna dla środowisk regulowanych jak wasze.
+
+Co to jest sandbox w kontekście agenta? To izolacja środowiska w którym agent uruchamia komendy. Bez sandboxa — agent ma dostęp do wszystkich plików na dysku, może uruchamiać dowolne procesy. Z sandboxem — jest ograniczony do katalogu projektu i nie może przypadkowo (ani złośliwie) wyjść poza."
+
+💬 WKLEJ NA CHAT:
+```
+Sandbox — Claude Code CLI vs Desktop App:
+
+CLI na Windows (bez WSL2):
+⚠️ BRAK pełnego sandbox — AppContainer ogranicza sieć,
+   ale agent ma dostęp do plików poza projektem!
+   → Używajcie na projektach bez wrażliwych credentiali
+   → Lub: osobne konto OS / dedykowana maszyna
+
+CLI na Windows (z WSL2):
+✅ bubblewrap (bwrap) — izolacja przez nowe namespace'y Linuxa
+   → włącz: claude --sandbox
+
+Desktop App (Windows Pro/Enterprise):
+✅ Hyper-V VM — najlepsza izolacja, pełna separacja
+   → Działa tylko na Windows Pro/Enterprise, nie Home!
+
+Kiedy szczególnie ważne:
+❗ Projekty z kluczami API, credentialami, danymi klientów
+❗ Środowiska bankowe / regulowane
+❗ YOLO mode (--dangerously-skip-permissions) — TYLKO w VM/kontenerze!
+
+Rekomendacja dla Was:
+• Desktop App jeśli macie Windows Pro → najlepszy sandbox
+• CLI + WSL2 jeśli zostajecie w terminalu
+• W CI/CD: zawsze w dedykowanym kontenerze Docker
+```
+
+🎬 „W środowisku bankowym, gdzie pracujecie — sandbox nie jest opcją, jest wymaganiem. Zapamiętajcie tę zasadę: im wyższy poziom autonomii agenta, tym ważniejsza izolacja.
+
+Wrócimy do tego praktycznie na Dzień 4 przy CI/CD. Na razie zapamiętajcie: Desktop App = bezpieczniejszy start na Windowsie jeśli macie Pro.
+
+Teraz — zacznijmy od CLI, bo to jest fundament.
 
 Stwórzcie katalog projektu i zainicjujcie repo:"
 
@@ -1186,7 +1294,6 @@ WezTerm vs Windows Terminal — kiedy warto zmienić:
 • Nie chcesz kolejnej konfiguracji teraz
 
 Instalacja: https://wezfurlong.org/wezterm/installation.html
-Mój config (z kursu): w repo szkoleniowym
 ```
 
 📺 **CO POKAZUJĘ:**
@@ -1194,16 +1301,83 @@ Mój config (z kursu): w repo szkoleniowym
 - Shift+Enter dla nowej linii w długim prompcie
 - Powiadomienie po zakończeniu długiego zadania
 
+🎬 „Mam dla Was gotowe pliki konfiguracyjne — `.wezterm.lua` z moimi ustawieniami i motywem Omarchy który widzicie u mnie na ekranie. Są w materiałach szkoleniowych."
+
 💬 WKLEJ NA CHAT:
 ```
-WezTerm — przydatne skróty (gdy zainstalujecie):
+WezTerm — gotowe konfiguracje z kursu:
+• .wezterm.lua — pełna konfiguracja z splitami i skrótami
+• omarchy.lua — motyw kolorystyczny
+Lokalizacja: course-materials/WezTerm/
 
+WezTerm — przydatne skróty:
 Shift+Enter        = nowa linia bez wysyłania prompta
 Ctrl+Backspace     = usuń całe słowo w lewo
 Ctrl+Shift+D       = podziel panel pionowo
 Ctrl+Shift+E       = podziel panel poziomo
 Ctrl+Shift+Arrow   = przeskocz między panelami
 ```
+
+---
+
+## 🔵 Dla zaawansowanych: Ollama + przełączanie backendów Claude Code
+⏱️ opcjonalne, równolegle z WezTerm lub jako praca domowa
+
+💡 **Uwaga:** Ten blok tylko dla tych którzy już mają WezTerm gotowy lub nie potrzebują go. Reszta może poczekać do podsumowania.
+
+🎬 „Dla tych którzy są już gotowi — pokażę jeszcze jedną rzecz: jak uruchomić Claude Code z alternatywnym backendem. Czyli zamiast Anthropic API — OpenRouter, GLM przez Z.ai albo lokalne modele przez Ollama. Dlaczego to ważne? Bo w środowiskach gdzie nie możecie wysyłać kodu firmowego do Anthropic — możecie użyć lokalnego modelu który zostaje w Waszej infrastrukturze.
+
+Mam gotowy plik `.bashrc` z funkcjami bash do szybkiego przełączania między backendami."
+
+💬 WKLEJ NA CHAT:
+```
+Przełączanie backendów Claude Code — funkcje bash:
+
+Dostępne aliasy (z pliku .bashrc w materiałach szkoleniowych):
+
+ccn  = claude-native   → Anthropic (Wasz Team plan, domyślny)
+cco  = claude-or       → OpenRouter (dostęp do 200+ modeli)
+ccz  = claude-zai      → Z.ai / GLM-4.7 (tani, mocny open source)
+ccol = claude-ollama   → Ollama (lokalny model, zero danych w chmurze!)
+
+Przykłady użycia:
+cco                          → Claude Code przez OpenRouter
+CLAUDE_CODE_MODEL="deepseek/deepseek-v3.2" cco   → konkretny model
+ccz                          → Claude Code z GLM-4.7
+ccol                         → Claude Code z lokalnym Ollama
+
+Plik .bashrc z kursu: course-materials/.bashrc
+(skopiujcie zawartość do swojego ~/.bashrc lub ~/.zshrc)
+```
+
+🎬 „Jak działa to pod spodem? Claude Code używa zmiennych środowiskowych `ANTHROPIC_BASE_URL` i `ANTHROPIC_AUTH_TOKEN` do komunikacji z API. Te funkcje po prostu ustawiają inne wartości tych zmiennych przed uruchomieniem claude — i agent trafia do innego backendu, ale interfejs CLI zostaje taki sam.
+
+**Ollama** — to najciekawszy przypadek dla środowisk regulowanych. Instalujecie Ollama lokalnie, pobieracie model (np. `ollama pull qwen3-coder`), uruchamiacie `ollama serve`, i wtedy `ccol` połączy Claude Code z tym modelem. Żaden token kodu nie opuszcza Waszej maszyny."
+
+💬 WKLEJ NA CHAT:
+```
+🔵 Ollama — szybki start (dla zaawansowanych):
+
+Instalacja Ollama:
+winget install Ollama.Ollama   # Windows
+# lub: https://ollama.com/
+
+Pobierz model do kodowania:
+ollama pull qwen3-coder        # dobry coding model
+ollama pull glm-5:cloud        # GLM-5 przez Ollama cloud endpoint
+
+Uruchom jako lokalny serwer:
+ollama serve
+→ dostępny na: http://localhost:11434
+
+Uruchom Claude Code z Ollama backendem:
+ccol                           # użyj aliasu z .bashrc
+
+Sprawdź aktywny model w Claude Code:
+/status
+```
+
+🎬 „Jedna ważna uwaga: lokalne modele przez Ollama są na razie słabsze od chmurowych przy złożonym kodowaniu. Świetne do: prostych tasków, korekty tekstu, local CI na słabo połączonej maszynie, i testowania co możemy zrobić lokalnie. Do architektury i trudnych zadań — wciąż warto sięgnąć po Opus lub Sonnet."
 
 ---
 
@@ -1220,12 +1394,14 @@ Ctrl+Shift+Arrow   = przeskocz między panelami
 
 □ Działające środowisko lokalne (Claude Code, Java, Git)
 □ Claude Code CLI — zalogowany, pierwsze komendy
+□ Sandbox — wiemy kiedy i jak używać (CLI vs Desktop)
 □ Claude Code Desktop App — wiemy kiedy używać
 □ Claude Code w IntelliJ przez ACP (dla tych z 2025.3+)
 □ Projekt ai-claim-validator — struktura Spring Boot
 □ CLAUDE.md — kontekst dla agentów przez cały tydzień
 □ Modele danych: ClaimRequest, ClaimResponse
 □ Wspólny mental model: Vibe Engineering nie Vibe Coding
+□ 🔵 Ollama + .bashrc — backend switchers (dla zaawansowanych)
 
 Jutro (Dzień 2): Od pomysłu do projektu
 Temat: AI jako Twój PM i UX Designer
@@ -1448,3 +1624,44 @@ Praktycznie:
 • Desktop App: najlepsza izolacja jeśli macie Win Pro+
 • W CI/CD: uruchamiajcie agenta w dedykowanym kontenerze Docker
 ```
+
+---
+
+## APPENDIX F — Plan B: jeśli mocno za wolno (timing)
+
+Jeśli quiz + runda zajęły za dużo i jesteś 20-30 min do tyłu:
+
+| Co przyciąć | Jak |
+|---|---|
+| Moduł 1.1 | Pomiń case study Microsoft, skróć poziomy 0-5 do 2 min |
+| GLM demo | Pokaż tylko wynik GLM-5, bez przeprowadzania ćwiczenia |
+| LMArena | Pokaż sam, bez ćwiczenia uczestników (5 min zamiast 10) |
+| Context Rot | Skróć do 1 bloku chat, bez omawiania |
+| IntelliJ ACP | Pokaż demo, instalacja jako homework 🔵 |
+| Pierwsze komendy | Pomijamy CLAUDE.md generation — robimy jutro rano jako rozgrzewkę |
+
+**Minimum must-have na koniec Dnia 1:**
+1. Claude Code CLI zainstalowany i zalogowany u wszystkich
+2. Uczestnicy rozumieją agent vs assistant i poziomy 0-5
+3. Uczestnicy wiedzą czym jest context rot i jak używać `/compact`
+4. Katalog projektu z CLAUDE.md zainicjowany
+5. Znają różnicę Vibe Coding vs Vibe Engineering
+
+---
+
+## APPENDIX G — FAQ dla prowadzącego
+
+**Q: Czy musimy używać Claude Code czy możemy Cursor / Copilot?**
+Na kursie skupiamy się na CC żeby nie tracić czasu na różnice między narzędziami. Wszystko się przenosi — AGENTS.md, MCP, sub-agents to te same koncepcje wszędzie. CC jest naszym referencyjnym przykładem.
+
+**Q: Czy Claude Code zbiera nasz kod / dane firmowe?**
+Anthropic nie trenuje modeli na danych API bez zgody (domyślnie wyłączone dla Pro/Team). Dla wrażliwego kodu produkcyjnego: sprawdźcie Enterprise tier lub modele lokalne przez Ollama.
+
+**Q: Czym różni się Claude Code Web (claude.ai/code) od CLI?**
+Web to cloud agent — działa w przeglądarce, ma własne środowisko w chmurze. Dobry do asynchronicznych zadań. CLI działa lokalnie, ma pełny dostęp do repo i jest lepszy do interaktywnej pracy.
+
+**Q: Jak CC działa z dużym projektem Spring / monorepo?**
+Nie otwierajcie całego repo naraz. Używajcie `@src/main/java/com/firma/modul/` zamiast `@src/`. Dobry CLAUDE.md z opisem architektury zastępuje konieczność ładowania całego kodu. To temat Dnia 5 (legacy code).
+
+**Q: Czy możemy używać Codex zamiast Claude?**
+Pokażę Codex porównawczo ostatniego dnia. Na szkoleniu jeden workflow — żeby nie było zamieszania. Wiedza przenosi się 1:1.
