@@ -29,7 +29,7 @@ Dzień 1 – agenda:
 13:30  Moduł 1.3 – Setup Claude Code CLI + Desktop App + pierwsze komendy
 14:30  ☕ OPCJONALNA PRZERWA
 14:40  Moduł 1.4 – Narzędzia: CLI vs Desktop vs IntelliJ ACP
-15:35  WezTerm – dlaczego warto (mini-moduł)
+15:35  WezTerm – dlaczego warto (mini-moduł) + Ollama / alternatywne endpointy CC
 15:50  Podsumowanie dnia
 16:00  Koniec
 ```
@@ -1293,6 +1293,7 @@ WezTerm vs Windows Terminal — kiedy warto zmienić:
 • Działa stabilnie i nie masz problemów z sesjami
 • Nie chcesz kolejnej konfiguracji teraz
 
+Oficjalne docs Claude Code o terminalach: https://code.claude.com/docs/en/terminal-config
 Instalacja: https://wezfurlong.org/wezterm/installation.html
 ```
 
