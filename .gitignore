@@ -37,6 +37,12 @@ node_modules/
 .vite
 frontend/dist
 
+### Secrets / credentials
+.env
+.env.local
+# You should NEVER use .env files for production envs! But just in case it's better to also ignore this file name to prevent commiting it to git repo
+.env.production
+
 ### Local / private (user-specific) Claude settings.
 # Should be ignored but I commit it as an example.
 # .claude/settings.local.json
