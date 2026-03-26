@@ -53,7 +53,7 @@ claude-or() {
   export ANTHROPIC_AUTH_TOKEN="${OPENROUTER_API_KEY}"
   export ANTHROPIC_CUSTOM_HEADERS="HTTP-Referer: https://openrouter.ai, X-Title: Claude Code via Git Bash"
   export ANTHROPIC_DEFAULT_SONNET_MODEL="${CLAUDE_CODE_MODEL:-deepseek/deepseek-v3.2}"
-  export ANTHROPIC_DEFAULT_OPUS_MODEL="${CLAUDE_CODE_MODEL:-deepseek/deepseek-v3.2}"
+  export ANTHROPIC_DEFAULT_OPUS_MODEL="${CLAUDE_CODE_MODEL:-z-ai/glm-5}"
   export ANTHROPIC_DEFAULT_HAIKU_MODEL="${CLAUDE_CODE_MODEL:-deepseek/deepseek-v3.2}"
   export CLAUDE_CODE_SUBAGENT_MODEL="${CLAUDE_CODE_MODEL:-deepseek/deepseek-v3.2}"
   claude "$@"
