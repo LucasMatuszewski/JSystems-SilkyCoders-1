@@ -548,7 +548,9 @@ Dokumentacja: https://github.com/microsoft/playwright-mcp
 
 Wklej do claude:
 
-"Używając Playwright MCP, przeanalizuj stronę https://www.sinsay.com i:
+---
+
+Używając Playwright MCP, przeanalizuj stronę https://www.sinsay.com/pl/pl i:
 
 1. Zrób screenshot strony głównej i zapisz jako assets/sinsay-homepage.png
 2. Wyciągnij z CSS/DOM design tokeny:
@@ -556,11 +558,13 @@ Wklej do claude:
    - Fonty (family, size, weight)
    - Spacing (padding, margin values używane najczęściej)
    - Border radius
+   - itp.
 3. Pobierz favicon i zapisz jako assets/sinsay-favicon.ico
-4. Sprawdź czy logo jest dostępne jako SVG lub PNG
-5. Zapisz znalezione tokeny jako assets/design-tokens.json
+4. Sprawdź czy logo jest dostępne jako SVG lub PNG i zapisz je jako assets/logo.png (lub svg)
+5. Zapisz znalezione tokeny oraz szczegółowy opis design system jako /docs/design-guidelines.md który ma posłużyć agentom do dokładnego odzwierciedlenia wyglądu strony Sinsay w naszej aplikacji aby była ona spójna - powinien on zawierać odnośniki do wszystkich zapisanych plików w assets.
+6. same design tokens zapisz w pliku assets/design-tokens.json
 
-Cel: będziemy używać tych tokenów w naszym frontend."
+Cel: będziemy używać tych tokenów i opisu design guidelines tworząc naszą aplikację aby była spójna z brendem Sinsay.
 
 Commit: "Docs: add sinsay design tokens and assets"
 ```

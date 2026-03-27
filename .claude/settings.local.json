@@ -5,10 +5,19 @@
       "WebFetch(domain:blog.jetbrains.com)",
       "WebFetch(domain:www.jetbrains.com)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__query-docs"
+      "mcp__context7__query-docs",
+      "Bash(./mvnw test:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_evaluate",
+      "Bash(powershell -Command \"Invoke-WebRequest -Uri 'https://www.sinsay.com/pl/pl/skin/frontend/6.444.0/sinsay/default/favicon.ico' -OutFile 'D:/DEV/COURSES/JSystems-SilkyCoders-1/assets/sinsay-favicon.ico'\" 2>&1)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "context7"
+    "context7",
+    "playwright"
   ]
 }
