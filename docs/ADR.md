@@ -26,8 +26,8 @@ Credentials are stored in [`.env`](../.env) (OpenRouter API key and base URL).
 | Layer | Choice | Rationale |
 |---|---|---|
 | Language | Kotlin (JVM) | Concise, null-safe, first-class Spring support |
-| Framework | Spring Boot 3.x — standalone fat JAR | Simple deployment, embedded Tomcat, no external container needed |
-| AI integration | Spring AI → OpenRouter (`openai/gpt-5.4-mini`) | OpenAI-compatible client; multimodal Media API; streaming Flux out of the box |
+| Framework | Spring Boot 3.x + WebFlux — standalone fat JAR | Reactive, non-blocking stack; embedded Reactor Netty (WebFlux default); controllers use Kotlin coroutines and `Flow<T>`; no extra server configuration needed |
+| AI integration | Spring AI → OpenRouter (`openai/gpt-5.4-mini`) | OpenAI-compatible client; multimodal Media API; streaming via `Flux` converted to `Flow` with `.asFlow()` |
 | UI templating | kotlinx.html DSL | Type-safe HTML from Kotlin, no template language context-switch |
 | UI interactivity | HTMX 2.x + vanilla JS | Form submission, SSE chat streaming, file preview — no build step required |
 | Persistence | SQLite via Spring JDBC | Zero-setup embedded database; sufficient for single-node MVP session history |
@@ -174,7 +174,22 @@ Documents are `ClassPathResource` files concatenated into the system message in 
 
 ### Streaming
 
-Spring AI `ChatClient.stream().content()` emits `Flux<String>` chunks. The controller exposes a `text/event-stream` endpoint. HTMX SSE extension connects and appends tokens in real time:
+Spring AI `ChatClient.stream().content()` returns a `Flux<String>`. This is converted to a Kotlin `Flow<String>` with `.asFlow()` (from `kotlinx-coroutines-reactor`). Spring WebFlux handles `Flow` return types natively — no Reactor operators needed anywhere in application code.
+
+```kotlin
+// infrastructure/ai/SpringAiEvaluationAdapter.kt
+fun evaluate(...): Flow<String> =
+    chatClient.prompt(prompt).stream().content().asFlow()
+
+// presentation/web/IntakeController.kt
+@PostMapping("/submit", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+fun submit(@ModelAttribute cmd: SubmitCommand): Flow<String> =
+    submitRequestUseCase.execute(cmd)
+```
+
+The `kotlinx-coroutines-reactor` bridge is included automatically by `spring-boot-starter-webflux` when the Kotlin plugin is present — no extra dependency declaration needed.
+
+HTMX SSE connects and appends tokens in real time:
 
 ```html
 <div hx-ext="sse" sse-connect="/api/stream/{sessionId}" sse-swap="token">
@@ -269,7 +284,7 @@ flowchart TD
     UseCase --> Repo
     AI -- "OpenAI-compatible\nchat/completions stream" --> OR
     OR -- "Flux<String> tokens" --> AI
-    AI -- "SSE chunks" --> Controller
+    AI -- "Flow<String> (.asFlow())" --> Controller
     Controller -- "text/event-stream" --> Browser
     Repo --> DB
     Docs -- "ClassPathResource" --> AI
@@ -298,8 +313,8 @@ sequenceDiagram
     AI->>AI: build Prompt(system=policy, user=description+Media)
     AI->>OR: POST /chat/completions stream=true
     OR-->>AI: token stream (Flux<String>)
-    AI-->>UC: Flux<String>
-    UC-->>C: Flux<String>
+    AI-->>UC: Flow<String> (.asFlow())
+    UC-->>C: Flow<String>
     C-->>U: SSE text/event-stream (decision tokens)
     UC->>D: UPDATE sessions SET decision_outcome, decision_explanation, mismatch_recommendation
 
@@ -310,9 +325,9 @@ sequenceDiagram
     UC->>D: INSERT chat_messages (role=USER)
     UC->>AI: chat(sessionContext, history, userMessage)
     AI->>OR: POST /chat/completions stream=true
-    OR-->>AI: token stream
-    AI-->>UC: Flux<String>
-    UC-->>C: Flux<String>
+    OR-->>AI: token stream (Flux<String>)
+    AI-->>UC: Flow<String> (.asFlow())
+    UC-->>C: Flow<String>
     C-->>U: SSE text/event-stream (chat tokens)
     UC->>D: INSERT chat_messages (role=ASSISTANT)
 ```
@@ -348,6 +363,9 @@ flowchart TD
 
 | Alternative | Reason rejected |
 |---|---|
+| Spring MVC + embedded Tomcat | Blocking I/O; each SSE connection holds a thread; streaming requires extra configuration in servlet containers |
+| Jetty (as WebFlux server) | Requires explicit Netty exclusion and extra dependency; no functional benefit over the default for this use case — unnecessary complexity |
+| Reactor `Flux`/`Mono` in application code | Steeper learning curve than Kotlin coroutines for a Kotlin-first team; operator chains (`flatMap`, `switchMap`, backpressure) are harder to reason about than sequential coroutine code; `Flux` is still used at the Spring AI adapter boundary but converted immediately to `Flow` |
 | Thymeleaf for templating | Extra template files; less type safety than kotlinx.html in Kotlin |
 | React / Vue for frontend | Build pipeline overhead; overkill for server-driven UI |
 | PostgreSQL | Requires external process; SQLite is sufficient for single-node MVP |
@@ -363,6 +381,8 @@ flowchart TD
 
 **Positive**
 - Fat JAR deployment is simple (`java -jar app.jar`); no server config needed
+- Spring WebFlux + Reactor Netty is fully non-blocking out of the box; SSE streams hold no threads while awaiting LLM tokens
+- Kotlin `Flow` + coroutines keeps all application code idiomatic Kotlin; `Flux` is confined to the single `.asFlow()` call at the Spring AI boundary
 - Spring AI abstracts OpenRouter — model or provider can be swapped via config only
 - HTMX SSE delivers real-time feel without a JS build step
 - SQLite requires no separate database process for MVP
@@ -370,10 +390,124 @@ flowchart TD
 - Clean architecture by package makes layer responsibilities explicit without multi-module overhead
 
 **Negative / risks**
+- Kotlin coroutines/`Flow` still require understanding of suspend functions and structured concurrency — but the learning curve is lower than Reactor `Flux`/`Mono` for a Kotlin team
+- Spring JDBC (blocking) used inside a reactive stack requires offloading to a scheduler (`Schedulers.boundedElastic()`) to avoid blocking the event loop
 - SQLite is single-writer; concurrent sessions may queue on writes (acceptable for MVP load)
 - `openai/gpt-5.4-mini` must support vision — verify on OpenRouter before launch
-- kotlinx.html has limited documentation (45 snippets); team must be comfortable with Kotlin DSL
+- kotlinx.html has limited documentation; team must be comfortable with Kotlin DSL
 - CA by package convention relies on team discipline; no build-level enforcement
+
+---
+
+## Project Initialisation
+
+Generate the skeleton using the [Spring Initializr](https://start.spring.io) REST API. The command below creates a Gradle/Kotlin project with the core Spring dependencies; Spring AI, SQLite JDBC driver, and kotlinx.html are added manually to `build.gradle.kts` afterwards (they are not available in the Initializr catalogue).
+
+```bash
+curl https://start.spring.io/starter.zip \
+  --output sinsay-returns-bot.zip \
+  -d type=gradle-project-kotlin \
+  -d language=kotlin \
+  -d bootVersion=3.4.4 \
+  -d groupId=com.lppsa \
+  -d artifactId=sinsay-returns-bot \
+  -d name=SinsayReturnsBot \
+  -d packageName=com.lppsa \
+  -d javaVersion=21 \
+  -d dependencies=webflux,data-jdbc,flyway
+
+unzip sinsay-returns-bot.zip -d sinsay-returns-bot
+cd sinsay-returns-bot
+```
+
+After unzipping, add the remaining dependencies in `build.gradle.kts` (`webflux` from the Initializr already pulls in Reactor Netty — no server configuration needed):
+
+```kotlin
+// build.gradle.kts (additions)
+dependencies {
+    // Spring AI (BOM manages the version)
+    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
+
+    // SQLite
+    implementation("org.xerial:sqlite-jdbc:3.46.0.0")
+
+    // kotlinx.html DSL for type-safe HTML generation
+    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.11.0")
+
+    // dotenv for .env file loading
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.2")
+}
+
+// Spring AI BOM
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:1.0.0")
+    }
+}
+```
+
+References:
+- [Spring Initializr API docs](https://docs.spring.io/initializr/docs/current/reference/html/)
+- [Spring Boot reference — Gradle plugin](https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle/)
+- [Spring WebFlux reference](https://docs.spring.io/spring-framework/reference/web/webflux.html)
+- [Spring WebFlux — Kotlin coroutines support](https://docs.spring.io/spring-framework/reference/languages/kotlin/coroutines.html)
+- [Kotlin Flow documentation](https://kotlinlang.org/docs/flow.html)
+- [Spring AI reference](https://docs.spring.io/spring-ai/reference/)
+- [Kotlin Gradle DSL docs](https://docs.gradle.org/current/userguide/kotlin_dsl.html)
+- [kotlinx.html GitHub](https://github.com/Kotlin/kotlinx.html)
+
+---
+
+## Running the Application
+
+### Prerequisites
+
+- JDK 21+ on `PATH` (`java -version`)
+- A `.env` file in the project root:
+
+```
+OPENROUTER_API_KEY=sk-or-...
+```
+
+### Development (hot reload via Gradle)
+
+```bash
+./gradlew bootRun
+```
+
+The application starts on `http://localhost:8080` by default. To override the port:
+
+```bash
+./gradlew bootRun --args='--server.port=9090'
+```
+
+### Production fat JAR
+
+Build and run the self-contained JAR:
+
+```bash
+# Build
+./gradlew build
+
+# Run
+java -jar build/libs/sinsay-returns-bot-0.0.1-SNAPSHOT.jar
+```
+
+Pass the API key at runtime without editing `.env`:
+
+```bash
+OPENROUTER_API_KEY=sk-or-... java -jar build/libs/sinsay-returns-bot-0.0.1-SNAPSHOT.jar
+```
+
+### Useful Gradle tasks
+
+| Task | Purpose |
+|---|---|
+| `./gradlew build` | Compile, test, and assemble the fat JAR |
+| `./gradlew test` | Run unit and integration tests |
+| `./gradlew bootRun` | Start with Spring Boot DevTools (auto-restart on code change) |
+| `./gradlew dependencies` | Inspect the resolved dependency tree |
+| `./gradlew flywayInfo` | Show applied / pending Flyway migrations |
 
 ---
 
