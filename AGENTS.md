@@ -67,6 +67,57 @@ Escape rules: `"` → `\"`, newline → `\\n`. Use `ResponseBodyEmitter`, not `F
 
 ---
 
+## Agent Workflow
+
+### Before Starting Any Task
+1. Read the relevant PRD (`docs/PRD-Product-Requirements-Document.md`) and ADR files (`docs/ADR/`) for the affected area.
+2. Read `backend/AGENTS.md` if the task touches `backend/`, or `frontend/AGENTS.md` if it touches `frontend/`.
+3. Define the expected behavior from the specification before writing or changing any code.
+
+### TDD Rules
+For every feature and bug fix:
+1. Start from the specification, not the existing implementation.
+2. Write or extend tests **before** production code.
+3. Run the new tests and confirm they fail for the expected reason.
+4. Implement the minimum code needed to make them pass.
+5. Run the full verification suite for the changed scope (see below).
+6. Refactor only while tests stay green.
+
+If the area has no suitable test infrastructure yet, add it as part of the task — do not silently skip tests.
+
+### Verification (required before every commit)
+
+**Backend** (run from `backend/`):
+```bash
+./mvnw test          # all JUnit tests pass
+./mvnw clean package # build succeeds
+```
+
+**Frontend** (run from `frontend/`):
+```bash
+npm test             # Vitest passes
+npm run lint         # ESLint — no errors
+npm run format:check # Prettier — no violations
+npm run build        # Vite build succeeds
+```
+
+Verify only the scope relevant to your change. If the change affects runtime behavior, confirm the app starts correctly.
+
+### Commit Rules
+- Commit only after verification passes and the changed scope is in a working state.
+- Keep commits focused: one logical change per commit.
+- Format: `Area: short summary` (e.g. `Backend:`, `Frontend:`, `Docs:`)
+- Do **not** push to remote unless the user explicitly asks.
+
+### Completion Criteria
+A task is complete only when:
+- Implementation matches the relevant PRD, ADR, and design guidance
+- Tests were written first and pass honestly
+- Verification for the changed scope passed with no errors or warnings
+- The commit message is focused and the repository is in a consistent, reviewable state
+
+---
+
 ## Context7 MCP Library IDs
 
 | Library | Context7 ID |
