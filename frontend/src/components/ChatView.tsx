@@ -3,65 +3,64 @@ import { useSession } from '../hooks/useSession'
 import { useChatRuntime, AssistantChatTransport } from '@assistant-ui/react-ai-sdk'
 import { AssistantRuntimeProvider } from '@assistant-ui/react'
 import { ThreadPrimitive, ComposerPrimitive, MessagePrimitive } from '@assistant-ui/react'
+import type { UIMessage } from 'ai'
+
+interface SessionInfo {
+  intent: string
+  productName: string
+  orderNumber: string
+}
+
+interface MessageDto {
+  id: string
+  role: 'USER' | 'ASSISTANT'
+  content: string
+  sequenceNumber: number
+}
+
+interface SessionResponse {
+  session: SessionInfo
+  messages: MessageDto[]
+}
 
 export interface ChatViewProps {
   sessionId: string
   onSessionInvalid: () => void
-  initialMessages?: Array<{
-    id: string
-    role: 'user' | 'assistant'
-    content: string
-  }>
 }
 
-export default function ChatView({
-  sessionId,
-  onSessionInvalid,
-}: ChatViewProps): React.JSX.Element {
-  const { clearSession } = useSession()
-  const [sessionInfo, setSessionInfo] = useState<{
-    intent: string
-    productName: string
-    orderNumber: string
-  } | null>(null)
+interface ChatRuntimeViewProps {
+  sessionId: string
+  sessionInfo: SessionInfo
+  initialMessages: UIMessage[]
+  onNewSession: () => void
+}
 
+function isSessionResponse(data: unknown): data is SessionResponse {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return typeof d['session'] === 'object' && d['session'] !== null && Array.isArray(d['messages'])
+}
+
+function mapMessageDtoToUIMessage(msg: MessageDto): UIMessage {
+  return {
+    id: msg.id,
+    role: msg.role === 'USER' ? 'user' : 'assistant',
+    parts: [{ type: 'text', text: msg.content }],
+  }
+}
+
+function ChatRuntimeView({
+  sessionId,
+  sessionInfo,
+  initialMessages,
+  onNewSession,
+}: ChatRuntimeViewProps): React.JSX.Element {
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({
       api: `/api/sessions/${sessionId}/messages`,
     }),
+    messages: initialMessages,
   })
-
-  // Fetch session info on mount if not provided
-  useEffect(() => {
-    const fetchSessionInfo = async () => {
-      try {
-        const response = await fetch(`/api/sessions/${sessionId}`)
-        if (!response.ok) {
-          if (response.status === 404) {
-            onSessionInvalid()
-            clearSession()
-          }
-          return
-        }
-
-        const data = await response.json()
-        setSessionInfo({
-          intent: data.intent,
-          productName: data.productName,
-          orderNumber: data.orderNumber,
-        })
-      } catch (error) {
-        console.error('Failed to fetch session info:', error)
-      }
-    }
-
-    fetchSessionInfo()
-  }, [sessionId, onSessionInvalid, clearSession])
-
-  const handleNewSession = () => {
-    clearSession()
-    onSessionInvalid()
-  }
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
@@ -69,20 +68,16 @@ export default function ChatView({
         {/* Summary Bar */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
           <div className="flex items-center gap-4 text-sm">
-            {sessionInfo && (
-              <>
-                <span className="font-medium text-text-primary">
-                  {sessionInfo.intent === 'RETURN' ? 'Zwrot' : 'Reklamacja'}
-                </span>
-                <span className="text-text-secondary">•</span>
-                <span className="text-text-secondary">{sessionInfo.productName}</span>
-                <span className="text-text-secondary">•</span>
-                <span className="text-text-secondary">{sessionInfo.orderNumber}</span>
-              </>
-            )}
+            <span className="font-medium text-text-primary">
+              {sessionInfo.intent === 'RETURN' ? 'Zwrot' : 'Reklamacja'}
+            </span>
+            <span className="text-text-secondary">•</span>
+            <span className="text-text-secondary">{sessionInfo.productName}</span>
+            <span className="text-text-secondary">•</span>
+            <span className="text-text-secondary">{sessionInfo.orderNumber}</span>
           </div>
           <button
-            onClick={handleNewSession}
+            onClick={onNewSession}
             className="text-sm font-medium text-brand-accent hover:text-brand-accent/80"
           >
             Nowa sesja
@@ -145,5 +140,68 @@ export default function ChatView({
         </ThreadPrimitive.Root>
       </div>
     </AssistantRuntimeProvider>
+  )
+}
+
+export default function ChatView({
+  sessionId,
+  onSessionInvalid,
+}: ChatViewProps): React.JSX.Element {
+  const { clearSession } = useSession()
+  const [sessionData, setSessionData] = useState<{
+    info: SessionInfo
+    messages: UIMessage[]
+  } | null>(null)
+
+  useEffect(() => {
+    const fetchSessionInfo = async () => {
+      try {
+        const response = await fetch(`/api/sessions/${sessionId}`)
+        if (!response.ok) {
+          if (response.status === 404) {
+            onSessionInvalid()
+            clearSession()
+          }
+          return
+        }
+
+        const data: unknown = await response.json()
+        if (!isSessionResponse(data)) {
+          console.error('Unexpected session response shape', data)
+          return
+        }
+
+        setSessionData({
+          info: {
+            intent: data.session.intent,
+            productName: data.session.productName,
+            orderNumber: data.session.orderNumber,
+          },
+          messages: data.messages.map(mapMessageDtoToUIMessage),
+        })
+      } catch (error) {
+        console.error('Failed to fetch session info:', error)
+      }
+    }
+
+    fetchSessionInfo()
+  }, [sessionId, onSessionInvalid, clearSession])
+
+  const handleNewSession = () => {
+    clearSession()
+    onSessionInvalid()
+  }
+
+  if (sessionData === null) {
+    return <div className="h-screen flex items-center justify-center bg-background" />
+  }
+
+  return (
+    <ChatRuntimeView
+      sessionId={sessionId}
+      sessionInfo={sessionData.info}
+      initialMessages={sessionData.messages}
+      onNewSession={handleNewSession}
+    />
   )
 }
