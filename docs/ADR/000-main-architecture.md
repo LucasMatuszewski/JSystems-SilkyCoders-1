@@ -82,7 +82,7 @@ sinsay-poc/
 | Frontend language | TypeScript (strict mode) | Project requirement |
 | Frontend build | Vite | Fast DX, simple config |
 | Chat UI | assistant-ui (`@assistant-ui/react`, `@assistant-ui/react-ai-sdk`) | See ADR-002-frontend |
-| Streaming protocol | Vercel AI SDK data stream (via `useChat`) | Required by assistant-ui `useChatRuntime` |
+| Streaming protocol | Vercel AI SDK UI Message Stream (SSE, via `AssistantChatTransport`) | Required by assistant-ui `useChatRuntime` |
 | UI primitives | Shadcn/ui + Tailwind CSS | Component library compatible with assistant-ui |
 
 ---
@@ -177,13 +177,20 @@ One message in the conversation for a session.
 - **Response (404):** session not found
 
 ### POST `/api/sessions/{sessionId}/messages` — Continue conversation (streaming)
-- **Content-Type:** `application/json`
-- **Request body:** `{ "content": "user message text" }`
-- **Response (200):** `text/plain;charset=UTF-8` — Vercel data stream format, streamed
-  - Each text chunk: `0:"<JSON-escaped text>"\n`
-  - Finish signal: `d:{"finishReason":"stop"}\n`
+- **Content-Type (request):** `application/json`
+- **Request body:** `{ "messages": [...], "system": "...", ... }` — sent by `AssistantChatTransport`. Backend extracts only the last user message from `messages[]`; it maintains its own history in the DB.
+- **Response (200):** `text/event-stream` — Vercel AI SDK UI Message Stream (SSE format)
+  - Header: `x-vercel-ai-ui-message-stream: v1`
+  - Stream events (each line prefixed with `data: ` and followed by `\n\n`):
+    ```
+    data: {"type":"start","messageId":"<uuid>"}
+    data: {"type":"text-start","id":"<uuid>"}
+    data: {"type":"text-delta","id":"<uuid>","delta":"Hello"}
+    data: {"type":"text-delta","id":"<uuid>","delta":" world"}
+    data: {"type":"text-end","id":"<uuid>"}
+    ```
 - **Response (404):** session not found
-- **Notes:** Backend loads full message history from DB + reconstructs system prompt + calls OpenAI. Persists new USER and ASSISTANT messages to DB during/after streaming.
+- **Notes:** Backend loads full message history from DB + reconstructs system prompt + calls OpenAI. Persists new USER and ASSISTANT messages to DB during/after streaming. The frontend sends the full `messages[]` via `AssistantChatTransport`, but the backend ignores it and uses its own DB history — it only extracts the last user message content from the request.
 
 ---
 
@@ -230,16 +237,18 @@ The OpenAI Java SDK automatically picks up `OPENAI_API_KEY` and `OPENAI_BASE_URL
 
 ---
 
-### Vercel data stream protocol for chat streaming
-**Status:** Accepted
-**Context:** assistant-ui's `useChatRuntime` wraps Vercel AI SDK's `useChat` hook, which expects a specific streaming wire format. The backend must emit this format.
-**Decision:** The Spring Boot chat endpoint returns `text/plain;charset=UTF-8` with `Transfer-Encoding: chunked`. Each line is a Vercel data stream protocol token: `0:"<text>"\n`. The stream ends with `d:{"finishReason":"stop"}\n`. The frontend uses `useChatRuntime` with `streamProtocol: 'data'` (default).
+### Vercel AI SDK UI Message Stream protocol for chat streaming
+**Status:** Accepted (updated 2026-03-30 — protocol v6 migration)
+**Context:** assistant-ui's `useChatRuntime` uses `AssistantChatTransport` from `@assistant-ui/react-ai-sdk`, which expects the Vercel AI SDK v6 UI Message Stream format over SSE. The backend must emit this format.
+**Decision:** The Spring Boot chat endpoint returns `text/event-stream` with SSE-formatted JSON events. Each event is a line `data: <JSON>\n\n`. The protocol uses typed messages: `start`, `text-start`, `text-delta`, `text-end`. The response must include header `x-vercel-ai-ui-message-stream: v1`. The frontend uses `useChatRuntime` with `AssistantChatTransport` which handles parsing automatically.
 **Rejected alternatives:**
-- Raw SSE (`text/event-stream`): Would require custom adapter in the frontend to translate SSE events into the data stream format that `useChat` expects.
+- Legacy `0:"text"\n` data stream format: This was the AI SDK v3/v4 format. The current AI SDK v6 has migrated to SSE-based UI Message Stream.
+- `TextStreamChatTransport` (plain text streaming): Simpler backend but loses structured message types and full assistant-ui `Thread` component features.
 - useLocalRuntime (non-streaming): Loses the streaming UX required by the PRD.
 **Consequences:**
-- (+) Native integration with assistant-ui and useChat — no custom stream parsing on frontend
-- (-) Backend must produce exactly the right format; incorrect escaping will break the client
+- (+) Native integration with assistant-ui v6 and `AssistantChatTransport` — no custom stream parsing on frontend
+- (+) SSE format provides standardized keep-alive, reconnect, and cache handling
+- (-) Backend must produce correctly structured SSE JSON events
 **Review trigger:** If assistant-ui upgrades to a different default protocol (check on version upgrade).
 
 ---
@@ -331,7 +340,7 @@ sequenceDiagram
     participant PDS as PolicyDocService
     participant OA as OpenRouter API
 
-    FE->>CC: POST /api/sessions/{id}/messages\n{content: "user question"}
+    FE->>CC: POST /api/sessions/{id}/messages\n{messages: [...], system: "..."}
     CC->>DB: load Session by id
     DB-->>CC: Session (intent, orderNumber...)
     CC->>DB: load ChatMessages for session (ordered by seq)
@@ -343,10 +352,10 @@ sequenceDiagram
     CS->>OA: chat.completions.createStreaming()\nsystemPrompt + history + new message
     OA-->>CS: stream chunks
     loop each token chunk
-        CS->>FE: write "0:\"chunk\"\n" (ResponseBodyEmitter)
+        CS->>FE: write SSE: data: {"type":"text-delta","id":"...","delta":"chunk"} (SseEmitter)
     end
     CS->>OA: stream completes
-    CS->>FE: write "d:{\"finishReason\":\"stop\"}\n"
+    CS->>FE: write SSE: data: {"type":"text-end","id":"..."}
     CS->>FE: emitter.complete()
     CS->>DB: persist ASSISTANT message (full content)
 ```
@@ -403,8 +412,8 @@ TDD: implementing agents should write tests before or alongside implementation. 
 - TAC-06: `POST /api/sessions` with any required field missing returns HTTP 400
 - TAC-07: `GET /api/sessions/{id}` with valid ID returns correct session + messages in sequenceNumber order
 - TAC-08: `GET /api/sessions/{unknown}` returns HTTP 404
-- TAC-09: `POST /api/sessions/{id}/messages` returns `Content-Type: text/plain` response, body contains at least one line matching `^0:".*"\n`
-- TAC-10: `POST /api/sessions/{id}/messages` body ends with `d:{"finishReason":"stop"}\n`
+- TAC-09: `POST /api/sessions/{id}/messages` returns `Content-Type: text/event-stream` response with header `x-vercel-ai-ui-message-stream: v1`, body contains SSE events with `data: {"type":"text-delta",...}` lines
+- TAC-10: `POST /api/sessions/{id}/messages` body contains a `data: {"type":"text-end",...}` event signaling stream completion
 - TAC-11: After `POST /api/sessions/{id}/messages` completes, both USER and ASSISTANT messages are persisted in DB
 - TAC-12: Data in SQLite survives JVM restart (file-based persistence verified)
 - TAC-13: Frontend stores sessionId in localStorage after successful form submission

@@ -16,9 +16,9 @@ Always mock `OpenAiClient` / any HTTP client in tests. Do not call real OpenAI o
 
 - `PolicyDocService`: loads correct docs per intent (RETURN vs COMPLAINT); assembles system prompt with all 6 sections
 - `AnalysisService`: base64 image encoding; multipart validation (missing fields, wrong MIME type, oversized file)
-- `ChatService`: Vercel stream format encoding — correct escaping of `"` and `\n`; stream ends with `d:{"finishReason":"stop"}\n`
+- `ChatService`: SSE stream format encoding — produces `start`, `text-start`, `text-delta`, `text-end` events with correct JSON; all events share same message UUID
 - `SessionController`: returns 400 on invalid multipart; returns `{sessionId, message}` on success
-- `ChatController`: streams Vercel-format chunks; persists assistant message after stream completes
+- `ChatController`: streams SSE events (UI Message Stream format); includes `x-vercel-ai-ui-message-stream: v1` header; accepts `{ messages }` request body; persists assistant message after stream completes
 - Session persistence: Session + ChatMessage saved to DB; `GET /api/sessions/{id}` returns full history
 
 ## Test Class Naming

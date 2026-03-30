@@ -34,16 +34,26 @@ Validate with **Zod**. Show inline errors per field. Submit as `multipart/form-d
 
 ## Chat Integration
 
-Use `useChatRuntime` from `@assistant-ui/react-ai-sdk`:
+Use `useChatRuntime` with `AssistantChatTransport` from `@assistant-ui/react-ai-sdk`:
 
 ```ts
+import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
+
 const runtime = useChatRuntime({
-  api: `/api/sessions/${sessionId}/messages`,
-  initialMessages, // mapped from GET /api/sessions/{id} on session resume
+  transport: new AssistantChatTransport({
+    api: `/api/sessions/${sessionId}/messages`,
+  }),
 });
 ```
 
 Pass `runtime` to `<AssistantRuntimeProvider>`. Do NOT use `useLocalRuntime`.
+
+The `AssistantChatTransport` sends `{ messages, system, tools }` to the backend and expects SSE responses in Vercel AI SDK v6 UI Message Stream format (`x-vercel-ai-ui-message-stream: v1` header). The backend extracts only the last user message from `messages[]`.
+
+For session resume, map messages from `GET /api/sessions/{id}` to the `UIMessage` format:
+```ts
+{ id: string, role: 'user' | 'assistant', parts: [{ type: 'text', text: string }] }
+```
 
 ## Session Flow
 
@@ -64,3 +74,10 @@ Pass `runtime` to `<AssistantRuntimeProvider>`. Do NOT use `useLocalRuntime`.
 - Dev proxy: `/api/*` → `http://localhost:8080`
 - Build output: `../backend/src/main/resources/static/`
 - All UI text must be in **Polish**
+
+## Completion Criteria
+- All tests and ESLint pass
+- Check the application visually, use puppeter to make a screen and align it with:
+  - wireframe of the Form (view 1) `docs\wireframe-form.png`
+  - wireframe of decision and chat (view 2) `docs\wireframe-decision+chat.png`
+  - screen of Sinsay Home Page `assets\sinsay-homepage.png`

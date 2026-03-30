@@ -43,19 +43,26 @@ cd frontend && npm run format:check      # Prettier
 
 ---
 
-## Critical Integration: Vercel Data Stream Protocol
+## Critical Integration: Vercel AI SDK UI Message Stream Protocol (v6)
 
-The frontend uses `useChatRuntime` from `@assistant-ui/react-ai-sdk`. The backend SSE response **must** use Vercel AI SDK data stream format or streaming will break:
+The frontend uses `useChatRuntime` with `AssistantChatTransport` from `@assistant-ui/react-ai-sdk`. The backend SSE response **must** use the Vercel AI SDK v6 UI Message Stream format or streaming will break:
 
 ```
-Content-Type: text/plain;charset=UTF-8
+Content-Type: text/event-stream
+x-vercel-ai-ui-message-stream: v1
 
-0:"Hello"\n
-0:" world"\n
-d:{"finishReason":"stop"}\n
+data: {"type":"start","messageId":"<uuid>"}
+
+data: {"type":"text-start","id":"<uuid>"}
+
+data: {"type":"text-delta","id":"<uuid>","delta":"Hello"}
+
+data: {"type":"text-delta","id":"<uuid>","delta":" world"}
+
+data: {"type":"text-end","id":"<uuid>"}
 ```
 
-Escape rules: `"` → `\"`, newline → `\\n`. Use `ResponseBodyEmitter`, not `Flux`.
+Use `SseEmitter` (Spring MVC), not `Flux` or plain `ResponseBodyEmitter`. The `AssistantChatTransport` sends `{ messages, system, tools }` to the backend; extract only the last user message content.
 
 ---
 

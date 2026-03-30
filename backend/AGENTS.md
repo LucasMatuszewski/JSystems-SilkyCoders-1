@@ -34,7 +34,7 @@ See root `AGENTS.md` for project overview. This file covers backend-specific imp
 |---|---|---|---|
 | `POST` | `/api/sessions` | multipart (intent, orderNumber, productName, description, image) | `{sessionId, message}` JSON |
 | `GET` | `/api/sessions/{id}` | — | `{session, messages[]}` JSON |
-| `POST` | `/api/sessions/{id}/messages` | `{content}` JSON | `text/plain` Vercel stream |
+| `POST` | `/api/sessions/{id}/messages` | `{messages, system, ...}` JSON (from AssistantChatTransport) | `text/event-stream` SSE (UI Message Stream) |
 
 ## Data Models
 
@@ -42,17 +42,23 @@ See root `AGENTS.md` for project overview. This file covers backend-specific imp
 
 **ChatMessage**: `id` (UUID), `sessionId` (FK), `role` (USER/ASSISTANT), `content` (TEXT), `sequenceNumber`, `createdAt`
 
-## Vercel Data Stream Format (CRITICAL)
+## Vercel AI SDK UI Message Stream Format (CRITICAL)
 
-`POST /api/sessions/{id}/messages` must return `text/plain;charset=UTF-8` with chunked encoding:
+`POST /api/sessions/{id}/messages` must return `text/event-stream` with SSE encoding and header `x-vercel-ai-ui-message-stream: v1`:
 
 ```
-0:"Hello"\n
-0:" world"\n
-d:{"finishReason":"stop"}\n
+data: {"type":"start","messageId":"<uuid>"}
+
+data: {"type":"text-start","id":"<uuid>"}
+
+data: {"type":"text-delta","id":"<uuid>","delta":"Hello"}
+
+data: {"type":"text-delta","id":"<uuid>","delta":" world"}
+
+data: {"type":"text-end","id":"<uuid>"}
 ```
 
-**Escaping**: `"` → `\"`, newline `\n` → `\\n`. Use `ResponseBodyEmitter` (not `Flux`).
+Each SSE event is `data: <JSON>\n\n`. The `messageId`/`id` should be the same UUID across all events for one assistant message. Use `SseEmitter` (not `Flux` or plain `ResponseBodyEmitter`).
 
 ## Initial Analysis (Non-Streaming)
 
@@ -67,12 +73,15 @@ d:{"finishReason":"stop"}\n
 ## Chat Continuation (Streaming)
 
 `POST /api/sessions/{id}/messages` uses `ChatService`:
-1. Persist user `ChatMessage`
-2. Load full session history from DB
-3. Assemble system prompt (see below)
-4. Call OpenAI SDK with streaming enabled
-5. Write each chunk to `ResponseBodyEmitter` in Vercel format
-6. Persist assembled assistant response on stream completion
+- **Request body**: `{ messages: [...], system: "...", ... }` sent by `AssistantChatTransport`. Backend extracts only the last user message text from `messages[]`.
+- **Steps**:
+1. Extract last user message content from request `messages[]`
+2. Persist user `ChatMessage` to DB
+3. Load full session history from DB
+4. Assemble system prompt from policy docs (ignore `system` from request)
+5. Call OpenAI SDK with streaming enabled
+6. Write SSE events to `SseEmitter`: `start` → `text-start` → `text-delta` (per chunk) → `text-end`
+7. Persist assembled assistant response on stream completion
 
 ## System Prompt Structure
 
