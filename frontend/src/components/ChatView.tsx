@@ -65,33 +65,49 @@ function ChatRuntimeView({
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <div className="h-screen flex flex-col bg-background">
+        {/* Logo bar */}
+        <div className="flex justify-center px-4 py-3 border-b border-gray-200 bg-white">
+          <img src="/logo.svg" alt="Sinsay" className="h-7" />
+        </div>
+
         {/* Summary Bar */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
-          <div className="flex items-center gap-4 text-sm">
-            <span className="font-medium text-text-primary">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 bg-white">
+          <div className="flex items-center gap-2 text-sm min-w-0 mr-4">
+            <span
+              className="font-semibold shrink-0 px-2 py-0.5 text-xs uppercase tracking-wide"
+              style={{ backgroundColor: '#fff8f0', color: '#e09243', border: '1px solid #e09243' }}
+            >
               {sessionInfo.intent === 'RETURN' ? 'Zwrot' : 'Reklamacja'}
             </span>
-            <span className="text-text-secondary">•</span>
-            <span className="text-text-secondary">{sessionInfo.productName}</span>
-            <span className="text-text-secondary">•</span>
-            <span className="text-text-secondary">{sessionInfo.orderNumber}</span>
+            <span className="text-text-secondary truncate">{sessionInfo.orderNumber}</span>
+            <span className="text-text-secondary shrink-0">–</span>
+            <span className="text-text-secondary truncate">{sessionInfo.productName}</span>
           </div>
           <button
             onClick={onNewSession}
-            className="text-sm font-medium text-brand-accent hover:text-brand-accent/80"
+            className="text-sm font-semibold shrink-0 px-3 py-1.5 border transition-colors"
+            style={{
+              color: '#16181d',
+              borderColor: '#16181d',
+              borderRadius: 0,
+              backgroundColor: '#ffffff',
+            }}
           >
             Nowa sesja
           </button>
         </div>
 
         {/* Thread Area */}
-        <ThreadPrimitive.Root className="flex-1 flex flex-col">
+        <ThreadPrimitive.Root className="flex-1 flex flex-col min-h-0">
           <ThreadPrimitive.Viewport className="flex-1 overflow-y-auto p-4">
             <ThreadPrimitive.Messages
               components={{
                 UserMessage: () => (
                   <div className="flex justify-end mb-4">
-                    <div className="max-w-[80%] rounded-2xl bg-brand-accent px-4 py-2.5 text-sm text-white">
+                    <div
+                      className="max-w-[80%] px-4 py-2.5 text-sm text-white"
+                      style={{ backgroundColor: '#e09243', borderRadius: 0 }}
+                    >
                       <MessagePrimitive.Root>
                         <MessagePrimitive.Parts />
                       </MessagePrimitive.Root>
@@ -100,7 +116,14 @@ function ChatRuntimeView({
                 ),
                 AssistantMessage: () => (
                   <div className="flex justify-start mb-4">
-                    <div className="max-w-[80%] rounded-2xl bg-gray-100 px-4 py-2.5 text-sm text-text-primary">
+                    <div
+                      className="max-w-[80%] px-4 py-2.5 text-sm"
+                      style={{
+                        backgroundColor: '#f3f4f6',
+                        color: '#333333',
+                        borderRadius: 0,
+                      }}
+                    >
                       <MessagePrimitive.Root>
                         <MessagePrimitive.Parts />
                       </MessagePrimitive.Root>
@@ -113,28 +136,21 @@ function ChatRuntimeView({
 
           {/* Composer */}
           <ThreadPrimitive.ViewportFooter className="border-t border-gray-200 bg-white p-4">
-            <ComposerPrimitive.Root className="flex w-full flex-col rounded-3xl border border-gray-300 bg-white">
+            <ComposerPrimitive.Root
+              className="flex w-full items-center gap-2 border border-gray-300 bg-white px-4 py-2"
+              style={{ borderRadius: 0 }}
+            >
               <ComposerPrimitive.Input
-                placeholder="Napisz wiadomość..."
-                className="min-h-10 w-full resize-none bg-transparent px-5 pt-3.5 pb-2.5 text-sm focus:outline-none"
+                placeholder="Zadaj pytanie..."
+                className="flex-1 min-h-8 resize-none bg-transparent text-sm focus:outline-none"
                 rows={1}
               />
-              <div className="flex items-center justify-end px-2.5 pb-2.5">
-                <ComposerPrimitive.Send className="flex size-8 items-center justify-center rounded-full bg-brand-accent text-white disabled:opacity-30">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="size-4"
-                  >
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </ComposerPrimitive.Send>
-              </div>
+              <ComposerPrimitive.Send
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white disabled:opacity-30"
+                style={{ backgroundColor: '#e09243', borderRadius: 0 }}
+              >
+                Wyślij
+              </ComposerPrimitive.Send>
             </ComposerPrimitive.Root>
           </ThreadPrimitive.ViewportFooter>
         </ThreadPrimitive.Root>

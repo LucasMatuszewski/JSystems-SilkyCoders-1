@@ -183,11 +183,9 @@ export default function ImageUpload({ value, onChange, error }: ImageUploadProps
         >
           <div className="space-y-2">
             <p className="text-lg font-medium text-[var(--color-text-primary)]">
-              Drag & Drop pliku tutaj
+              Przeciągnij i upuść plik tutaj
             </p>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              lub kliknij, aby wybrać plik
-            </p>
+            <p className="text-sm text-[var(--color-text-secondary)]">lub kliknij, aby wybrać</p>
             <div className="pt-4 space-y-1 text-xs text-[var(--color-text-muted)]">
               <p>Dozwolone formaty: JPEG, PNG, WebP, GIF</p>
               <p>Maksymalny rozmiar pliku: 10 MB</p>

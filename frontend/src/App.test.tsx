@@ -115,6 +115,6 @@ describe('App', () => {
 
   it('displays correct page title', () => {
     render(<App />)
-    expect(document.title).toBe('Zgłoszenie zwrotu lub reklamacji')
+    expect(document.title).toBe('Sprawdź zwrot lub reklamację')
   })
 })

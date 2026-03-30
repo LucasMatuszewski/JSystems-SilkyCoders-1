@@ -23,27 +23,22 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {}
 
-    // Validate intent
     if (!intent) {
       newErrors.intent = 'Proszę wybrać typ zgłoszenia'
     }
 
-    // Validate order number
     if (!orderNumber.trim()) {
       newErrors.orderNumber = 'Numer zamówienia jest wymagany'
     }
 
-    // Validate product name
     if (!productName.trim()) {
       newErrors.productName = 'Nazwa produktu jest wymagana'
     }
 
-    // Validate description
     if (!description.trim()) {
       newErrors.description = 'Opis problemu jest wymagany'
     }
 
-    // Validate image
     if (!image) {
       newErrors.image = 'Zdjęcie produktu jest wymagane'
     } else {
@@ -59,10 +54,8 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Clear previous submit error
     setSubmitError(null)
 
-    // Validate form
     const validationErrors = validateForm()
     setErrors(validationErrors)
 
@@ -73,7 +66,6 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
     setIsSubmitting(true)
 
     try {
-      // Create FormData for multipart upload
       const formData = new FormData()
       formData.append('intent', intent!)
       formData.append('orderNumber', orderNumber)
@@ -94,10 +86,7 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
 
       const data = await response.json()
 
-      // Store session ID in localStorage
       setSessionId(data.sessionId)
-
-      // Call onSuccess callback
       onSuccess(data.sessionId)
     } catch (error) {
       setSubmitError('Błąd podczas przesyłania formularza. Spróbuj ponownie.')
@@ -109,62 +98,78 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
 
   const handleImageChange = (file: File | null) => {
     setImage(file)
-    // Clear image error when file changes
     if (file) {
       setErrors((prev) => ({ ...prev, image: undefined }))
     }
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen bg-background flex items-start justify-center px-4 py-8">
+      <div className="w-full max-w-lg">
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <img src="/logo.svg" alt="Sinsay" className="h-8" />
         </div>
 
-        {/* Form Card */}
-        <div className="bg-background border border-gray-200 p-8">
-          <h1 className="text-2xl font-semibold text-brand-primary text-center mb-6">
-            Zgłoszenie zwrotu lub reklamacji
-          </h1>
+        {/* Heading */}
+        <h1
+          className="text-2xl font-semibold text-center mb-2"
+          style={{ color: '#16181d', fontWeight: 600 }}
+        >
+          Sprawdź zwrot lub reklamację
+        </h1>
+        <p className="text-center text-sm mb-8" style={{ color: '#777777' }}>
+          Asystent AI zwrotów i reklamacji Sinsay
+        </p>
 
+        {/* Form Card */}
+        <div className="bg-white border border-gray-200 p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Intent Selection */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-3">
-                Typ zgłoszenia
-              </label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
+              <p className="block text-sm font-medium mb-3" style={{ color: '#333333' }}>
+                Rodzaj zgłoszenia
+              </p>
+              <div className="flex gap-3 flex-wrap">
+                <label
+                  className="flex items-center gap-2 cursor-pointer px-4 py-2 border transition-colors"
+                  style={{
+                    borderColor: intent === 'RETURN' ? '#e09243' : '#d1d5db',
+                    backgroundColor: intent === 'RETURN' ? '#fff8f0' : '#ffffff',
+                  }}
+                >
                   <input
                     type="radio"
                     name="intent"
                     value="RETURN"
                     checked={intent === 'RETURN'}
-                    onChange={(e) =>
-                      setIntent(e.target.value === 'RETURN' ? 'RETURN' : 'COMPLAINT')
-                    }
-                    className="w-4 h-4"
+                    onChange={() => setIntent('RETURN')}
+                    className="w-4 h-4 accent-[#e09243]"
+                    aria-label="Zwrot"
                   />
-                  <span className="text-text-primary">Zwrot</span>
+                  <span style={{ color: '#333333' }}>Zwrot</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label
+                  className="flex items-center gap-2 cursor-pointer px-4 py-2 border transition-colors"
+                  style={{
+                    borderColor: intent === 'COMPLAINT' ? '#e09243' : '#d1d5db',
+                    backgroundColor: intent === 'COMPLAINT' ? '#fff8f0' : '#ffffff',
+                  }}
+                >
                   <input
                     type="radio"
                     name="intent"
                     value="COMPLAINT"
                     checked={intent === 'COMPLAINT'}
-                    onChange={(e) =>
-                      setIntent(e.target.value === 'COMPLAINT' ? 'COMPLAINT' : 'RETURN')
-                    }
-                    className="w-4 h-4"
+                    onChange={() => setIntent('COMPLAINT')}
+                    className="w-4 h-4 accent-[#e09243]"
+                    aria-label="Reklamacja"
                   />
-                  <span className="text-text-primary">Reklamacja</span>
+                  <span style={{ color: '#333333' }}>Reklamacja</span>
                 </label>
               </div>
               {errors.intent && (
-                <p className="text-sm text-brand-error mt-1" role="alert">
+                <p className="text-sm mt-1" style={{ color: '#e90000' }} role="alert">
                   {errors.intent}
                 </p>
               )}
@@ -174,7 +179,8 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
             <div>
               <label
                 htmlFor="orderNumber"
-                className="block text-sm font-medium text-text-primary mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: '#333333' }}
               >
                 Numer zamówienia
               </label>
@@ -187,10 +193,11 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
                   setErrors((prev) => ({ ...prev, orderNumber: undefined }))
                 }}
                 placeholder="np. PL123456789"
-                className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-brand-accent"
+                className="w-full px-4 py-3 border focus:outline-none"
+                style={{ borderColor: errors.orderNumber ? '#e90000' : '#d1d5db', borderRadius: 0 }}
               />
               {errors.orderNumber && (
-                <p className="text-sm text-brand-error mt-1" role="alert">
+                <p className="text-sm mt-1" style={{ color: '#e90000' }} role="alert">
                   {errors.orderNumber}
                 </p>
               )}
@@ -200,7 +207,8 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
             <div>
               <label
                 htmlFor="productName"
-                className="block text-sm font-medium text-text-primary mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: '#333333' }}
               >
                 Nazwa produktu
               </label>
@@ -213,10 +221,11 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
                   setErrors((prev) => ({ ...prev, productName: undefined }))
                 }}
                 placeholder="np. Sukienka midi w kwiaty"
-                className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-brand-accent"
+                className="w-full px-4 py-3 border focus:outline-none"
+                style={{ borderColor: errors.productName ? '#e90000' : '#d1d5db', borderRadius: 0 }}
               />
               {errors.productName && (
-                <p className="text-sm text-brand-error mt-1" role="alert">
+                <p className="text-sm mt-1" style={{ color: '#e90000' }} role="alert">
                   {errors.productName}
                 </p>
               )}
@@ -226,7 +235,8 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
             <div>
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-text-primary mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: '#333333' }}
               >
                 Opis problemu
               </label>
@@ -239,10 +249,11 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
                 }}
                 placeholder="Opisz stan produktu i powód zwrotu lub reklamacji"
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-brand-accent resize-none"
+                className="w-full px-4 py-3 border focus:outline-none resize-none"
+                style={{ borderColor: errors.description ? '#e90000' : '#d1d5db', borderRadius: 0 }}
               />
               {errors.description && (
-                <p className="text-sm text-brand-error mt-1" role="alert">
+                <p className="text-sm mt-1" style={{ color: '#e90000' }} role="alert">
                   {errors.description}
                 </p>
               )}
@@ -253,7 +264,7 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
 
             {/* Submit Error */}
             {submitError && (
-              <p className="text-sm text-brand-error text-center" role="alert">
+              <p className="text-sm text-center" style={{ color: '#e90000' }} role="alert">
                 {submitError}
               </p>
             )}
@@ -262,11 +273,18 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-8 bg-brand-accent text-white font-semibold text-base hover:bg-brand-accent/90 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="w-full font-semibold text-base transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: 'var(--color-brand-accent)',
-                color: 'var(--color-text-on-dark)',
-                border: 'none',
+                backgroundColor: isSubmitting ? '#d1d5db' : '#e09243',
+                color: '#ffffff',
+                border: '1.6px solid',
+                borderColor: isSubmitting ? '#d1d5db' : '#e09243',
+                borderRadius: 0,
+                padding: '12px 32px',
+                fontSize: '16px',
+                fontWeight: 600,
+                lineHeight: '24px',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
               }}
             >
               {isSubmitting ? 'Analizuję...' : 'Sprawdź'}

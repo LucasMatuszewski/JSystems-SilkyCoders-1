@@ -14,7 +14,7 @@ describe('ImageUpload', () => {
   it('renders drop zone with format and size guidance text', () => {
     render(<ImageUpload value={null} onChange={vi.fn()} />)
 
-    expect(screen.getByText(/drag & drop/i)).toBeInTheDocument()
+    expect(screen.getByText(/przeciągnij i upuść/i)).toBeInTheDocument()
     expect(screen.getByText(/Dozwolone formaty/i)).toBeInTheDocument()
     expect(screen.getByText(/JPEG, PNG, WebP, GIF/i)).toBeInTheDocument()
     expect(screen.getByText(/Maksymalny rozmiar/i)).toBeInTheDocument()

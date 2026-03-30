@@ -8,7 +8,7 @@ function App(): React.JSX.Element {
 
   // Set page title
   useEffect(() => {
-    document.title = 'Zgłoszenie zwrotu lub reklamacji'
+    document.title = 'Sprawdź zwrot lub reklamację'
   }, [])
 
   // Derive view from sessionId - no separate state needed

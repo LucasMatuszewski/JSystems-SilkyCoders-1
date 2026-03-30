@@ -67,7 +67,7 @@ describe('IntakeForm', () => {
     render(<IntakeForm onSuccess={mockOnSuccess} />)
 
     // Check heading
-    expect(screen.getByText('Zgłoszenie zwrotu lub reklamacji')).toBeInTheDocument()
+    expect(screen.getByText('Sprawdź zwrot lub reklamację')).toBeInTheDocument()
 
     // Check intent radio buttons
     expect(screen.getByLabelText('Zwrot')).toBeInTheDocument()
@@ -197,6 +197,49 @@ describe('IntakeForm', () => {
     // Button should be disabled - use the specific button
     const loadingButton = screen.getByRole('button', { name: 'Analizuję...' })
     expect(loadingButton).toBeDisabled()
+  })
+
+  it('renders logo image in form view (TAC-FE-09)', () => {
+    render(<IntakeForm onSuccess={mockOnSuccess} />)
+
+    const logo = screen.getByRole('img', { name: /sinsay/i })
+    expect(logo).toBeInTheDocument()
+  })
+
+  it('all user-visible strings are in Polish (TAC-FE-08)', () => {
+    render(<IntakeForm onSuccess={mockOnSuccess} />)
+
+    // Heading
+    expect(screen.getByText('Sprawdź zwrot lub reklamację')).toBeInTheDocument()
+
+    // Intent section label
+    expect(screen.getByText('Rodzaj zgłoszenia')).toBeInTheDocument()
+
+    // Radio options
+    expect(screen.getByLabelText('Zwrot')).toBeInTheDocument()
+    expect(screen.getByLabelText('Reklamacja')).toBeInTheDocument()
+
+    // Field labels
+    expect(screen.getByLabelText('Numer zamówienia')).toBeInTheDocument()
+    expect(screen.getByLabelText('Nazwa produktu')).toBeInTheDocument()
+    expect(screen.getByLabelText('Opis problemu')).toBeInTheDocument()
+
+    // Submit button
+    expect(screen.getByRole('button', { name: 'Sprawdź' })).toBeInTheDocument()
+  })
+
+  it('form layout uses w-full and max-width container to prevent overflow at 375px (TAC-FE-09)', () => {
+    render(<IntakeForm onSuccess={mockOnSuccess} />)
+
+    // Root wrapper must be w-full so it never exceeds the viewport width
+    const wFullContainer = document.querySelector(
+      '.w-full.max-w-lg, .w-full.max-w-xl, .w-full.max-w-2xl',
+    )
+    expect(wFullContainer).not.toBeNull()
+
+    // Form element exists
+    const form = document.querySelector('form')
+    expect(form).not.toBeNull()
   })
 
   it('integrates ImageUpload component and validates image', async () => {
