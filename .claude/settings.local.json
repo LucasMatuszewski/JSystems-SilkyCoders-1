@@ -18,5 +18,9 @@
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7"
-  ]
+  ],
+  "env": {
+    "_comment": "To reuse existing tasks use ID of folder where tasks are stored and restart Claude. In my case: C:/Users/lucas/.claude/tasks/f2d4990d-bc8f-48ca-884b-7f21dbcee59e",
+    "CLAUDE_CODE_TASK_LIST_ID": "f2d4990d-bc8f-48ca-884b-7f21dbcee59e"
+  }
 }

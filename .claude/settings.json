@@ -94,8 +94,10 @@
 
       "Read(.env.*)",
       "Read(**/.env)",
+      "Read(**/logs/**)",
       "Read(**/secrets/**)",
       "Read(examples/**)"
     ]
-  }
+  },
+  "plansDirectory": "./docs/plans"
 }

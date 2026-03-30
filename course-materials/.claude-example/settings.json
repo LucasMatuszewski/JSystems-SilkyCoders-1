@@ -108,5 +108,7 @@
       "Read(**/.env)",
       "Read(**/secrets/**)"
     ]
-  }
+  },
+  // Override the plans directory (default is "~/.claude/plans")
+  "plansDirectory": "./docs/plans"
 }
