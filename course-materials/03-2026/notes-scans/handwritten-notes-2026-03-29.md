@@ -6,40 +6,32 @@ Pierwsze strony z imionami uczestników to notatki z rozmowy o ich problemach z 
 
 ---
 
-## Strona 1 - `20260329_141210(1).jpg`
-
-# Silky Coders
-
-- 03.2026
-- III edition
-
 ## Kontekst rozmowy
 
 - Start zajęć i zebranie oczekiwań
 - Rozmowa o problemach z AI i agentami
 - Rozpoznanie doświadczenia uczestników
 
-## Tematy otwierające
+## Uczestnicy i ich potrzeby
+
+### Łukasz
 
 - Codex
 - MCP
 - Jira, GitHub, Confluence
 - Agent
-- Co agent ma robić
+- Hallucynacje, co robić?
 - Claude
-
-## Uczestnicy i ich potrzeby
 
 ### Artur
 
 - FE developer
 - React
-- Codex w API IntelliJ
-- Testy, commit, NPM-y
+- Codex w IntelliJ
+- Gemini app prywatnie
+- Testy, commit names
 - Hallucynacje
-- Weryfikacja: jak to zrobić
-
-> Obok jest dopisek w ramce, prawdopodobnie: "Gemini app / przepytanie".
+- Weryfikacja odpowiedzi
 
 ### Sebastian
 
@@ -48,72 +40,50 @@ Pierwsze strony z imionami uczestników to notatki z rozmowy o ich problemach z 
 - React
 - JS, TS
 - Java, C++
-
-> Pierwsza linia przy Sebastianie jest słabo czytelna.
-
----
-
-## Strona 2 - `20260329_141216(1).jpg`
-
-### Sebastian
-
-- Mało pisał kodu teraz
-- Testy
-- Architektura
-- Refactoring
-- Hallucynacje
-- Przegląd
-
-> Między "architektura" i "refactoring" jest jeszcze jeden słabo czytelny dopisek.
+- Mało pisze kodu teraz, zarządza teraz głównie
+- Testy, Architektura, Diagramy
+- Problem i oczekiwania:
+  - Hallucynacje
+  - Przegląd narzędzi
 
 ### Daniel
 
 - Senior Java dev
-- AI assistant
-- Turnie
+- AI assistant Junie w IntelliJ
 - Full stack, też FE
-- Spam
-- Hallucynacje
-- Gubienie kontekstu
+- Problemy:
+  - Spam (LLM / AI Agent dużo generuje textu)
+  - Hallucynacje
+  - Gubienie kontekstu
 
 ### Tomasz
 
 - Architect
 - Outlook, Teams, Excel
 - Czytanie kodu
-- Bolt.new
-- Cursor
-- Agent
-- Dużo tekstu / spam / podsumowanie
-- Hallucynacje: limity czy cena
-
-## Dodatkowe hasła
-
-- PlantUML
-- Taki Mermaid
-- ChatGPT Deep Research
-- Kontekstu
-
-> Ostatnie dwa dopiski po prawej są częściowo nieczytelne i mogą należeć do innego wątku.
-
----
-
-## Strona 3 - `20260329_141224(0).jpg`
+- Bolt.new bawił się
+- Cursor IDE używa na co dzień
+- Agenci trochę
+- ChatGPT używa, Deep Research często
+- PlantUML w Markdown (podobny do Mermaid)
+- Problemy
+  - Dużo tekstu / spam generowany przez modele LLM
+  - Hallucynacje, wymyśla rzeczy
 
 ### Kamil
 
 - Java dev
 - DevOps
-- FE więcej niż AI ostatnio
-- Od 3 tygodni nie pisze kodu
-- Terminal 100%
-- Claude Code
-- Skills
-- Agenci
-- Jak radzić sobie z hallucynacjami
-- Współbieżna praca subagentów
-- Lepiej definiować skills
-- Zapomina, że skill ma użyć MCP
+- FE więcej z AI ostatnio generuje
+- Od 3 tygodni nie pisze kodu samemu, całkowicie agenci generują
+- Terminal 100% przez CLI agentów
+- Claude Code głównie
+- Skills, Subagenci
+- Poradził sobie sam z hallucynacjami
+- Problemy i oczekiwania:
+  - Współbieżna praca subagentów
+  - Lepiej definiować skills
+  - Agent zapomina, że skill ma używać
 
 ### Karol
 
@@ -123,43 +93,31 @@ Pierwsze strony z imionami uczestników to notatki z rozmowy o ich problemach z 
 - Server side
 - HTMX
 - Android
-- Nie używa agentów
-
-> Ostatnia linia przy Karolu wygląda jak uwaga o złych doświadczeniach albo o "trenowaniu", ale nie jestem pewien odczytu.
-
----
-
-## Strona 4 - `20260329_141231.jpg`
+- Izolacja agentów w Linux, WSL, Docker, sandbox
+- Problemy:
+  - Nie używa agentów
+  - Ma złe wspomnienia z Junie AI Agent w IntelliJ, długo trwa generowanie i słaba jakość
 
 ### Rafał
 
 - Tech lead
 - BE, DevOps, FE
 - Z AI od 8 miesięcy
-- Chat, Sonet, Turnie
+- Chat, Sonnet, Junie z IntelliJ
 - Claude Code
-- Sam nie wychwyci błędów, trzeba go pilnować
-- Testy integracyjne
-- Gubi się, nie pamięta
-- TODO?
-- Który agent do czego ma najlepiej pasować
-- Nowy styl programowania
-- Potrzeba czegoś, żeby pamiętać
-
-## Testy i jakość
-
-- Endpoint
-- Wynik testu
-- Chce bity danych z danymi
-- Happy path, edge case
-- Asercje
-- Kombinacje
-
-> Ostatnia kolumna po prawej jest nieostra. Widać coś w rodzaju: "ma ukryty factory / do seed bazy", ale to wymaga ręcznej weryfikacji.
-
----
-
-## Strona 5 - `20260329_141239.jpg`
+- Problemy:
+  - Sam nie wychwyci błędów, trzeba go pilnować
+  - Jak nauczyć agenta swojego stylu programowania, aby pamiętał
+  - Testy integracyjne z aentami
+    - Gubią się agenci, testy nie działają
+    - TDD?
+    - Testuje Endpoint i wynik requestu
+    - Chce bazę danych z danymi a nie mocki
+    - Happy Path i Edge Case
+    - Agent za dużo kombinuje, robi słabe asercje
+    - Używa obecnie Java class Factory do robienia Seed Bazy Danych
+      - dać to agentowi jako narzędzie aby sam seedował zanim testy zrobi
+- Który agent do czego najlepiej działa (Claude vs Codex vs ...)
 
 ### Arek
 
@@ -168,212 +126,162 @@ Pierwsze strony z imionami uczestników to notatki z rozmowy o ich problemach z 
 - React
 - BE głównie
 - iOS
-- Animal research
-- Mniej pisania kodu
-- Gubi się
-- Marnowanie czasu
-- W dużym projekcie gubi się
-- Mało używa AI
+- Analiza, research
+- Problemy:
+  - Mniej pisania kodu
+  - Agent gubi się, Marnowanie czasu
+  - W dużym projekcie agent gubi się bardzo
+  - Mało używa AI bo słabo to działa
+  - Archetypy w kodzie słabo wykrywają agenci (legacy code)
 - Subagenci
-- TDD
-- Chce
-- AI first: pracować, ale tak, żeby nadal się na czymś uczyć
-- Architekty / wykręcanie stubów
+- TDD Chce z agentami robić
+- Chciałby AI-first pracować
+  - aby agent podejmował decyzje np. architektoniczne
+  - teraz ma tendencję do decydowania samemu, nie oddaje kontroli,
+  - czyta wszystko
 
 ### Patryk
 
 - Android
 - Kotlin
 - BE
-- Chat / Android Studio
-- Gemini
-- Błędy
-- Testy
-
-> Fragment "animal research" może być błędnie odczytany. Końcowa linia o "stubach" też jest częściowo niepewna.
+- AI Chat w Android Studio
+- Gemini App
+- Błędy wykrywa wrzucając problemy do Gemini App lub AI Chat
+- Testy robi z AI ale ręcznie
+- nie używa agentów, tylko chat prosty
 
 ---
-
-## Strona 6 - `20260329_141252(1).jpg`
 
 ## Pytania i tematy do wyjaśnienia
 
-- I need compression 400 if context?
-- My context in Claude default?
-- 1x or 2x price / limit?
+- /rewind - jak działa kompresja przy rewind?
+- 1M context in Claude is now default? In Desktop?
+  - 2x price >200k as in the past?
+- Agent Review w Jenkins workflows
+  - Więcej pracy w chmurze, review w chmurze
+  - Oddelegować poza CI/CD workflow
+  - Połączenie z Jira, Confluence on premisses
+- Claude Desktop Dispatch (mobile app)
+  - Teams licence? - NO, Pro / Max only
+  - requires Private mobile phone
+- Sandbox na MacOS vs Linux i WSL2 (brak sandbox na Windows, tylko w WSL2)
+- Envs do Claude w `.claude` folder?
 
-### Karol
-
-- Policja
-- Linux
-- Docker
-
-### WSL
-
-- Kto ma quiz na rano
-
-## Badanie
-
-- Badanie jakości agentów
-- Tego
-
-## Review i narzędzia
-
-- Agent review w Temu? / Teams?
-- W chmurze więcej pracy
-- Odpieczkować poza CI/CD workflow
-- Jira
-- Confluence
-
-> Ta strona ma kilka bardzo niepewnych fragmentów. Szczególnie linia "Agent review w Temu/Teams" wymaga ręcznego sprawdzenia.
-
----
-
-## Strona 7 - `20260329_141302.jpg`
-
-## Claude Code
-
-- Desktop dispatch?
-- Teams? - NO
-- Pro / Max only
-- Private mobile phone
-- Sandbox
-- MacOS?
-- Linux i WSL2
-
-## Claude auto mode
+## Claude Auto Mode
 
 - Teams only
 - Admin settings
-- Codex guardian approvals
-
-## Przydatne funkcje
-
-- Voice mode -> hold Space to talk
-- `/update-config`
-- Claude helps with own config file, np. alias command
-- `/schedule`
-- `/export`
-- `/debug`
-- `/helpdump`
-
-> Pierwsza sekcja zawiera kilka skrótowych haseł. "Desktop dispatch" i "Teams only" mogą wymagać doprecyzowania z Twojej pamięci.
+- similar to Codex guardian approvals (but Codex notify human on every issue)
+- uses much more tokens (separate LLM rund to review commands)
+- still not 100% safe.
+- Tells Agent to try different method. After 5 blocks notify human.
 
 ---
 
-## Strona 8 - `20260329_141309(1).jpg`
+## Przydatne funkcje
+
+- `/voice` mode -> hold Space to talk, change language config for whole app to use Polish language (in both UI / agent responses and for voice dictation)
+- `/update-config` - Claude helps with own config file, np. Allow command
+- `/schedule` to automate work, schedule tasks
+- Claude Debugging:
+  - `/doctor`
+  - `/export`
+  - `/debug`
+  - `/heapdump`
+
+---
 
 ## Skróty i komendy w Claude
 
 - `Ctrl + R` - search prompts
-- `(Ctrl + Shift + F w terminalu)` - powiązany skrót do szukania
+  - `Ctrl + Shift + F` w Windows Terminal - powiązany skrót do szukania
 - `!command` - bash mode
-- `Shift + Tab` - auto accept changes
-- `Ctrl + O` - verbose output
-- `Ctrl + Shift + -` - undo
-- `Alt + V` - paste image
-- `Ctrl + S` - stash prompt
-- `16k w` - side question
-- Write next prompt
-- Queue prompts
-- `Ctrl + G` - edit prompt in `$EDITOR` bez `@filename`
+  - to execute commands and provide output to agent's context window
+  - e.g. `!git status`
+- `Shift + Tab` - toggle: auto accept changes, plan mode
+- `Ctrl + O` - verbose output, see thinking, tools output (not everything)
+- `Ctrl + Shift + -` - undo (`-` = minus)
+- `Alt + V` - paste image from clipboard, e.g. screenshot
+- `Ctrl + S` - stash prompt (don't send immediatelly)
+- `/btw` - side question, like separate micro-session without interupting work
+- `enter` - Just write next prompt when agent thinks to Queue prompts
+- `Ctrl + G` - edit prompt in `$EDITOR` set in `.bashrc`
+  - `@filename` nie działa w edytorze, ale wygodne dla długich promptów
+- `/fast` - zużywa 2x tokenów, ale działa szybciej
+  - używaj jeśli rzedko korzystasz, nie dobijasz do limitu i tak.
+- `/update-config <prompt>` - agent zmieni swoje ustawienia
+  - e.g. add Playwright MCP na poziomie globalnym / projektu
+- `/mcp` - włączenie / wyłączenie MCP
 
 ## Pętle i agenci
 
-- `loop < 5m` (10m default) `<command/prompt>`
-- `batch`
-- 5-30 worktree agents
-- Each separate PR
-
-> Wiersz "16k w - side question" jest niepewny, ale wygląda na skrót związany z pytaniem pobocznym.
+- `/loop <time> <command/prompt>` - (10m default), repeat same prompt/command
+- `/batch` - 5-30 worktree agents - Each creates separate PR
 
 ---
 
-## Strona 9 - `20260329_141316(1)(1).jpg`
-
 ## Diagramy i dokumentacja
 
-- PlantUML - GitLab: tak
-- GitHub: nie, zamiast tego Mermaid
+- **PlantUML** w Markdown
+  - GitLab: tak
+  - GitHub: nie, zamiast tego **Mermaid**
 
 ## Praktyka pracy w CLI
 
-- Nie pisać długich promptów w oknie CLI
-- Używać `Ctrl + G`
-- Alternatywnie używać tools / desktop app
+- Nie pisać długich promptów w oknie CLI - łatwo w CLI niechcący je usunąć
+- Używać `Ctrl + G` (edit prompt in editor)
+- Alternatywnie używać desktop app
 
 ## Pytania konfiguracyjne
 
-- Envs do Claude
-- `.claude` folder?
-- `.mcp.json` w projekcie nie działało?
-- LangGraph Studio: jak działa?
-- Online czy offline?
-- Jak update kodu robi?
+- `.mcp.json` w root projektu - wymaga czasem restartu terminala
+- `CLAUDE.md` - Claude czyta zagnieżdżone pliki
+  - Odnośnik do `@AGENTS.md` i podać niżej co tylko Claude Code dotyczy
+- **LangGraph Studio**:
+  - jak działa?
+  - Online czy offline?
+  - Jak update kodu robi?
+- Context7 - skill vs MCP
+- Linux sandbox: o wszystko pyta?
+  - Nie ma auto allow?
 
 ## Dokumentacja projektowa
 
 - PRD i ADR gotowe stworzyć
 - Dopracować tylko wzór
-- Skill do robienia ADR z PRD?
-- Problem z generowaniem ich z szablony
-
-> Ostatni punkt prawdopodobnie oznacza problem z generowaniem zbyt szablonowych ADR-ów.
-
----
-
-## Strona 10 - `20260329_141324(1).jpg`
-
-## Pytania ogólne
-
-- Claude.md: zagnieżdżone czy czyta?
-- Context7 skill vs MCP
-- Linux sandbox: o wszystko go pyta?
-- Nie ma auto allow
+- Skill do robienia ADR i PRD (na podstawie naszej sesji)
 
 ## Sterowanie zespołowe
 
-- Team sterowanie
+- Team subscription pozwala na sterowanie ustawieniami dla zespołu
 - Wspólne rules i MD files dla wielu projektów
+  - Claude Code pozwala ustawić główny CLAUDE.md dla wszystkich pracowników
+  - Ale dla dzielenia Rules i zagnieżdżonych CLAUDE.md polecają wspólne repo i np. robienie symlinków do projektu z innego folderu wspólnego
 
 ## Zarządzanie taskami
 
-- Zmianie taski, aby curation Claude.md był wolny
-- Jak master ma nie być developerem
-- W Jenkins flow
+- Zdalne taski z `/schedule`, aby **curation CLAUDE.md** był robiony automatem dla wielu developerów, np. w Jenkins flow
+- Schedule -> 1/week sprzątanie plików `CLAUDE.md` i skills
+- Hooks i Automatyzacje ze skryptami
 
-> Dolna część strony jest słabo czytelna. Sens wygląda na pytanie o podział ról i prowadzenie pracy przez przepływ typu Jenkins.
+## Edit plan
 
----
+- Edit plan
+  - files are saved in user's `~/.claude/plans`
+  - use `Ctrl + G` after plan was created to edit it manually
 
-## Strona 11 - `20260329_141330.jpg`
 
-## Edit plan i automatyzacje
+## Subagenci: Claude vs Codex
+- Czy mogą używać wspólnych definicji subagentów jakoś?
 
-- Edit plan - how to?
-- Only from users?
-- `claude/plans`?
-- `Ctrl + G`
-- Hooks
-- Automatyzacje
-- Schedule -> 1/week odpytywanie plików `CLAUDE.md` i skills
+## Git Worktrees i bash
 
-## Subagenci
-
-- Subagents: Claude vs Codex
-- Wspólne
-
-## Worktrees i bash
-
-- Flaga worktree
-- CLI worktrees
-- Allow bash (`*`, np. git, code?)
-
-> Ostatnia linia może odnosić się do whitelisty poleceń bash.
+- Flaga `codex --worktree` or `-w` with optional worktree name
+- Does `bash(* git add:*)` work to allow anything before `git`?
+  - agent likes to enter folder with `cd` before using `git add`)
 
 ---
-
-## Strona 12 - `20260329_141336.jpg`
 
 ## Praca na wielu repo
 
@@ -384,31 +292,10 @@ Pierwsze strony z imionami uczestników to notatki z rozmowy o ich problemach z 
 
 - Hooks do skills
 - `/hooks`
-- `Ctrl + C` - background
-- `/update-config <prompt>`
-- Add Playwright MCP na poziomie globalnym albo project level
-- `/mcp` - włączenie / wyłączenie MCP
-
-## Prompt workflow
-
-- `Ctrl + S` - stash prompt
-- `/b…`
-- Directly send prompt
-- `/bash`
-- Background
-
-> Jedna komenda po `Ctrl + S` jest nieczytelna i wygląda jak `/b...`.
 
 ---
 
 ## Zbiorcze wnioski z notatek
-
-### Profil pierwszych stron
-
-- To są głównie notatki o uczestnikach
-- Każda osoba opisywała swoje doświadczenia, obawy i oczekiwania wobec AI
-- Powtarzały się problemy z hallucynacjami, utratą kontekstu i weryfikacją wyników
-- Wiele osób chciało lepiej używać agentów, testów i workflow opartych o CLI
 
 ### Najczęstsze tematy
 
