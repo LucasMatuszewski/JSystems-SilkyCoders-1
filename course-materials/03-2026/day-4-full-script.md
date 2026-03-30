@@ -24,7 +24,7 @@ Dzień 4 – agenda:
 10:00  Debugging + refactoring z agentami
 11:00  ☕ PRZERWA
 
-11:15  Test review: czy testy agentów naprawdę coś bronią?
+11:15  Test review: czy testy stworzone przez agentów naprawdę coś dają?
 11:45  TDD i antywzorce: jak nie pozwolić agentowi “naprawiać testów”
 12:15  Testy integracyjne z seedem bazy danych
 13:00  🍽️ PRZERWA
@@ -40,8 +40,6 @@ Dzień 4 – agenda:
 ---
 
 ## Założenie dnia
-
-To nie jest dzień “jedziemy dalej jakby wszyscy byli gotowi”.
 
 To jest dzień:
 1. domknięcia aplikacji, jeśli ktoś nie zdążył po weekendzie,
@@ -79,48 +77,7 @@ Dajcie proszę na chat:
 
 ---
 
-## 09:10–09:40 — Dokańczamy appkę według planu
-⏱️ 30 min
-
-🎬 **CO MÓWIĘ:**
-
-„Jeśli aplikacja nie działa, nie wymyślamy nowego planu od zera. Najpierw każemy agentowi kontynuować istniejący plan, z naciskiem na weryfikację po każdym kroku.”
-
-💬 WKLEJ NA CHAT:
-```text
-Prompt startowy — dokończenie appki
-
-Przeczytaj najpierw:
-- docs/PRD-Product-Requirements-Document.md
-- docs/ADR/000-main-architecture.md
-- docs/ADR/001-backend.md
-- docs/ADR/002-frontend.md
-- docs/task-plan-matrix.md lub docs/day-3-PLAN-dependency-matrix-pararelizm-map.md jeśli istnieje
-
-Następnie:
-1. oceń aktualny stan implementacji,
-2. porównaj go z planem,
-3. wypisz co jest skończone, co jest zablokowane, co można zrobić równolegle,
-4. zaproponuj najkrótszą ścieżkę do działającego MVP,
-5. wykonuj zadania krokami, po każdym kroku uruchamiaj odpowiednią weryfikację.
-
-Zasady:
-- nie zmieniaj testów tylko po to, żeby przechodziły,
-- jeśli test jest zły, najpierw uzasadnij dlaczego,
-- jeśli czegoś nie wiesz, sprawdź dokumentację albo Context7,
-- commit po każdym logicznym kroku.
-```
-
-📺 **CO POKAZUJĘ:**
-- uruchomienie tego promptu,
-- agent w trybie plan + wykonanie,
-- weryfikacja po każdym kroku.
-
-💡 Jeśli większość grupy utknęła, prowadź to jako wspólny live debugging/finish session.
-
----
-
-## 09:40–10:00 — Weryfikacja advanced planu
+## 09:10–09:40 — Weryfikacja advanced planu
 ⏱️ 20 min
 
 🎬 **CO MÓWIĘ:**
@@ -188,6 +145,47 @@ Zapisz jako docs/day-4-advanced-plan.md
 ```
 
 💡 Tu warto pokazać związek z oficjalną rekomendacją Claude: „explore first, then plan, then code” oraz „let Claude interview you” dla większych zadań.
+
+---
+
+## 09:40–10:00 — Dokańczamy appkę według planu
+⏱️ 30 min
+
+🎬 **CO MÓWIĘ:**
+
+„Jeśli aplikacja nie działa, nie wymyślamy nowego planu od zera. Najpierw każemy agentowi kontynuować istniejący plan, z naciskiem na weryfikację po każdym kroku.”
+
+💬 WKLEJ NA CHAT:
+```text
+Prompt startowy — dokończenie appki
+
+Przeczytaj najpierw:
+- docs/PRD-Product-Requirements-Document.md
+- docs/ADR/000-main-architecture.md
+- docs/ADR/001-backend.md
+- docs/ADR/002-frontend.md
+- docs/task-plan-matrix.md lub docs/day-3-PLAN-dependency-matrix-pararelizm-map.md jeśli istnieje
+
+Następnie:
+1. oceń aktualny stan implementacji, odpal aplikację (BE i FE) i sprawdź co działa, odpal testy e2e i inne,
+2. porównaj stan implementacji z planem,
+3. wypisz co jest skończone, co jest zablokowane, co można zrobić równolegle, jakie są błędy, co działa a co nie,
+4. zaproponuj najkrótszą ścieżkę do działającego MVP,
+5. wykonuj zadania krokami, po każdym kroku uruchamiaj odpowiednią weryfikację (testy, linting lub/i manaualne sprawdzenie np. z Playwright).
+
+Zasady:
+- nie zmieniaj testów tylko po to, żeby przechodziły,
+- jeśli test jest zły, najpierw uzasadnij dlaczego,
+- jeśli czegoś nie wiesz, sprawdź dokumentację albo Context7,
+- commit po każdym logicznym kroku.
+```
+
+📺 **CO POKAZUJĘ:**
+- uruchomienie tego promptu,
+- agent w trybie plan + wykonanie,
+- weryfikacja po każdym kroku.
+
+💡 Jeśli większość grupy utknęła, prowadź to jako wspólny live debugging/finish session.
 
 ---
 
@@ -259,7 +257,8 @@ Kod już działa. Teraz zrób refactoring tylko w wybranym zakresie.
 Zakres:
 - uprość zbyt długie metody,
 - nazwij lepiej klasy / metody / zmienne,
-- usuń duplikację,
+- dodaj lepszy error handling,
+- usuń duplikację, DRY,
 - zachowaj obecne zachowanie i kontrakty.
 
 Nie zmieniaj:
@@ -288,7 +287,8 @@ Po refactoringu:
 
 „Teraz najważniejszy moment dnia. Nie pytamy ‘czy mamy testy’. Pytamy: ‘czy te testy naprawdę coś łapią?’
 
-To, że agent wygenerował 40 testów, nie znaczy, że mamy jakość. Bardzo często mamy teatr bezpieczeństwa.”
+To, że agent wygenerował 40 testów, nie znaczy, że dają one pewność, że wszystko działa.
+Bardzo często mamy teatr bezpieczeństwa.”
 
 ### Co sprawdzamy
 
@@ -309,15 +309,18 @@ Oceń:
 - czy asercje są wystarczająco mocne,
 - czy testy nie są flaky,
 - czy nie testują szczegółów implementacji zamiast zachowania,
-- czy są luki w coverage najważniejszych flow.
+- czy są luki w coverage najważniejszych flow,
+- czy testy sprawdzają edge cases (nie tylko happy path).
 
 Chcę wynik w formacie:
 1. Krytyczne problemy
 2. Słabe testy do poprawy
 3. Brakujące testy
 4. 5 najważniejszych testów do dopisania teraz
+```
 
-Jeśli masz komendę /review, użyj jej. Jeśli nie, zrób review ręcznie w tym samym stylu.
+```
+Użyj komendy /review.
 ```
 
 ### Ćwiczenie: celowe psucie aplikacji
@@ -564,12 +567,6 @@ Jeśli lepszy będzie skrypt uruchamiany przed testem, przygotuj skrypt i opisz 
 7. Dla dużych zespołów można mieć centralnie zarządzany `CLAUDE.md`.
 8. Można współdzielić rules między projektami przez symlinki.
 9. Pluginy mogą zawierać skills, agents, hooks, MCP config i settings.
-
-### Czego nie pokazuję jako “pewnik”
-
-⚠️ Publicznie zweryfikowałem blog i docs dla web/cloud execution, sandboxingu, admin toggle i allowed domains.
-
-⚠️ Nie znalazłem publicznej, szczegółowej instrukcji UI krok po kroku dla “secrets/env vars in Claude Code Web” na poziomie, który chciałbym pokazać bez ryzyka zmyślania. Jeśli macie to w waszym tenant UI, pokazujcie z własnego konta jako live product demo, ale w skrypcie mówimy o tym ostrożnie.
 
 ### Co mówię
 

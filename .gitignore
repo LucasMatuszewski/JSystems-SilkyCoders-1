@@ -47,3 +47,5 @@ frontend/dist
 ### Local / private (user-specific) Claude settings.
 # Should be ignored but I commit it as an example.
 # .claude/settings.local.json
+
+course-materials/03-2026/notes-scans/*.jpg
