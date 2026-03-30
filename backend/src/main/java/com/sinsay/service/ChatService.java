@@ -11,6 +11,7 @@ import com.sinsay.repository.ChatMessageRepository;
 import com.sinsay.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -26,13 +27,26 @@ import java.util.concurrent.Executors;
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class ChatService {
 
     private final OpenAIClient openAIClient;
     private final PolicyDocService policyDocService;
     private final ChatMessageRepository chatMessageRepository;
     private final SessionRepository sessionRepository;
+    private final String model;
+
+    public ChatService(
+            OpenAIClient openAIClient,
+            PolicyDocService policyDocService,
+            ChatMessageRepository chatMessageRepository,
+            SessionRepository sessionRepository,
+            @Qualifier("openaiModel") String model) {
+        this.openAIClient = openAIClient;
+        this.policyDocService = policyDocService;
+        this.chatMessageRepository = chatMessageRepository;
+        this.sessionRepository = sessionRepository;
+        this.model = model;
+    }
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -72,6 +86,7 @@ public class ChatService {
 
                 // Build ChatCompletionCreateParams
                 ChatCompletionCreateParams.Builder paramsBuilder = ChatCompletionCreateParams.builder()
+                        .model(model)
                         .addDeveloperMessage(systemPrompt);
 
                 // Add history as USER/ASSISTANT messages

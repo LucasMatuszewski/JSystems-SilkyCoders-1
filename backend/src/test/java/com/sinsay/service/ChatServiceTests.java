@@ -56,7 +56,7 @@ class ChatServiceTests {
 
     @BeforeEach
     void setUp() {
-        chatService = new ChatService(openAIClient, policyDocService, chatMessageRepository, sessionRepository);
+        chatService = new ChatService(openAIClient, policyDocService, chatMessageRepository, sessionRepository, "openai/gpt-4o-mini");
 
         testSessionId = UUID.randomUUID();
         testSession = Session.builder()

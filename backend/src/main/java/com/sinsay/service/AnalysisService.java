@@ -1,8 +1,10 @@
 package com.sinsay.service;
 
 import com.openai.client.OpenAIClient;
-import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.ChatCompletion;
+import com.openai.models.chat.completions.ChatCompletionContentPart;
+import com.openai.models.chat.completions.ChatCompletionContentPartImage;
+import com.openai.models.chat.completions.ChatCompletionContentPartText;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.sinsay.model.ChatMessage;
 import com.sinsay.model.Intent;
@@ -11,16 +13,16 @@ import com.sinsay.model.Session;
 import com.sinsay.repository.ChatMessageRepository;
 import com.sinsay.repository.SessionRepository;
 import com.sinsay.service.dto.AnalysisResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class AnalysisService {
 
@@ -28,6 +30,20 @@ public class AnalysisService {
     private final PolicyDocService policyDocService;
     private final SessionRepository sessionRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final String model;
+
+    public AnalysisService(
+            OpenAIClient openAIClient,
+            PolicyDocService policyDocService,
+            SessionRepository sessionRepository,
+            ChatMessageRepository chatMessageRepository,
+            @Qualifier("openaiModel") String model) {
+        this.openAIClient = openAIClient;
+        this.policyDocService = policyDocService;
+        this.sessionRepository = sessionRepository;
+        this.chatMessageRepository = chatMessageRepository;
+        this.model = model;
+    }
 
     @Transactional
     public AnalysisResponse analyzeAndCreateSession(
@@ -47,18 +63,25 @@ public class AnalysisService {
         // Get system prompt
         String systemPrompt = policyDocService.getSystemPrompt(intent);
 
-        // For this PoC, we'll use a simpler approach without multimodal content
-        // The image is converted to a base64 data URI and mentioned in the user message
-        String userMessageWithImage = "[Image: " + dataUri + "]\n\n" + description;
+        // Build multimodal user message with 2 content parts: image + text
+        ChatCompletionContentPart imagePart = ChatCompletionContentPart.ofImageUrl(
+                ChatCompletionContentPartImage.builder()
+                        .imageUrl(ChatCompletionContentPartImage.ImageUrl.builder()
+                                .url(dataUri)
+                                .build())
+                        .build()
+        );
+        ChatCompletionContentPart textPart = ChatCompletionContentPart.ofText(
+                ChatCompletionContentPartText.builder()
+                        .text(description)
+                        .build()
+        );
 
-        // Build chat completion request
-        // Note: The OpenAI Java SDK's builder pattern requires using the standard addMessage methods
-        // For full multimodal support with content parts, we would need to use the raw JSON API
-        // For this PoC, we include the image data URI in the text message
+        // Build chat completion request with multimodal content
         ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
-                .model(ChatModel.of("openai/gpt-4o-mini"))
+                .model(model)
                 .addSystemMessage(systemPrompt)
-                .addUserMessage(userMessageWithImage)
+                .addUserMessageOfArrayOfContentParts(List.of(imagePart, textPart))
                 .build();
 
         // Call OpenAI API (synchronous, non-streaming)

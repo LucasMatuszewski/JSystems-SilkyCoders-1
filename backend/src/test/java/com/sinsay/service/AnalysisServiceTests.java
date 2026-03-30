@@ -47,7 +47,7 @@ class AnalysisServiceTests {
 
     @BeforeEach
     void setUp() {
-        analysisService = new AnalysisService(openAIClient, policyDocService, sessionRepository, chatMessageRepository);
+        analysisService = new AnalysisService(openAIClient, policyDocService, sessionRepository, chatMessageRepository, "openai/gpt-4o-mini");
 
         // Setup OpenAI client chain mocks
         when(openAIClient.chat()).thenReturn(chatService);
