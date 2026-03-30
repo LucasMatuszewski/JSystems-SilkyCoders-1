@@ -5,7 +5,7 @@ import type { FormErrors } from '../lib/validation'
 import ImageUpload from './ImageUpload'
 
 export interface IntakeFormProps {
-  onSuccess: (sessionId: string, initialMessage: string) => void
+  onSuccess: (sessionId: string) => void
 }
 
 export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.Element {
@@ -98,7 +98,7 @@ export default function IntakeForm({ onSuccess }: IntakeFormProps): React.JSX.El
       setSessionId(data.sessionId)
 
       // Call onSuccess callback
-      onSuccess(data.sessionId, data.message)
+      onSuccess(data.sessionId)
     } catch (error) {
       setSubmitError('Błąd podczas przesyłania formularza. Spróbuj ponownie.')
       console.error('Form submission error:', error)

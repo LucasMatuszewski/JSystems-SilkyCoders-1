@@ -151,10 +151,7 @@ describe('IntakeForm', () => {
     )
 
     // Verify the callback was called with correct arguments
-    expect(mockOnSuccess).toHaveBeenCalledWith(
-      'test-session-123',
-      'Dziękuję za zgłoszenie. Analizuję przypadek...',
-    )
+    expect(mockOnSuccess).toHaveBeenCalledWith('test-session-123')
 
     // Verify sessionId was stored in localStorage
     expect(localStorage.getItem('sinsay_session_id')).toBe('test-session-123')

@@ -1,9 +1,33 @@
-import React from 'react'
+import { useEffect } from 'react'
+import { useSession } from './hooks/useSession'
+import IntakeForm from './components/IntakeForm'
+import ChatView from './components/ChatView'
 
 function App(): React.JSX.Element {
+  const { sessionId, setSessionId, clearSession } = useSession()
+
+  // Set page title
+  useEffect(() => {
+    document.title = 'Zgłoszenie zwrotu lub reklamacji'
+  }, [])
+
+  // Derive view from sessionId - no separate state needed
+  const view = sessionId ? 'chat' : 'form'
+
+  const handleFormSuccess = (newSessionId: string) => {
+    setSessionId(newSessionId)
+  }
+
+  const handleSessionInvalid = () => {
+    clearSession()
+  }
+
   return (
     <main className="min-h-screen bg-background">
-      <h1 className="text-2xl font-semibold text-brand-primary">Sinsay AI</h1>
+      {view === 'form' && <IntakeForm onSuccess={handleFormSuccess} />}
+      {view === 'chat' && sessionId && (
+        <ChatView sessionId={sessionId} onSessionInvalid={handleSessionInvalid} />
+      )}
     </main>
   )
 }
