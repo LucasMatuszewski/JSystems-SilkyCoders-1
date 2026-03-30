@@ -1,0 +1,46 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import IntakeForm from './IntakeForm'
+
+describe('IntakeForm - Simple Test', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+  })
+
+  it('submits form when all fields are filled', async () => {
+    const mockOnSuccess = vi.fn()
+    const user = userEvent.setup({ delay: null })
+
+    render(<IntakeForm onSuccess={mockOnSuccess} />)
+
+    // Select intent
+    await user.click(screen.getByLabelText('Zwrot'))
+
+    // Fill in all text fields
+    await user.type(screen.getByLabelText('Numer zamówienia'), 'PL123')
+    await user.type(screen.getByLabelText('Nazwa produktu'), 'Test')
+    await user.type(screen.getByLabelText('Opis problemu'), 'Test desc')
+
+    // Upload image
+    const fileInput = screen.getByLabelText(/Wybierz zdjęcie produktu/i)
+    const imageFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' })
+    await user.upload(fileInput, imageFile)
+
+    // Wait for image processing
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
+    // Submit
+    await user.click(screen.getByRole('button', { name: 'Sprawdź' }))
+
+    // Check result - give it more time
+    await waitFor(
+      () => {
+        console.log('mockOnSuccess calls:', mockOnSuccess.mock.calls)
+        expect(mockOnSuccess).toHaveBeenCalled()
+      },
+      { timeout: 10000 }
+    )
+  })
+})
