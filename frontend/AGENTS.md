@@ -79,6 +79,21 @@ For session resume, map messages from `GET /api/sessions/{id}` to the `UIMessage
 
 **TypeScript:** Strict mode. Always annotate types. Prefer `interface` over `type`. No `any`, no `as`/`!` assertions. Use type guards for runtime narrowing. Functional components with TypeScript interfaces.
 
+## Testing
+
+**Unit/Integration:** Vitest + MSW for API mocks.
+**E2E:** Playwright, REAL stack (no `page.route()` API mocking, do real END to END tests! No Mocks!).
+
+## Verification
+1. `npm test` — pass
+2. `npm run lint` — no errors
+3. `npm run format:check` — no violations
+4. `npm run build` — succeeds
+5. `npm run dev` — STARTS, no console errors
+6. Manual test with real backend at least once per task
+
+If app won't load → fix before commit.
+
 ## Completion Criteria
 
 - All tests and ESLint pass

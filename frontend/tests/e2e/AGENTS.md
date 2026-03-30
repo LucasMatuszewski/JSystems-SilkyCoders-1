@@ -1,20 +1,49 @@
 # E2E Test Guidelines
 
-## Framework
+**Framework:** Playwright
 
-**Playwright** — add to `package.json` when implementing E2E tests.
+## E2E = Real Stack, No API Mocks
 
-Run against the full stack (backend at `localhost:8080`, frontend served by Vite or the bundled JAR).
+Tests run against:
+- Real backend at `localhost:8080`
+- Real frontend at `localhost:5173`
+- Real browser (Chrome)
+- Real database (SQLite)
 
-## Key Scenarios
+**NO `page.route()` mocking of `/api/*` endpoints.**
 
-- Full **form → chat** flow: fill all fields + upload image → submit → chat view renders with initial AI message
-- **Session resume**: reload page with valid `sinsay_session_id` in localStorage → ChatView renders with history
-- **Streaming display**: assistant message appears incrementally (no spinner, text streams in)
-- **"Nowa sesja" button**: clears session, returns to empty form
-- **Form validation**: all 5 required field errors shown on empty submit
+## QA Workflow: Quality FIRST, Tests SECOND
 
-## Notes
+### Phase 1: Manual Smoke Test (MANDATORY)
+1. Start backend: `cd backend && ./mvnw spring-boot:run`
+2. Start frontend: `cd frontend && npm run dev`
+3. Open `http://localhost:5173`
+4. Fill form with REAL data + image from `assets/example-images/`
+5. Submit → verify chat appears
+6. Send follow-up → verify response streams
+7. "Nowa sesja" → verify form shown
+8. Take screenshots
 
-- Seed test data via direct DB inserts or a test-only API endpoint — do not depend on real OpenAI responses
-- Use Playwright's `page.route()` to mock `/api/*` when testing FE in isolation
+**If any step fails → document bug, don't write tests yet.**
+
+### Phase 2: Write Tests
+Codify working behavior with Playwright. Use REAL images from `assets/example-images/`.
+
+## Images
+- `cloth1.webp` — WebP format
+- `cloth2.jpg`, `cloth3.jpg`, `cloth4.jpg` — JPEG format
+
+Load with `fs.readFileSync(path.resolve('../../assets/example-images/cloth2.jpg'))`.
+
+## Screenshots (REQUIRED)
+Save to `tests/e2e/screenshots/<descriptive-name>.png`.
+
+## Logging (REQUIRED)
+Log to `logs/e2e-tests.log` (repo root). Format: `[timestamp] [test] [step] message`.
+
+## What You're NOT Responsible For
+- Unit tests (fe/be-developer)
+- Fixing bugs (fe/be-developer)
+- Writing code (fe/be-developer)
+
+Your job: Ensure app ACTUALLY WORKS before it ships.

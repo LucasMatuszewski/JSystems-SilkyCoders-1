@@ -107,6 +107,17 @@ npm run build        # Vite build succeeds
 
 Verify only the scope relevant to your change. If the change affects runtime behavior, confirm the app starts correctly.
 
+**Test Strategy:**
+| Type | Mocks | Who |
+|---|---|---|
+| Unit | All deps | be/fe-dev |
+| Integration | Only OpenAI (external) | be-dev |
+| E2E | NOTHING (real stack) | qa-engineer |
+
+**Verification:** Always start the app before committing. Tests passing ≠ app working. Be sure the app really works, not only pass tests.
+
+**Env Vars:** See `.env.example` (OPENROUTER_API_KEY or OPENAI_API_KEY required)
+
 ### Commit Rules
 - Commit only after verification passes and the changed scope is in a working state.
 - Keep commits focused: one logical change per commit.

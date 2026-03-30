@@ -1,7 +1,5 @@
 # Backend Guidelines
 
-See root `AGENTS.md` for project overview. This file covers backend-specific implementation rules.
-
 ## Tech Stack
 
 - Java 21, Spring Boot 3.5.9, Spring Web MVC, Lombok
@@ -92,10 +90,27 @@ The system prompt sent to the LLM must include these 6 sections in order:
 4. Scope boundary (answer only Sinsay policy questions; redirect off-topic)
 5. Language instruction (always respond in Polish)
 6. Policy document content (concatenated markdown, intent-specific)
+7.**Security constraints** (prompt injection protection, jailbreak prevention)
+8. **Image analysis instructions** (two-stage: analyze image, then evaluate)
+9. Policy content (regulamin.md + intent-specific doc)
 
 **Policy doc selection** per intent:
 - `RETURN`: `regulamin.md` + `zwrot-30-dni.md`
 - `COMPLAINT`: `regulamin.md` + `reklamacje.md`
+
+## Testing
+
+**Integration Tests:** HTTP → Controller → Service → DB (real). Mock ONLY OpenAIClient.
+❌ WRONG: `@MockBean` for services
+✅ CORRECT: `@MockBean` for OpenAIClient only
+
+## Verification (MANDATORY)
+1. `./mvnw test` — pass
+2. `./mvnw clean package` — build succeeds
+3. `./mvnw spring-boot:run` — APP STARTS (verify this!)
+4. Final manual curl test to verify API works with running real BE (not mocked)
+
+If app won't start → fix before commit.
 
 ## Coding Conventions
 

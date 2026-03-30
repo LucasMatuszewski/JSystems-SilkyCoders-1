@@ -36,11 +36,67 @@ These files must be provided to FE and QA agents for UI implementation and valid
 ## Workflow Rules (apply to ALL tasks, remind agents in every prompt)
 
 1. **TDD**: Write tests FIRST. Run them and confirm they FAIL. Then implement. Then run tests and confirm they PASS. Never skip tests.
-2. **Verify before commit**: Backend: `cd backend && ./mvnw test && ./mvnw clean package`. Frontend: `cd frontend && npm test && npm run lint && npm run format:check && npm run build`.
+2. **Verify before commit**:
+   - Backend: `cd backend && ./mvnw test && ./mvnw clean package && ./mvnw spring-boot:run` (verify app starts!)
+   - Frontend: `cd frontend && npm test && npm run lint && npm run format:check && npm run build && npm run dev` (verify app really loads!)
 3. **Commit after every task**: One logical change per commit. Format: `Area: short summary`.
 4. **Read specs first**: Before coding, read the relevant PRD sections, ADR files, and AGENTS.md for the affected area.
 5. **No push**: Do not push to remote unless explicitly asked.
 6. **Context7 MCP**: Use `resolve-library-id` + `query-docs` for any library listed in AGENTS.md before using it.
+
+## CRITICAL: Test Definitions
+
+### Test Type Responsibilities
+
+| Test Type | Purpose | What Gets Mocked | Who Writes | Verification |
+|---|---|---|---|---|
+| **Unit** | Single class/function logic | All dependencies | be/fe-developer | Fast, isolated |
+| **Integration** | HTTP→Service→DB OR Service→DB | ONLY OpenAI (external API) | be-developer | Real services, real DB |
+| **E2E** | Full stack: Browser→FE→BE→DB | NOTHING (or only OpenAI) | qa-engineer | Real everything |
+
+### Integration Tests: DO NOT Mock Services
+
+Integration tests MUST:
+- Use `@SpringBootTest` with real Spring context
+- Inject REAL services (NOT `@MockBean` for services)
+- Mock ONLY the OpenAI client (`OpenAIClient`)
+- Test: HTTP request → Controller → Service → Database
+
+Integration tests MUST NOT:
+- Mock `AnalysisService`, `ChatService`, etc.
+- Mock repositories
+- Mock controllers
+
+### E2E Tests: NO page.route() Mocking
+
+E2E tests MUST:
+- Run REAL backend at `localhost:8080`
+- Run REAL frontend at `localhost:5173` (dev server) or use JAR
+- Use REAL browser (Playwright)
+- Test: User fills form → submits → real HTTP → real LLM response!
+
+E2E tests MUST NOT:
+- Use `page.route()` to mock `/api/*` endpoints
+- Mock backend & LLM responses
+- Test frontend in isolation
+
+### QA Engineer: Quality FIRST, Tests SECOND
+
+QA's primary job: **ASSURE QUALITY**, not just write tests.
+
+1. **Manual testing FIRST:**
+   - Start backend: `./mvnw spring-boot:run`
+   - Start frontend: `npm run dev`
+   - Open browser, test manually (you can use Playwright to USE the app, not only write test)
+   - Take screenshots on every step and save it in repo
+   - Document bugs
+
+2. **ONLY THEN write tests:**
+   - Codify working behavior
+   - Catch regressions
+   - Run against REAL running stack
+
+If the app doesn't work, DO NOT write tests. Report bugs instead. Write tests only when you verified already that the app works.
 
 ---
 
@@ -583,22 +639,33 @@ FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> F
 
 **Context to provide:**
 - Comprehensive integration test: create session → load session → chat message → verify DB
-- `@SpringBootTest(webEnvironment = RANDOM_PORT)`, `TestRestTemplate`, `@MockitoBean` for OpenAI
-- H2 test profile
+- `@SpringBootTest(webEnvironment = RANDOM_PORT)`, `TestRestTemplate`
+- **CRITICAL:** Mock ONLY `OpenAIClient` — do NOT mock services!
+- Use H2 test profile (in-memory DB)
 
 **Spec references to include in prompt:**
 - `docs/ADR/000-main-architecture.md` §10 — TAC-01 through TAC-12
-- `backend/src/test/CLAUDE.md`
+- `backend/AGENTS.md` — Testing Strategy section (READ THIS!)
 
 **TDD steps:**
-1. POST /api/sessions (mock OpenAI) → 200, get sessionId
-2. GET /api/sessions/{sessionId} → session + messages in order
-3. POST /api/sessions/{sessionId}/messages with `{ messages: [{ role: "user", content: "..." }] }` (mock streaming) → SSE UI Message Stream format response with `x-vercel-ai-ui-message-stream: v1` header
-4. GET again → 4 messages total
+1. Write test for POST /api/sessions (mock OpenAI client, return canned response)
+2. Write test for GET /api/sessions/{id} — verify session + messages in order
+3. Write test for POST /api/sessions/{id}/messages (mock streaming, return SSE events)
+4. Verify GET returns 4 messages total after chat
+
+**IMPORTANT Integration Test Rules:**
+- DO NOT use `@MockBean` for `AnalysisService` or `ChatService`
+- Let Spring inject REAL service beans
+- Mock ONLY `OpenAIClient` (external dependency)
+- Test full HTTP → Controller → Service → DB flow
 
 **Implementation:** `FullFlowIntegrationTests`
 
-**Validation:** `cd backend && ./mvnw test && ./mvnw clean package`
+**Validation:**
+1. `cd backend && ./mvnw test` — all pass
+2. `cd backend && ./mvnw clean package` — builds
+3. `cd backend && ./mvnw spring-boot:run` — verify app starts (manual check)
+
 **Commit:** `Backend: add full-flow integration test for session lifecycle`
 
 ---
@@ -610,9 +677,20 @@ FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> F
 - **Depends on:** FE-7, BE-8
 - **Parallel with:** none
 
+**IMPORTANT: E2E Tests Test REAL Stack**
+
+E2E tests MUST:
+- Run REAL backend at `localhost:8080`
+- Run REAL frontend at `localhost:5173` (dev server)
+- Use REAL browser (Playwright)
+- **DO NOT use `page.route()` to mock `/api/*`**
+
 **Context to provide:**
-- Set up Playwright in project. Test against Vite dev server (5173) with `page.route()` API mocking.
+- Set up Playwright in project
+- **FIRST:** Manual smoke test — start backend+frontend, verify form works
+- **THEN:** Write automated tests that codify working behavior
 - Form has 5 required fields. Polish labels. AC-01 through AC-06.
+- Use REAL images from `assets/example-images/`
 - **MUST visually compare** the rendered form against:
   - `docs/wireframe-form.png` — verify form layout matches wireframe
   - `assets/sinsay-homepage.png` — verify brand consistency (colors, typography, overall feel)
@@ -628,6 +706,17 @@ FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> F
 - `frontend/tests/e2e/AGENTS.md`
 
 **Implementation:**
+
+**Phase 1: Manual Testing (DO THIS FIRST)**
+1. Start backend: `cd backend && ./mvnw spring-boot:run`
+2. Start frontend: `cd frontend && npm run dev`
+3. Open browser to `http://localhost:5173`
+4. Test form manually with REAL image from `assets/example-images/`
+5. Take screenshots
+6. Compare with wireframes
+7. Document any issues
+
+**Phase 2: Automated Tests**
 1. Install Playwright, configure `playwright.config.ts`
 2. Test: form renders with all 5 fields
 3. Test: empty submit → 5 validation errors
@@ -637,7 +726,12 @@ FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> F
 7. **Visual validation**: take screenshot of form, compare against wireframe `docs/wireframe-form.png` — verify layout is similar (centered form, logo at top, fields in order, styled button). Report any significant deviations.
 8. **Design check**: verify button has accent color, form uses brand typography
 
-**Validation:** `npx playwright test` — all pass
+**Validation:**
+1. Backend running: `cd backend && ./mvnw spring-boot:run`
+2. Frontend running: `cd frontend && npm run dev`
+3. `npx playwright test` — all pass against REAL stack
+4. Screenshots saved in `frontend/tests/e2e/screenshots/`
+5. Visual audit logged in `logs/visual-audit.md`
 **Commit:** `QA: add Playwright setup and form validation E2E tests`
 
 ---
@@ -646,9 +740,16 @@ FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> F
 - **Agent:** `qa-engineer`
 - **Depends on:** QA-1
 
+**IMPORTANT: Test REAL Stack**
+
+- Run REAL backend at `localhost:8080`
+- Run REAL frontend at `localhost:5173`
+- **DO NOT use `page.route()` to mock `/api/*`**
+- Use REAL images from `assets/example-images/`
+
 **Context to provide:**
-- After form submit (mocked API), chat view should appear with AI message
-- sessionId in localStorage. Chat input functional. "Nowa sesja" returns to form.
+- Manual smoke test first: start both servers, test form→chat flow
+- Use REAL image upload, REAL API calls
 - **MUST visually compare** chat view against `docs/wireframe-decision+chat.png`
 
 **Spec references to include in prompt:**
@@ -656,17 +757,31 @@ FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> F
 - `assets/sinsay-homepage.png` — brand consistency
 - `docs/design-guidelines.md` — design spec
 - `docs/PRD-Product-Requirements-Document.md` §6 (AC-07, AC-12, AC-15, AC-18)
-- `docs/ADR/002-frontend.md` §5 (Form → Chat Transition)
 
 **Implementation:**
-1. Test: fill form + submit (mock API) → chat appears with AI message
+
+**Phase 1: Manual Testing**
+1. Start backend + frontend
+2. Fill form with REAL data + REAL image
+3. Submit → verify chat appears with AI message
+4. Verify sessionId in localStorage
+5. Send follow-up message → verify response streams
+6. Take screenshots, compare with wireframe
+
+**Phase 2: Automated Tests**
+1. Test: fill form + submit → chat appears with AI message
 2. Test: sessionId in localStorage
-3. Test: chat input visible, can type
+3. Test: chat input visible and functional, can type
 4. Test: "Nowa sesja" → form, localStorage cleared
 5. Test: mock streaming → assistant message appears
 6. **Visual validation**: take screenshot of chat view, compare against wireframe `docs/wireframe-decision+chat.png` — verify summary bar, message layout, input area. Report deviations.
 
-**Validation:** `npx playwright test`
+**Validation:**
+1. Backend + frontend running
+2. `npx playwright test` — all pass
+3. Screenshots in `frontend/tests/e2e/screenshots/`
+4. Visual audit in `logs/visual-audit.md`
+
 **Commit:** `QA: add form-to-chat flow E2E tests`
 
 ---
@@ -675,27 +790,53 @@ FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> F
 - **Agent:** `qa-engineer`
 - **Depends on:** QA-2
 
+**IMPORTANT: Test REAL Stack**
+
+- Run REAL backend at `localhost:8080`
+- Run REAL frontend at `localhost:5173`
+- **DO NOT use `page.route()` to mock `/api/*`**
+- Test session persistence (SQLite survives page reload)
+
 **Context to provide:**
-- Session resume via localStorage. 404 handling. 375px viewport. All text Polish.
-- **Final visual audit**: compare both screens at desktop and mobile widths against wireframes and design system
+- Manual smoke test first
+- Session resume via localStorage
+- 404 handling
+- 375px viewport (mobile)
+- Final visual audit at multiple screen sizes
+- See `frontend/tests/e2e/AGENTS.md` for full workflow
 
 **Spec references to include in prompt:**
-- `docs/wireframe-form.png` — form wireframe (for mobile check)
-- `docs/wireframe-decision+chat.png` — chat wireframe (for mobile check)
-- `assets/sinsay-homepage.png` — overall brand feel
+- `frontend/tests/e2e/AGENTS.md` — READ THIS FIRST!
+- Wireframes for both form + chat at mobile
+- `assets/sinsay-homepage.png` — brand reference
 - `docs/design-guidelines.md` — responsive expectations
 - `docs/PRD-Product-Requirements-Document.md` §6 (AC-15 through AC-20)
-- `docs/ADR/002-frontend.md` §7 (TAC-FE-05, TAC-FE-06, TAC-FE-09)
 
 **Implementation:**
-1. Test: localStorage sessionId → reload → mock GET → chat with history
+
+**Phase 1: Manual Testing**
+1. Start backend + frontend
+2. Fill form, submit → create session
+3. Reload page → verify session restored
+4. Check history is complete
+5. Test "Nowa sesja" → verify new form
+6. Resize browser to 375px → verify mobile usability
+7. Take screenshots at 1440px and 375px
+
+**Phase 2: Automated Tests**
+1. Test: localStorage sessionId → reload → chat with history
 2. Test: invalid sessionId → 404 → form, localStorage cleared
 3. Test: 375px viewport → form without horizontal scroll
 4. Test: 375px viewport → chat without horizontal scroll
-5. Test: Polish text strings present (labels, buttons)
-6. **Final visual audit**: take screenshots at 1440px and 375px for both form and chat. Read wireframes and homepage screenshot. Compare. Report a summary of visual alignment: what matches, what deviates, what needs attention. This is informational — create the report as a test output or log.
+5. Test: Polish text strings present
+6. **Final visual audit:** screenshots at 1440px + 375px, compare with wireframes
 
-**Validation:** `npx playwright test`
+**Validation:**
+1. Backend + frontend running
+2. `npx playwright test` — all pass
+3. Screenshots in `frontend/tests/e2e/screenshots/`
+4. Visual audit report in `logs/visual-audit.md`
+
 **Commit:** `QA: add session resume, responsive, and visual audit E2E tests`
 
 ---
@@ -704,11 +845,87 @@ FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> F
 
 After ALL tasks complete, run the full validation suite:
 
-1. **Backend unit+integration tests:** `cd backend && ./mvnw clean test` — all pass
-2. **Backend build:** `cd backend && ./mvnw clean package` — JAR builds
-3. **Frontend unit tests:** `cd frontend && npm test` — all pass
-4. **Frontend lint:** `cd frontend && npm run lint` — no errors
-5. **Frontend format:** `cd frontend && npm run format:check` — no violations
-6. **Frontend build:** `cd frontend && npm run build` — builds into backend static/
-7. **E2E tests:** `cd frontend && npx playwright test` — all pass
-8. **Manual smoke test:** Start backend with `OPENAI_API_KEY`, open browser, submit form, verify chat with real AI
+### 1. Backend Verification
+
+```bash
+cd backend
+
+# Unit + integration tests
+./mvnw clean test                    # All pass
+
+# Build JAR
+./mvnw clean package                 # Succeeds
+
+# CRITICAL: Start the app
+export OPENAI_API_KEY=sk-test-key   # Or OPENROUTER_API_KEY
+export OPENAI_BASE_URL=https://openrouter.ai/api/v1
+./mvnw spring-boot:run               # Verify: "Started SinsayApplication"
+```
+
+**Manual check:** Open `http://localhost:8080/actuator/health` or verify logs show no errors.
+
+### 2. Frontend Verification
+
+```bash
+cd frontend
+
+# Unit tests
+npm test                             # All pass
+
+# Lint + format
+npm run lint                         # No errors
+npm run format:check                 # No violations
+
+# Build
+npm run build                        # Succeeds, output to backend/static/
+
+# CRITICAL: Start dev server
+npm run dev                          # Verify: "Local: http://localhost:5173/"
+```
+
+**Manual check:** Open browser to `http://localhost:5173`, verify form renders, no console errors.
+
+### 3. Full Stack Verification (E2E)
+
+```bash
+# Terminal 1: Backend
+cd backend
+export OPENAI_API_KEY=sk-test-key
+export OPENAI_BASE_URL=https://openrouter.ai/api/v1
+./mvnw spring-boot:run
+
+# Terminal 2: Frontend
+cd frontend
+npm run dev
+
+# Terminal 3: E2E tests
+cd frontend
+npx playwright test                  # All pass against REAL stack
+```
+
+### 4. Manual Smoke Test (DO THIS!)
+
+1. Open browser to `http://localhost:5173`
+2. Fill form with REAL data:
+   - Intent: Zwrot
+   - Order: TEST-123
+   - Product: Test Shirt
+   - Description: Product damaged
+   - Image: Upload from `assets/example-images/cloth2.jpg`
+3. Click "Sprawdź"
+4. Verify: Chat appears with AI message
+5. Send follow-up message
+6. Verify: Response streams in
+7. Reload page
+8. Verify: Session restored with history
+9. Click "Nowa sesja"
+10. Verify: Form shown, session cleared
+
+### 5. Visual Verification
+
+Compare screenshots with wireframes:
+- `docs/wireframe-form.png`
+- `docs/wireframe-decision+chat.png`
+- `assets/sinsay-homepage.png`
+
+Check: Colors, fonts, spacing, layout, mobile responsiveness (375px).
