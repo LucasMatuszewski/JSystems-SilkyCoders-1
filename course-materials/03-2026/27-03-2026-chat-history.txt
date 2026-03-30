@@ -371,7 +371,7 @@ name
   hand.
 
 2026-03-27 15:41:31 From JSystems Szkolenia to Everyone:
-	If everything is unclear, you should ask minimum 5 questions to make sure
+	If enything is unclear, you should ask minimum 5 questions to make sure
   that you understand everything correct and that you don't have any doubts
   about what you should do and how this process should work.
 
