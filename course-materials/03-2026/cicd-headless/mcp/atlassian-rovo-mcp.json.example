@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "atlassian-rovo-mcp": {
+      "url": "https://mcp.atlassian.com/v1/mcp",
+      "headers": {
+        "Authorization": "Basic BASE64_ENCODED_EMAIL_AND_API_TOKEN"
+      }
+    }
+  }
+}

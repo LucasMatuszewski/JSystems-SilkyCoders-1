@@ -706,6 +706,15 @@ Keep the API contract unchanged.
 5. Można użyć hooków lokalnie do automatycznych weryfikacji.
 6. Claude docs wprost odsyłają do użycia Agent SDK w GitHub Actions.
 
+📺 **CO POKAZUJĘ:**
+- osobny pakiet materiałów:
+  `course-materials/03-2026/cicd-headless/README.md`
+- gotowe pliki do wysłania uczestnikom:
+  - workflow GitHub Actions,
+  - Jenkinsfile,
+  - skrypty do Jira, Confluence i Bitbucket,
+  - przykład konfiguracji Atlassian MCP
+
 ### Komendy do pokazania
 
 💬 WKLEJ NA CHAT:

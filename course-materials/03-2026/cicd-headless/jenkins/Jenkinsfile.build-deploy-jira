@@ -1,0 +1,111 @@
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+  }
+
+  parameters {
+    string(name: 'JIRA_SITE', defaultValue: 'example.atlassian.net', description: 'Jira Cloud site configured in Jenkins for Jira')
+    string(name: 'CONFLUENCE_BASE_URL', defaultValue: 'https://example.atlassian.net', description: 'Confluence Cloud base URL')
+    string(name: 'CONFLUENCE_SPACE_ID', defaultValue: '', description: 'Confluence space ID for release notes')
+    string(name: 'CONFLUENCE_PAGE_TITLE', defaultValue: 'Release Notes', description: 'Confluence page title')
+  }
+
+  environment {
+    JIRA_ISSUE_KEY = ''
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        script {
+          def branchRef = env.CHANGE_BRANCH?.trim() ? env.CHANGE_BRANCH.trim() : env.BRANCH_NAME
+          def matcher = (branchRef =~ /([A-Z][A-Z0-9]+-\\d+)/)
+          env.JIRA_ISSUE_KEY = matcher ? matcher[0][1] : ''
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh './mvnw -B -DskipTests=false verify'
+      }
+      post {
+        always {
+          jiraSendBuildInfo site: "${params.JIRA_SITE}"
+        }
+      }
+    }
+
+    stage('Deploy - Staging') {
+      when {
+        anyOf {
+          branch 'main'
+          branch 'master'
+        }
+      }
+      steps {
+        sh '''
+          set -euo pipefail
+          mkdir -p build
+          printf '# %s\\n\\nBuild %s deployed to staging.\\n' "$JOB_NAME" "$BUILD_TAG" > build/release-notes.md
+        '''
+      }
+      post {
+        always {
+          jiraSendDeploymentInfo site: "${params.JIRA_SITE}", environmentId: 'staging-1', environmentName: 'Staging', environmentType: 'staging'
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      script {
+        if (env.JIRA_ISSUE_KEY?.trim()) {
+          withCredentials([
+            usernamePassword(credentialsId: 'jira-cloud-api-user', usernameVariable: 'JIRA_EMAIL', passwordVariable: 'JIRA_API_TOKEN')
+          ]) {
+            writeFile file: 'build/jira-success-comment.md', text: """Implementation/build completed successfully.
+
+- Build: ${env.BUILD_TAG}
+- Branch: ${env.BRANCH_NAME}
+- Jenkins URL: ${env.BUILD_URL}
+- Ready for code review
+"""
+            sh '''
+              set -euo pipefail
+              python3 ./course-materials/03-2026/cicd-headless/scripts/jira_comment_and_transition.py \
+                --base-url "https://${JIRA_SITE}" \
+                --email "$JIRA_EMAIL" \
+                --api-token "$JIRA_API_TOKEN" \
+                --issue-key "$JIRA_ISSUE_KEY" \
+                --comment-file build/jira-success-comment.md \
+                --transition-name "In Review"
+            '''
+          }
+        }
+
+        if (params.CONFLUENCE_SPACE_ID?.trim()) {
+          withCredentials([
+            usernamePassword(credentialsId: 'confluence-api-user', usernameVariable: 'CONFLUENCE_EMAIL', passwordVariable: 'CONFLUENCE_API_TOKEN')
+          ]) {
+            sh '''
+              set -euo pipefail
+              python3 ./course-materials/03-2026/cicd-headless/scripts/confluence_upsert_page.py \
+                --base-url "$CONFLUENCE_BASE_URL" \
+                --email "$CONFLUENCE_EMAIL" \
+                --api-token "$CONFLUENCE_API_TOKEN" \
+                --space-id "$CONFLUENCE_SPACE_ID" \
+                --title "$CONFLUENCE_PAGE_TITLE" \
+                --body-file build/release-notes.md
+            '''
+          }
+        }
+      }
+    }
+  }
+}
