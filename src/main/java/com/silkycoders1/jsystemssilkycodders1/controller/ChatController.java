@@ -14,7 +14,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.media.Media;
+import org.springframework.ai.content.Media;
 import org.springframework.http.MediaType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -106,7 +106,7 @@ public class ChatController {
             case "system" -> new SystemMessage(content);
             default -> images.isEmpty()
                     ? new UserMessage(content)
-                    : new UserMessage(content, toMedia(images));
+                    : UserMessage.builder().text(content).media(toMedia(images)).build();
         };
     }
 
@@ -118,7 +118,7 @@ public class ChatController {
             }
             String mimeType = image.mimeType() == null ? "image/jpeg" : image.mimeType();
             byte[] decoded = Base64.getDecoder().decode(image.base64Data());
-            mediaList.add(new Media(MimeTypeUtils.parseMimeType(mimeType), decoded));
+            mediaList.add(Media.builder().mimeType(MimeTypeUtils.parseMimeType(mimeType)).data(decoded).build());
         }
         return mediaList;
     }
