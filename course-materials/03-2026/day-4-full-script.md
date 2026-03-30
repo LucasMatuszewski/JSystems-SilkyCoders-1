@@ -629,6 +629,77 @@ Dla każdej opcji napisz:
 - jak wygląda rollout w zespole.
 ```
 
+### `/schedule` i cotygodniowe utrzymanie konfiguracji agentów
+
+🎬 **CO MÓWIĘ:**
+
+„Tu jest bardzo praktyczny use case dla schedulingu: nie do feature’ów, tylko do higieny konfiguracji agentów.
+
+Chcemy raz w tygodniu przejrzeć:
+- `CLAUDE.md`,
+- `AGENTS.md`,
+- `.claude/rules/**`,
+- `.claude/skills/**`,
+- `.mcp.json`,
+- i sprawdzić, czy nie mamy:
+  - duplikacji,
+  - sprzecznych instrukcji,
+  - starych linków,
+  - nazw komend albo bibliotek, które się zmieniły,
+  - rzeczy, które kiedyś miały sens, a dziś tylko szumią.”
+
+🎬 **CO MÓWIĘ DALEJ:**
+
+„Oficjalnie mamy trzy sensowne opcje:
+1. Cloud scheduled tasks,
+2. Desktop scheduled tasks,
+3. GitHub Actions `schedule`.
+
+`/loop` nie jest do tego, bo jest tylko w ramach bieżącej sesji.
+
+Jeśli pytacie o ideał: tak, najlepiej żeby to działało w chmurze i bez zależności od laptopa konkretnej osoby.
+Natomiast uczciwie: jako wzorzec zespołowy, który mogę wam polecić bez zgadywania, najbezpieczniejszy jest dziś GitHub Actions `schedule`.
+
+Cloud scheduled tasks są realne i sensowne dla pojedynczego repo, ale nie będę udawał, że mam publicznie zweryfikowaną instrukcję na centralne, admin-managed rollout dla całego teamu.”
+
+💬 WKLEJ NA CHAT:
+```text
+Prompt — weekly Claude config curation
+
+Review this repository's Claude-related configuration and keep it healthy.
+
+Scope:
+- CLAUDE.md
+- AGENTS.md
+- .mcp.json
+- .claude/settings.json
+- .claude/rules/**
+- .claude/skills/**
+
+Tasks:
+1. Remove duplicated or contradictory instructions.
+2. Update stale links, renamed commands, or outdated library references when they are clearly obsolete.
+3. Preserve project-specific workflow rules that still make sense.
+4. Keep files concise and easier for agents to follow.
+5. Create or update CLAUDE_CONFIG_AUDIT.md with:
+   - what changed,
+   - why it changed,
+   - what still needs human review.
+6. Open a PR with a short summary.
+
+Hard constraints:
+- Do not edit application source code, test code, or deployment manifests.
+- Do not weaken repository-specific rules just to make files shorter.
+- If no changes are needed, still create/update CLAUDE_CONFIG_AUDIT.md with "no changes needed".
+- Use official docs when checking whether a Claude feature or command name changed.
+```
+
+📺 **CO POKAZUJĘ:**
+- gotowy prompt:
+  `course-materials/03-2026/cicd-headless/cloud-schedule/weekly-claude-config-curation-prompt.md`
+- gotowy workflow tygodniowy:
+  `course-materials/03-2026/cicd-headless/github-actions/claude-weekly-config-curation.yml`
+
 ---
 
 ## 15:00–15:30 — GitHub Copilot coding agent i code review
@@ -645,6 +716,7 @@ Dla każdej opcji napisz:
 3. Można poprosić Copilota o zmiany do istniejącego PR przez komentarz `@copilot`.
 4. Copilot wtedy tworzy child PR zamiast ruszać oryginalny PR bezpośrednio.
 5. Można skonfigurować automatyczne code review dla PR.
+6. Automatyczne review nie zawsze uruchomi się tak samo dla uczestników pracujących z forków spoza organizacji.
 
 ### Co pokazuję
 
@@ -652,6 +724,39 @@ Dla każdej opcji napisz:
 - issue przypisane do Copilota,
 - komentarz `@copilot` na istniejącym PR,
 - gdzie włączyć automatic review w repo ruleset.
+
+🎬 **CO MÓWIĘ:**
+
+„Tu ważna uwaga organizacyjna do naszego szkolenia. Uczestnicy pracują na forkach waszego repo. To znaczy:
+- PR powinien iść z ich forka do waszego upstream repo,
+- base branch musi być jasno ustalony przed zajęciami,
+- i automatyczne AI review może nie odpalić się identycznie jak w repo wewnątrz waszej organizacji.
+
+Jeśli uczestnicy nie są członkami organizacji albo nie mają odpowiedniego planu / dostępu do Copilota, to najpewniej:
+- albo review odpalicie ręcznie,
+- albo pokażecie to na własnym PR-ze,
+- albo użyjecie alternatywy jak Gemini Code Assist na GitHub do porównania.”
+
+🎬 **CO MÓWIĘ DALEJ:**
+
+„Moja rekomendacja praktyczna na szkolenie:
+1. przed zajęciami ustalcie jeden poprawny base branch w upstream repo,
+2. jeśli trzeba, przywróćcie sensowny default branch przed demo,
+3. nie liczcie, że każdemu uczestnikowi auto-review odpali się identycznie,
+4. miejcie przygotowany własny PR demo w upstream repo, na którym pokażecie Copilota, a opcjonalnie też Gemini.”
+
+💬 WKLEJ NA CHAT:
+```text
+Instrukcja dla uczestników — PR do upstream
+
+1. Commitujesz zmiany na swoim fork-u.
+2. Otwierasz PR:
+   base = upstream repo / ustalony branch prowadzącego
+   compare = twój fork / twój branch
+3. Jeśli automatyczny AI review się nie uruchomi:
+   - poproś prowadzącego o ręczne uruchomienie review,
+   - albo użyjcie przygotowanego PR demo w repo prowadzącego.
+```
 
 💬 WKLEJ NA CHAT:
 ```text
@@ -680,13 +785,22 @@ Keep the API contract unchanged.
 
 🎬 **CO MÓWIĘ:**
 
-„To jest ważna różnica: Copilot coding agent działa w środowisku GitHub Actions i może od razu wrócić z PR-em. To jest świetne do backlogowych tasków i iteracji na PR-ach.”
+„To jest ważna różnica: Copilot coding agent działa w środowisku GitHub Actions i może od razu wrócić z PR-em. To jest świetne do backlogowych tasków i iteracji na PR-ach.
+
+Gemini Code Assist na GitHub działa trochę inaczej:
+- daje automatyczny review po otwarciu PR,
+- można go ręcznie wołać przez `/gemini summary`, `/gemini review` i `/gemini`,
+- i w review potrafi dawać gotowe sugestie do zaakceptowania bezpośrednio z GitHub.
+
+To jest dobry kontrast do pokazania obok Copilota.”
 
 ### Porównanie z Claude
 
 🎬 **CO MÓWIĘ:**
 
-„Moja opinia: Copilot ma dziś bardzo naturalną przewagę tam, gdzie workflow już żyje w GitHubie i chcecie delegować przez issue/PR/comment. Claude ma mocny workflow lokalny i dobry model pracy przez CLI, skills, hooks i własne zasady zespołowe. Nie musicie wybierać jednej religii. Warto dobrać narzędzie do etapu pracy.”
+„Moja opinia: Copilot ma dziś bardzo naturalną przewagę tam, gdzie workflow już żyje w GitHubie i chcecie delegować przez issue/PR/comment. Gemini też ma mocny, bardzo prosty workflow review-by-comment na GitHubie. Claude ma z kolei mocny workflow lokalny i bardzo dobry model pracy przez CLI, headless mode, skills, hooks i własne zasady zespołowe.
+
+Nie musicie wybierać jednej religii. Warto dobrać narzędzie do etapu pracy.”
 
 ---
 
@@ -831,6 +945,13 @@ GitHub Copilot:
   https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/make-changes-to-an-existing-pr
 - Configure automatic Copilot code review:
   https://docs.github.com/en/copilot/how-tos/use-copilot-agents/request-a-code-review/configure-automatic-review
+
+Gemini Code Assist for GitHub:
+- Review GitHub code:
+  https://developers.google.com/gemini-code-assist/docs/review-github-code
+
+Dedicated CI/CD package for this course:
+- course-materials/03-2026/cicd-headless/README.md
 
 Claude plugin example:
 - https://github.com/pluginagentmarketplace/custom-plugin-java
