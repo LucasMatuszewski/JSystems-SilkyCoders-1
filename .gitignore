@@ -53,3 +53,4 @@ logs/*.log
 # .claude/settings.local.json
 
 course-materials/03-2026/notes-scans/*.jpg
+backend/*.log
