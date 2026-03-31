@@ -99,5 +99,20 @@
       "Read(examples/**)"
     ]
   },
-  "plansDirectory": "./docs/plans"
+  "plansDirectory": "./docs/plans",
+  "hooks": {
+    "Notification": [
+      {
+        "__comment": "https://code.claude.com/docs/en/hooks-guide & https://code.claude.com/docs/en/hooks-guide",
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "__comment": "osaScript is macOS scripting tool like PowerShell. It's a little more complicated on Windows ;)",
+            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  }
 }

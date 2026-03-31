@@ -22,7 +22,7 @@
   "env": {
     "__comment_env_docs": "https://code.claude.com/docs/en/env-vars",
     "__comment_task_list": "To reuse existing tasks use ID of folder where tasks are stored and restart Claude. In my case: C:/Users/lucas/.claude/tasks/f2d4990d-bc8f-48ca-884b-7f21dbcee59e",
-    "CLAUDE_CODE_TASK_LIST_ID": "f2d4990d-bc8f-48ca-884b-7f21dbcee59e",
+    "backup_CLAUDE_CODE_TASK_LIST_ID": "f2d4990d-bc8f-48ca-884b-7f21dbcee59e",
     "__comment_disable_telemetry": "Disable Statsig telemetry",
     "DISABLE_TELEMETRY": 0,
     "__comment_is_demo": "Set to true to enable demo mode: hides email and organization from the UI, skips onboarding, and hides internal commands. Useful for streaming or recording sessions",

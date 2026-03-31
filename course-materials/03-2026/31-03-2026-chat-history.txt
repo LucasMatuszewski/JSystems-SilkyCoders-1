@@ -1,0 +1,380 @@
+2026-03-31 08:13:07 From JSystems Szkolenia to Everyone:
+	"plansDirectory": "./docs/plans"
+
+2026-03-31 08:14:06 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\.claude\plans
+
+Przenieście plan do folderu w projekcie
+
+2026-03-31 08:14:26 From Artur to Everyone:
+	Odpowiedz z codexa
+	{56FD9EC4-77CA-4B90-9209-F62EF87CED5B}.png
+
+2026-03-31 08:18:49 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\.claude\tasks
+
+2026-03-31 08:21:09 From JSystems Szkolenia to Everyone:
+	f2d4990d-bc8f-48ca-884b-7f21dbcee59e
+
+2026-03-31 08:22:08 From JSystems Szkolenia to Everyone:
+	CLAUDE_CODE_TASK_LIST_ID
+
+2026-03-31 08:22:15 From JSystems Szkolenia to Everyone:
+	"env": {
+    "__comment_env_docs": "https://code.claude.com/docs/en/env-vars",
+    "__comment_task_list": "To reuse existing tasks use ID of folder where tasks are stored and restart Claude. In my case: C:/Users/lucas/.claude/tasks/f2d4990d-bc8f-48ca-884b-7f21dbcee59e",
+    "CLAUDE_CODE_TASK_LIST_ID": "f2d4990d-bc8f-48ca-884b-7f21dbcee59e",
+    "__comment_disable_telemetry": "Disable Statsig telemetry",
+    "DISABLE_TELEMETRY": 0,
+    "__comment_is_demo": "Set to true to enable demo mode: hides email and organization from the UI, skips onboarding, and hides internal commands. Useful for streaming or recording sessions",
+    "IS_DEMO": false
+  }
+
+2026-03-31 08:26:52 From JSystems Szkolenia to Everyone:
+	API Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages.1.content.0: Invalid `signature` in `thinking`
+     block"},"request_id":"req_011CZaKS3gSzP2tV1k4syLhk"}
+
+2026-03-31 08:30:13 From JSystems Szkolenia to Everyone:
+	export CLAUDE_CODE_TASK_LIST_ID="id-of-task-list" claude
+
+2026-03-31 08:32:08 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/blob/march-2026-app-implementation/.claude/settings.local.json
+
+2026-03-31 08:33:17 From JSystems Szkolenia to Everyone:
+	export CLAUDE_CODE_TASK_LIST_ID="id-of-task-list" claude
+
+2026-03-31 08:38:07 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\.claude
+
+2026-03-31 08:39:03 From JSystems Szkolenia to Everyone:
+	przykładowy plik tasku 1.json
+
+{
+  "id": "1",
+  "subject": "FE-2: useSession hook and form validation",
+  "description": "Create useSession hook for localStorage and Zod form validation schema",
+  "activeForm": "Implementing useSession hook and form validation",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
+
+2026-03-31 08:42:14 From JSystems Szkolenia to Everyone:
+	/color blue
+
+2026-03-31 08:43:32 From JSystems Szkolenia to Everyone:
+	/rename sinsay-ai-poc-v3
+
+2026-03-31 08:47:03 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/statusline
+
+2026-03-31 08:48:17 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/blob/march-2026-app-implementation/course-materials/.claude-example/statusline.sh
+
+2026-03-31 08:50:39 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\.claude
+Dodać statusline.sh
+
+2026-03-31 08:51:07 From JSystems Szkolenia to Everyone:
+	"statusLine": {
+    "type": "command",
+    "command": "bash C:/Users/lucas/.claude/statusline.sh"
+  }
+
+2026-03-31 08:56:03 From JSystems Szkolenia to Everyone:
+	/statusline provide percent of context window as a number and graphical bar, add also model name, git branch name and cwd working directory
+
+2026-03-31 09:00:21 From JSystems Szkolenia to Everyone:
+	Testy integracyjne i E2E
+CI/CD, GH Action z agentem, implementacja do Jenkinsa
+Legacy code - stary projekt w java
+v0, Bolt, Lovable, Replit - agenci w chmurze
+
+2026-03-31 09:16:03 From JSystems Szkolenia to Everyone:
+	Claude Code headless w CI/CD / Jenkins / GitLab / GH Actions:
+https://code.claude.com/docs/en/headless
+
+2026-03-31 09:19:09 From JSystems Szkolenia to Everyone:
+	https://www.atlassian.com/platform/remote-mcp-server
+
+Cloud MCP
+
+2026-03-31 09:47:46 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/tree/master/assets/example-images
+
+Prawdziwe obrazki w testach
+
+2026-03-31 09:57:36 From JSystems Szkolenia to Everyone:
+	Analyse E2E tests in @frontend/tests/e2e\ and verify if we test real endpoints, full BE API, BE and real communication between BE and FE. Verify also if
+  we use real images from @assets/example-images\ (including also webp as edge case) to verify if LLM works for real images provided from FE. We should also
+  not mock the OpenRouter API and make real request to LLM in E2E test.
+
+  Analyse all the E2E files and provide full report with information what is implemented correctly and what should be fixed.
+
+  Verify also our @.claude/agent-memory/qa-engineer\ QA agent configuration if he knows how to do real E2E tests and if he doesn't have wrong instruction in
+  @.claude/agent-memory/qa-engineer/MEMORY.md agent memory. QA agent should not only make tests but also validate if the app works, so QA should start the
+  application and use Playwright MCP to use the reall application, click and fill data, submit form, talk on the chat with Sinsay agent.
+
+  So QA should make 2 verifications: E2E tests in playwright (in code) and manual tests with Playwright MCP. Verify also if QA makes screens on each step
+  and analyse these screens to verify how the app really looks like and what user will see when using application.
+
+  Validate also if @frontend/tests/e2e/AGENTS.md provide proper instructions for writing E2E tests.
+
+2026-03-31 10:11:31 From JSystems Szkolenia to Everyone:
+	BE agent test - use CURL, not only run tests
+
+4. Final manual curl test to verify API works with running real BE (not mocked)
+
+2026-03-31 10:11:54 From JSystems Szkolenia to Everyone:
+	Analyse E2E tests in @frontend/tests/e2e\ and verify if we test real endpoints, full BE API, BE and real communication between BE and FE. Verify also if
+  we use real images from @assets/example-images\ (including also webp as edge case) to verify if LLM works for real images provided from FE. We should also
+  not mock the OpenRouter API and make real request to LLM in E2E test.
+
+  Analyse all the E2E files and provide full report with information what is implemented correctly and what should be fixed.
+
+  Verify also our @.claude/agent-memory/qa-engineer\ QA agent configuration if he knows how to do real E2E tests and if he doesn't have wrong instruction in
+  @.claude/agent-memory/qa-engineer/MEMORY.md agent memory. QA agent should not only make tests but also validate if the app works, so QA should start the
+  application and use Playwright MCP to use the reall application, click and fill data, submit form, talk on the chat with Sinsay agent.
+
+  So QA should make 2 verifications: E2E tests in playwright (in code) and manual tests with Playwright MCP. Verify also if QA makes screens on each step
+  (and save them in tests folder) and analyse these screens to verify how the app really looks like and what user will see when using application.
+
+  Validate also if @frontend/tests/e2e/AGENTS.md provide proper instructions for writing E2E tests.
+
+2026-03-31 10:12:38 From JSystems Szkolenia to Everyone:
+	11:30 koniec przerwy
+
+2026-03-31 10:33:38 From Tomasz to Everyone:
+	Screenshot2026_03_31_113334.jpg
+
+2026-03-31 10:44:03 From JSystems Szkolenia to Everyone:
+	https://github.com/elder-plinius/CL4R1T4S
+
+https://x.com/elder_plinius
+
+2026-03-31 10:56:56 From JSystems Szkolenia to Everyone:
+	Create a custom skill that will make a curation and maintenance of our agent configuration files so that they are always up to date and really helps
+  agents to work. You should check the the agent files. Agentsmd files. And, agent memory files. And compare them with real, structure of our application,
+  of our repository, and all dependencies and also check if, there are some, and inconsistencies between these files. And duplicated informations. And you
+  should also check if, in system prompt, you have already some information that is provided also in our files, and it's also duplicated with the
+  information you already have in system, prompt.
+
+  Agents configuration to check:
+  @.claude/agents\
+  Agents memory files to check:
+  @.claude/agent-memory\
+
+  Check all AGENTS.md and CLAUDE.md files in the repo.
+  Make sure that all these files provide usefull information that will help agent in their work.
+  These files should not missleed agents or provide outdated information.
+  You should also make sure these files are not longer that 200 lines and that are precise.
+  AGENTS.md files should provide only necesary information for the part of system the file is located.
+
+2026-03-31 11:00:52 From JSystems Szkolenia to Everyone:
+	Dla języka Polskiego małe modele:
+
+https://ollama.com/search?q=mistral
+
+https://ollama.com/SpeakLeash/bielik-11b-v3.0-instruct
+
+2026-03-31 11:11:54 From JSystems Szkolenia to Everyone:
+	Model STT Nvidia open source
+https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+
+2026-03-31 11:15:44 From JSystems Szkolenia to Everyone:
+	https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/
+
+Kompresja kontekstu modelu
+
+2026-03-31 11:52:13 From JSystems Szkolenia to Everyone:
+	Custom Claude Plugin dla firmy - przykład:
+https://github.com/pluginagentmarketplace/custom-plugin-java/tree/main
+
+
+Docs:
+https://code.claude.com/docs/en/plugins
+
+2026-03-31 11:56:08 From JSystems Szkolenia to Everyone:
+	wspólny plik CLAUDE.md dla organizacji:
+
+https://code.claude.com/docs/en/memory#manage-claude-md-for-large-teams
+
+2026-03-31 11:59:08 From JSystems Szkolenia to Everyone:
+	Organization settings:
+https://code.claude.com/docs/en/settings#plugin-configuration
+
+Plagins dla organizacji:
+https://code.claude.com/docs/en/settings#plugin-configuration
+
+2026-03-31 12:08:15 From JSystems Szkolenia to Everyone:
+	npx skills add https://github.com/anthropics/skills --skill skill-creator
+
+2026-03-31 12:08:20 From JSystems Szkolenia to Everyone:
+	https://skills.sh/anthropics/skills/skill-creator
+
+2026-03-31 12:08:31 From JSystems Szkolenia to Everyone:
+	https://github.com/anthropics/skills
+
+2026-03-31 12:13:22 From JSystems Szkolenia to Everyone:
+	13:45 koniec przerwy
+
+2026-03-31 12:14:35 From Sebastian Jaworski to Everyone:
+	Jak co to po przerwie do około 14:10 mnie nie będzie (ważne spotkanie), nie czekajcie ;)
+
+2026-03-31 12:50:31 From JSystems Szkolenia to Everyone:
+	https://www.jsystems.pl/ankiety/start.do
+
+2026-03-31 12:51:01 From JSystems Szkolenia to Everyone:
+	Lista obecności i identyfikatory do ankiet
+	661_Lista obecnoscSilky Coders grupa 3.pdf
+
+2026-03-31 12:54:24 From JSystems Szkolenia to Everyone:
+	Codex CSV loop:
+https://developers.openai.com/codex/subagents#process-csv-batches-with-subagents-experimental
+
+2026-03-31 12:56:38 From JSystems Szkolenia to Everyone:
+	/loop
+
+https://code.claude.com/docs/en/scheduled-tasks
+
+2026-03-31 13:03:36 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/tree/master/course-materials/how-to-ralph-wiggum
+
+2026-03-31 13:07:03 From JSystems Szkolenia to Everyone:
+	Husky hook dla GIT:
+
+https://typicode.github.io/husky/
+
+2026-03-31 13:13:50 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/hooks
+
+2026-03-31 13:13:56 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/hooks-guide
+
+2026-03-31 13:16:28 From JSystems Szkolenia to Everyone:
+	https://qodo-merge-docs.qodo.ai/installation/gitlab/
+
+2026-03-31 13:20:40 From JSystems Szkolenia to Everyone:
+	Przykłady CI/CD agentów:
+
+https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/tree/master/course-materials/03-2026/cicd-headless
+
+2026-03-31 13:20:59 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/blob/master/course-materials/03-2026/cicd-headless/github-actions/qodo-pr-agent-review.yml
+
+2026-03-31 13:22:54 From JSystems Szkolenia to Everyone:
+	Test coverage agent: https://github.com/qodo-ai/qodo-cover
+
+2026-03-31 13:25:25 From JSystems Szkolenia to Everyone:
+	Atlassian MCP:
+
+https://www.atlassian.com/platform/remote-mcp-server
+
+2026-03-31 13:35:18 From JSystems Szkolenia to Everyone:
+	Jenkins:
+
+Skill
+https://github.com/0xfurai/claude-code-subagents/blob/main/agents/jenkins-expert.md
+
+MCP:
+https://plugins.jenkins.io/mcp-server/
+
+
+ Claude w workflow Jenkins:
+https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/blob/master/course-materials/03-2026/cicd-headless/jenkins/Jenkinsfile.claude-bitbucket-pr-review
+
+2026-03-31 13:38:22 From JSystems Szkolenia to Everyone:
+	Claude Github Actions:
+
+https://code.claude.com/docs/en/github-actions
+
+https://github.com/anthropics/claude-code-action
+
+2026-03-31 13:41:02 From JSystems Szkolenia to Everyone:
+	Claude Code w Headless mode dla CI/CD:
+https://code.claude.com/docs/en/headless
+
+2026-03-31 13:41:12 From JSystems Szkolenia to Everyone:
+	Claude Code w GitLab:
+https://code.claude.com/docs/en/gitlab-ci-cd
+
+2026-03-31 13:45:44 From JSystems Szkolenia to Everyone:
+	Codex Test Android Apps Plugin
+	{DE965637-3ACE-4BF4-93F9-A6A056561903}.png
+
+2026-03-31 13:51:27 From Tomasz to Everyone:
+	https://aistupidlevel.info/
+
+2026-03-31 13:58:08 From JSystems Szkolenia to Everyone:
+	https://www.figma.com/make
+
+2026-03-31 13:59:53 From JSystems Szkolenia to Everyone:
+	Biblioteka UI
+https://ui.shadcn.com/
+
+2026-03-31 14:01:39 From Kamil to Everyone:
+	działa !!
+	{82F0EF06-4B94-4C34-B3EB-4DC1CDF8DF53}.png
+
+2026-03-31 14:08:08 From JSystems Szkolenia to Everyone:
+	Create clone of this website: https://allegro.pl/
+Make it as close to the original as possible,
+MAke screenshot of the home page to see visually how it looks like.
+
+2026-03-31 14:13:21 From Karol to Everyone:
+	Musze konczyc akurat dzisiaj wyjatkowo wczesniej, wiec dziekuje za szkolenie
+
+2026-03-31 14:13:33 From JSystems Szkolenia to Everyone:
+	Dziękuję!
+
+2026-03-31 14:18:02 From Tomasz to Everyone:
+	spiewnik mi zrobil ;)
+	Screenshot2026_03_31_151759.jpg
+
+2026-03-31 14:25:52 From JSystems Szkolenia to Everyone:
+	https://docs.agno.com/compression/overview
+Context compression
+
+2026-03-31 14:26:13 From JSystems Szkolenia to Everyone:
+	https://arxiv.org/html/2509.19228v1
+
+2026-03-31 14:36:52 From Tomasz to Everyone:
+	Screenshot2026_03_31_153648.jpg
+
+2026-03-31 14:43:00 From JSystems Szkolenia to Everyone:
+	https://v0.app/templates
+
+2026-03-31 14:49:40 From JSystems Szkolenia to Everyone:
+	refactor this application to match visually our Sinsay Brand and use resources I send you to make sure this new dashbaord will be visually aligned with out brand and design guidelines.
+
+2026-03-31 14:50:49 From JSystems Szkolenia to Everyone:
+	Implent for every link on the left menu:
+- rooting, without loading
+- separate new shadcn charts adaquate for the content of the page
+
+2026-03-31 14:53:16 From JSystems Szkolenia to Everyone:
+	https://github.com/sai-pullabhotla/jftp/tree/master
+
+2026-03-31 14:59:32 From JSystems Szkolenia to Everyone:
+	Dokumentacja całości projektu w pliku. Z diagramami przełwów i zależności, Plant UML / Mermaid + dependencies
+Testy dokłądne pilnuje abyśmy nic nie popsuli prze refaktorze, aby funcjonalność cały czas działała
+Odpalenie aplikacji, uruchomienie jej przy niewielkim refaktorze niezbędnym
+Refaktor do najwszych wersji Java i najnowszych prakty i standardów w Java
+
+2026-03-31 15:02:39 From JSystems Szkolenia to Everyone:
+	661_Lista obecnoscSilky Coders grupa 3.pdf
+
+2026-03-31 15:03:37 From JSystems Szkolenia to Everyone:
+	https://www.jsystems.pl/ankiety/start.do
+
+2026-03-31 15:05:01 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/tree/master/course-materials/03-2026
+
+2026-03-31 15:05:41 From Rafał to Everyone:
+	dzięki
+
+2026-03-31 15:07:50 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/tree/master/course-materials
+
+2026-03-31 15:10:56 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\.claude\plans
