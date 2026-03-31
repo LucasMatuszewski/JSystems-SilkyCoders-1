@@ -65,3 +65,10 @@
 [2026-03-31T00:05:00.753Z] [IntakeForm - Test 4: >10MB file shows size error] [screenshot] Saved form-size-error.png
 [2026-03-31T00:05:00.765Z] [IntakeForm - Test 4: >10MB file shows size error] [assert] Size error message visible
 [2026-03-31T00:05:00.766Z] [IntakeForm - Test 4: >10MB file shows size error] [end] Test passed
+[2026-03-31T00:11:20.138Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T00:11:20.365Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T00:11:20.561Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T00:11:20.655Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T00:11:20.700Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T00:11:20.728Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T00:11:20.833Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png

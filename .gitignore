@@ -36,7 +36,11 @@ build/
 node_modules/
 .vite
 frontend/dist
+frontend/test-results/
 .playwright-mcp
+
+logs
+logs/*.log
 
 ### Secrets / credentials
 .env
