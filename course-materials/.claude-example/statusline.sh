@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Claude Code Status Line Script
+# Docs: https://code.claude.com/docs/en/statusline
 # 2 lines: git|path on line 1, model|context|cost on line 2
 
 set -euo pipefail
