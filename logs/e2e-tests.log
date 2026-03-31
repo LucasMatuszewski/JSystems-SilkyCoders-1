@@ -1,0 +1,391 @@
+[2026-03-31T00:04:25.785Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [start] Test started
+[2026-03-31T00:04:25.784Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [start] Test started
+[2026-03-31T00:04:25.785Z] [ChatFlow - Test 3: chat input visible and user can type] [start] Test started
+[2026-03-31T00:04:25.785Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [start] Test started
+[2026-03-31T00:04:25.785Z] [ChatFlow - Test 6: session resume on page reload] [start] Test started
+[2026-03-31T00:04:25.785Z] [ChatFlow - Test 5: send message → response streams in] [start] Test started
+[2026-03-31T00:04:26.534Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [navigate] Navigated to /
+[2026-03-31T00:04:26.534Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [navigate] Navigated to /
+[2026-03-31T00:04:26.534Z] [ChatFlow - Test 6: session resume on page reload] [navigate] Navigated to /
+[2026-03-31T00:04:26.539Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [navigate] Navigated to /
+[2026-03-31T00:04:26.558Z] [ChatFlow - Test 5: send message → response streams in] [navigate] Navigated to /
+[2026-03-31T00:04:26.565Z] [ChatFlow - Test 3: chat input visible and user can type] [navigate] Navigated to /
+[2026-03-31T00:04:27.816Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [action] Filled form and submitted
+[2026-03-31T00:04:27.839Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [action] Filled form and submitted
+[2026-03-31T00:04:27.846Z] [ChatFlow - Test 5: send message → response streams in] [action] Filled form and submitted
+[2026-03-31T00:04:27.880Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [action] Filled form and submitted
+[2026-03-31T00:04:27.896Z] [ChatFlow - Test 3: chat input visible and user can type] [action] Filled form and submitted
+[2026-03-31T00:04:27.898Z] [ChatFlow - Test 6: session resume on page reload] [action] Filled form and submitted
+[2026-03-31T00:04:57.510Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [start] Test started
+[2026-03-31T00:04:57.543Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [start] Test started
+[2026-03-31T00:04:57.643Z] [IntakeForm - Test 1: form renders with all 5 fields] [start] Test started
+[2026-03-31T00:04:57.645Z] [IntakeForm - Test 1: form renders with all 5 fields] [navigate] Navigating to /
+[2026-03-31T00:04:57.796Z] [IntakeForm - Test 4: >10MB file shows size error] [start] Test started
+[2026-03-31T00:04:57.824Z] [IntakeForm - Test 3: PDF upload shows format error] [start] Test started
+[2026-03-31T00:04:58.001Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [navigate] Navigated to /
+[2026-03-31T00:04:58.080Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [navigate] Navigated to /
+[2026-03-31T00:04:58.319Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [action] Clicked submit with empty fields
+[2026-03-31T00:04:58.329Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T00:04:58.344Z] [IntakeForm - Test 3: PDF upload shows format error] [navigate] Navigated to /
+[2026-03-31T00:04:58.384Z] [IntakeForm - Test 4: >10MB file shows size error] [navigate] Navigated to /
+[2026-03-31T00:04:58.501Z] [IntakeForm - Test 1: form renders with all 5 fields] [screenshot] Saved form-initial-load.png
+[2026-03-31T00:04:58.518Z] [IntakeForm - Test 3: PDF upload shows format error] [action] Uploaded PDF file
+[2026-03-31T00:04:58.545Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Intent radio buttons visible
+[2026-03-31T00:04:58.560Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [screenshot] Saved form-after-empty-submit.png
+[2026-03-31T00:04:58.561Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Order number input visible
+[2026-03-31T00:04:58.570Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Product name input visible
+[2026-03-31T00:04:58.579Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Description textarea visible
+[2026-03-31T00:04:58.580Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [assert] 5 validation errors shown
+[2026-03-31T00:04:58.594Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Image upload button visible
+[2026-03-31T00:04:58.595Z] [IntakeForm - Test 1: form renders with all 5 fields] [end] Test passed
+[2026-03-31T00:04:58.653Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [assert] All 5 error messages verified
+[2026-03-31T00:04:58.653Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [end] Test passed
+[2026-03-31T00:04:58.692Z] [IntakeForm - Test 3: PDF upload shows format error] [screenshot] Saved form-pdf-error.png
+[2026-03-31T00:04:58.718Z] [IntakeForm - Test 3: PDF upload shows format error] [assert] Format error message visible
+[2026-03-31T00:04:58.719Z] [IntakeForm - Test 3: PDF upload shows format error] [end] Test passed
+[2026-03-31T00:04:58.760Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T00:04:58.859Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [start] Test started
+[2026-03-31T00:04:58.921Z] [IntakeForm - Test 7: valid WebP upload works] [start] Test started
+[2026-03-31T00:04:58.992Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [action] Filled form and submitted
+[2026-03-31T00:04:59.162Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T00:04:59.293Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [navigate] Navigated to /
+[2026-03-31T00:04:59.317Z] [IntakeForm - Test 7: valid WebP upload works] [navigate] Navigated to /
+[2026-03-31T00:04:59.332Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T00:04:59.423Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T00:04:59.448Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T00:04:59.459Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [screenshot] Saved form-desktop.png
+[2026-03-31T00:04:59.514Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [assert] Key form elements visible
+[2026-03-31T00:04:59.515Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [end] Test passed
+[2026-03-31T00:04:59.589Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png
+[2026-03-31T00:04:59.682Z] [IntakeForm - Test 7: valid WebP upload works] [action] Filled all form fields with WebP image
+[2026-03-31T00:04:59.806Z] [IntakeForm - Test 7: valid WebP upload works] [screenshot] Saved form-webp-filled.png
+[2026-03-31T00:04:59.896Z] [IntakeForm - Test 7: valid WebP upload works] [action] Clicked submit button
+[2026-03-31T00:04:59.909Z] [IntakeForm - Test 7: valid WebP upload works] [assert] Loading state visible
+[2026-03-31T00:05:00.667Z] [IntakeForm - Test 4: >10MB file shows size error] [action] Uploaded 11MB JPEG file
+[2026-03-31T00:05:00.753Z] [IntakeForm - Test 4: >10MB file shows size error] [screenshot] Saved form-size-error.png
+[2026-03-31T00:05:00.765Z] [IntakeForm - Test 4: >10MB file shows size error] [assert] Size error message visible
+[2026-03-31T00:05:00.766Z] [IntakeForm - Test 4: >10MB file shows size error] [end] Test passed
+[2026-03-31T00:11:20.138Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T00:11:20.365Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T00:11:20.561Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T00:11:20.655Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T00:11:20.700Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T00:11:20.728Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T00:11:20.833Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png
+[2026-03-31T01:06:09.358Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T01:06:09.595Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T01:06:09.784Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T01:06:09.896Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T01:06:09.953Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T01:06:09.979Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T01:06:10.086Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png
+[2026-03-31T01:09:07.649Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T01:09:07.877Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T01:09:08.046Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T01:09:08.160Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T01:09:08.219Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T01:09:08.256Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T01:09:08.358Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png
+[2026-03-31T01:11:35.521Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T01:11:35.740Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T01:11:35.928Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T01:11:36.038Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T01:11:36.092Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T01:11:36.123Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T01:11:36.222Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png
+[2026-03-31T01:11:40.149Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Chat view appeared after backend processing
+[2026-03-31T01:11:40.237Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved chat-after-submit.png
+[2026-03-31T01:11:40.238Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [end] Test passed
+[2026-03-31T01:11:56.260Z] [ChatFlow - Test 6: session resume on page reload] [start] Test started
+[2026-03-31T01:11:56.470Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [start] Test started
+[2026-03-31T01:11:56.687Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [start] Test started
+[2026-03-31T01:11:56.700Z] [ChatFlow - Test 5: send message → response streams in] [start] Test started
+[2026-03-31T01:11:56.706Z] [ChatFlow - Test 3: chat input visible and user can type] [start] Test started
+[2026-03-31T01:11:56.706Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [start] Test started
+[2026-03-31T01:11:56.753Z] [ChatFlow - Test 6: session resume on page reload] [navigate] Navigated to /
+[2026-03-31T01:11:56.917Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [navigate] Navigated to /
+[2026-03-31T01:11:57.233Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [navigate] Navigated to /
+[2026-03-31T01:11:57.308Z] [ChatFlow - Test 3: chat input visible and user can type] [navigate] Navigated to /
+[2026-03-31T01:11:57.312Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [navigate] Navigated to /
+[2026-03-31T01:11:57.347Z] [ChatFlow - Test 5: send message → response streams in] [navigate] Navigated to /
+[2026-03-31T01:11:57.744Z] [ChatFlow - Test 6: session resume on page reload] [action] Filled form and submitted
+[2026-03-31T01:11:57.852Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [action] Filled form and submitted
+[2026-03-31T01:11:58.266Z] [ChatFlow - Test 3: chat input visible and user can type] [action] Filled form and submitted
+[2026-03-31T01:11:58.271Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [action] Filled form and submitted
+[2026-03-31T01:11:58.290Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [action] Filled form and submitted
+[2026-03-31T01:11:58.336Z] [ChatFlow - Test 5: send message → response streams in] [action] Filled form and submitted
+[2026-03-31T01:12:00.849Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [assert] Chat view appeared
+[2026-03-31T01:12:00.871Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [info] Session ID before Nowa sesja: 203abf0c-ebd6-4653-9dfb-872b07d60e65
+[2026-03-31T01:12:01.018Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [action] Clicked Nowa sesja button
+[2026-03-31T01:12:01.029Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [assert] Form view visible after Nowa sesja
+[2026-03-31T01:12:01.039Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [assert] Session ID cleared from localStorage
+[2026-03-31T01:12:01.186Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [screenshot] Saved form-after-nowa-sesja.png
+[2026-03-31T01:12:01.186Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [end] Test passed
+[2026-03-31T01:12:01.225Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [assert] Chat view appeared (Nowa sesja button visible)
+[2026-03-31T01:12:01.226Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] Chat view appeared
+[2026-03-31T01:12:01.238Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] Chat input visible
+[2026-03-31T01:12:01.282Z] [ChatFlow - Test 5: send message → response streams in] [assert] Chat view appeared
+[2026-03-31T01:12:01.334Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] User can type in chat input
+[2026-03-31T01:12:01.380Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [assert] Chat view appeared
+[2026-03-31T01:12:01.407Z] [ChatFlow - Test 5: send message → response streams in] [action] Typed user message
+[2026-03-31T01:12:01.603Z] [ChatFlow - Test 3: chat input visible and user can type] [screenshot] Saved chat-user-typing.png
+[2026-03-31T01:12:01.604Z] [ChatFlow - Test 3: chat input visible and user can type] [end] Test passed
+[2026-03-31T01:12:01.609Z] [ChatFlow - Test 5: send message → response streams in] [screenshot] Saved chat-before-send.png
+[2026-03-31T01:12:01.685Z] [ChatFlow - Test 6: session resume on page reload] [assert] Chat view appeared
+[2026-03-31T01:12:01.687Z] [ChatFlow - Test 5: send message → response streams in] [action] Pressed Enter to send message
+[2026-03-31T01:12:01.699Z] [ChatFlow - Test 6: session resume on page reload] [info] Session ID: 972b22fa-64cd-4c4c-980b-5a15ba74c9b1
+[2026-03-31T01:12:01.742Z] [ChatFlow - Test 5: send message → response streams in] [assert] User message visible in chat
+[2026-03-31T01:12:01.770Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [assert] Session ID stored in localStorage: 36ac6711-a847-4a8b-a2a7-7b66a9e293bc
+[2026-03-31T01:12:01.771Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [end] Test passed
+[2026-03-31T01:12:01.797Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [screenshot] Saved chat-initial-ai-message.png
+[2026-03-31T01:12:01.846Z] [ChatFlow - Test 6: session resume on page reload] [screenshot] Saved chat-before-reload.png
+[2026-03-31T01:12:01.957Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [start] Test started
+[2026-03-31T01:12:01.988Z] [ChatFlow - Test 6: session resume on page reload] [action] Reloaded page
+[2026-03-31T01:12:02.134Z] [ChatFlow - Test 6: session resume on page reload] [assert] Chat view restored after reload (session resumed)
+[2026-03-31T01:12:02.286Z] [IntakeForm - Test 1: form renders with all 5 fields] [start] Test started
+[2026-03-31T01:12:02.303Z] [IntakeForm - Test 1: form renders with all 5 fields] [navigate] Navigating to /
+[2026-03-31T01:12:02.332Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [start] Test started
+[2026-03-31T01:12:02.337Z] [ChatFlow - Test 6: session resume on page reload] [screenshot] Saved chat-after-reload.png
+[2026-03-31T01:12:02.338Z] [ChatFlow - Test 6: session resume on page reload] [end] Test passed
+[2026-03-31T01:12:02.405Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [navigate] Navigated to /
+[2026-03-31T01:12:02.868Z] [IntakeForm - Test 3: PDF upload shows format error] [start] Test started
+[2026-03-31T01:12:02.883Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [navigate] Navigated to /
+[2026-03-31T01:12:03.071Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [action] Clicked submit with empty fields
+[2026-03-31T01:12:03.104Z] [IntakeForm - Test 1: form renders with all 5 fields] [screenshot] Saved form-initial-load.png
+[2026-03-31T01:12:03.136Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Intent radio buttons visible
+[2026-03-31T01:12:03.152Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Order number input visible
+[2026-03-31T01:12:03.162Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Product name input visible
+[2026-03-31T01:12:03.172Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Description textarea visible
+[2026-03-31T01:12:03.190Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Image upload button visible
+[2026-03-31T01:12:03.190Z] [IntakeForm - Test 1: form renders with all 5 fields] [end] Test passed
+[2026-03-31T01:12:03.269Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [screenshot] Saved form-after-empty-submit.png
+[2026-03-31T01:12:03.281Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [assert] 5 validation errors shown
+[2026-03-31T01:12:03.328Z] [IntakeForm - Test 3: PDF upload shows format error] [navigate] Navigated to /
+[2026-03-31T01:12:03.339Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [assert] All 5 error messages verified
+[2026-03-31T01:12:03.340Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [end] Test passed
+[2026-03-31T01:12:03.412Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [action] Filled form and submitted
+[2026-03-31T01:12:03.481Z] [IntakeForm - Test 3: PDF upload shows format error] [action] Uploaded PDF file
+[2026-03-31T01:12:03.524Z] [IntakeForm - Test 4: >10MB file shows size error] [start] Test started
+[2026-03-31T01:12:03.568Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T01:12:03.621Z] [IntakeForm - Test 3: PDF upload shows format error] [screenshot] Saved form-pdf-error.png
+[2026-03-31T01:12:03.647Z] [IntakeForm - Test 3: PDF upload shows format error] [assert] Format error message visible
+[2026-03-31T01:12:03.648Z] [IntakeForm - Test 3: PDF upload shows format error] [end] Test passed
+[2026-03-31T01:12:03.963Z] [IntakeForm - Test 4: >10MB file shows size error] [navigate] Navigated to /
+[2026-03-31T01:12:04.002Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [start] Test started
+[2026-03-31T01:12:04.005Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T01:12:04.386Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [navigate] Navigated to /
+[2026-03-31T01:12:04.391Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T01:12:04.563Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T01:12:04.568Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [screenshot] Saved form-desktop.png
+[2026-03-31T01:12:04.625Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [assert] Key form elements visible
+[2026-03-31T01:12:04.625Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [end] Test passed
+[2026-03-31T01:12:04.645Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T01:12:04.668Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T01:12:04.822Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png
+[2026-03-31T01:12:04.849Z] [IntakeForm - Test 7: valid WebP upload works] [start] Test started
+[2026-03-31T01:12:05.194Z] [IntakeForm - Test 7: valid WebP upload works] [navigate] Navigated to /
+[2026-03-31T01:12:05.529Z] [IntakeForm - Test 7: valid WebP upload works] [action] Filled all form fields with WebP image
+[2026-03-31T01:12:05.701Z] [IntakeForm - Test 7: valid WebP upload works] [screenshot] Saved form-webp-filled.png
+[2026-03-31T01:12:05.768Z] [IntakeForm - Test 7: valid WebP upload works] [action] Clicked submit button
+[2026-03-31T01:12:05.779Z] [IntakeForm - Test 7: valid WebP upload works] [assert] Loading state visible
+[2026-03-31T01:12:06.375Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [assert] Chat view appeared
+[2026-03-31T01:12:06.564Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [assert] Key chat elements visible
+[2026-03-31T01:12:06.565Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [end] Test passed
+[2026-03-31T01:12:06.986Z] [IntakeForm - Test 4: >10MB file shows size error] [action] Uploaded 11MB JPEG file
+[2026-03-31T01:12:07.120Z] [IntakeForm - Test 4: >10MB file shows size error] [screenshot] Saved form-size-error.png
+[2026-03-31T01:12:07.136Z] [IntakeForm - Test 4: >10MB file shows size error] [assert] Size error message visible
+[2026-03-31T01:12:07.137Z] [IntakeForm - Test 4: >10MB file shows size error] [end] Test passed
+[2026-03-31T01:12:07.762Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Chat view appeared after backend processing
+[2026-03-31T01:12:07.914Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved chat-after-submit.png
+[2026-03-31T01:12:07.914Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [end] Test passed
+[2026-03-31T01:12:08.704Z] [IntakeForm - Test 7: valid WebP upload works] [assert] Chat view appeared after WebP upload
+[2026-03-31T01:12:08.828Z] [IntakeForm - Test 7: valid WebP upload works] [screenshot] Saved chat-webp-submit.png
+[2026-03-31T01:12:08.829Z] [IntakeForm - Test 7: valid WebP upload works] [end] Test passed
+[2026-03-31T01:15:02.570Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [start] Test started
+[2026-03-31T01:15:02.726Z] [ChatFlow - Test 3: chat input visible and user can type] [start] Test started
+[2026-03-31T01:15:02.769Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [start] Test started
+[2026-03-31T01:15:02.826Z] [ChatFlow - Test 6: session resume on page reload] [start] Test started
+[2026-03-31T01:15:02.877Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [start] Test started
+[2026-03-31T01:15:02.907Z] [ChatFlow - Test 5: send message → response streams in] [start] Test started
+[2026-03-31T01:15:03.404Z] [ChatFlow - Test 3: chat input visible and user can type] [navigate] Navigated to /
+[2026-03-31T01:15:03.417Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [navigate] Navigated to /
+[2026-03-31T01:15:05.680Z] [ChatFlow - Test 5: send message → response streams in] [navigate] Navigated to /
+[2026-03-31T01:15:05.805Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [navigate] Navigated to /
+[2026-03-31T01:15:06.665Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [navigate] Navigated to /
+[2026-03-31T01:15:06.697Z] [ChatFlow - Test 6: session resume on page reload] [navigate] Navigated to /
+[2026-03-31T01:15:08.132Z] [ChatFlow - Test 3: chat input visible and user can type] [action] Filled form and submitted
+[2026-03-31T01:15:08.383Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [action] Filled form and submitted
+[2026-03-31T01:15:11.071Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] Chat view appeared
+[2026-03-31T01:15:11.087Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] Chat input visible
+[2026-03-31T01:15:11.145Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] User can type in chat input
+[2026-03-31T01:15:11.265Z] [ChatFlow - Test 3: chat input visible and user can type] [screenshot] Saved chat-user-typing.png
+[2026-03-31T01:15:11.266Z] [ChatFlow - Test 3: chat input visible and user can type] [end] Test passed
+[2026-03-31T01:15:11.421Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [start] Test started
+[2026-03-31T01:15:11.794Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [navigate] Navigated to /
+[2026-03-31T01:15:12.327Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [assert] Chat view appeared (Nowa sesja button visible)
+[2026-03-31T01:15:12.438Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [screenshot] Saved chat-initial-ai-message.png
+[2026-03-31T01:15:12.452Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [assert] AI message visible in chat
+[2026-03-31T01:15:12.452Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [end] Test passed
+[2026-03-31T01:15:12.455Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [action] Filled form and submitted
+[2026-03-31T01:15:12.655Z] [IntakeForm - Test 1: form renders with all 5 fields] [start] Test started
+[2026-03-31T01:15:12.656Z] [IntakeForm - Test 1: form renders with all 5 fields] [navigate] Navigating to /
+[2026-03-31T01:15:13.070Z] [IntakeForm - Test 1: form renders with all 5 fields] [screenshot] Saved form-initial-load.png
+[2026-03-31T01:15:13.090Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Intent radio buttons visible
+[2026-03-31T01:15:13.096Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Order number input visible
+[2026-03-31T01:15:13.102Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Product name input visible
+[2026-03-31T01:15:13.106Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Description textarea visible
+[2026-03-31T01:15:13.111Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Image upload button visible
+[2026-03-31T01:15:13.111Z] [IntakeForm - Test 1: form renders with all 5 fields] [end] Test passed
+[2026-03-31T01:15:13.208Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [start] Test started
+[2026-03-31T01:15:13.481Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [navigate] Navigated to /
+[2026-03-31T01:15:13.604Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [action] Clicked submit with empty fields
+[2026-03-31T01:15:13.714Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [screenshot] Saved form-after-empty-submit.png
+[2026-03-31T01:15:13.728Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [assert] 5 validation errors shown
+[2026-03-31T01:15:13.758Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [assert] All 5 error messages verified
+[2026-03-31T01:15:13.758Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [end] Test passed
+[2026-03-31T01:15:13.866Z] [IntakeForm - Test 3: PDF upload shows format error] [start] Test started
+[2026-03-31T01:15:14.059Z] [IntakeForm - Test 3: PDF upload shows format error] [navigate] Navigated to /
+[2026-03-31T01:15:14.156Z] [IntakeForm - Test 3: PDF upload shows format error] [action] Uploaded PDF file
+[2026-03-31T01:15:14.252Z] [IntakeForm - Test 3: PDF upload shows format error] [screenshot] Saved form-pdf-error.png
+[2026-03-31T01:15:14.262Z] [IntakeForm - Test 3: PDF upload shows format error] [assert] Format error message visible
+[2026-03-31T01:15:14.262Z] [IntakeForm - Test 3: PDF upload shows format error] [end] Test passed
+[2026-03-31T01:15:14.380Z] [IntakeForm - Test 4: >10MB file shows size error] [start] Test started
+[2026-03-31T01:15:14.621Z] [IntakeForm - Test 4: >10MB file shows size error] [navigate] Navigated to /
+[2026-03-31T01:15:15.397Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [assert] Chat view appeared
+[2026-03-31T01:15:15.525Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [assert] Key chat elements visible
+[2026-03-31T01:15:15.526Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [end] Test passed
+[2026-03-31T01:15:15.686Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T01:15:15.954Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T01:15:16.130Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T01:15:16.328Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T01:15:16.386Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T01:15:16.397Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T01:15:16.498Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png
+[2026-03-31T01:15:16.578Z] [IntakeForm - Test 4: >10MB file shows size error] [action] Uploaded 11MB JPEG file
+[2026-03-31T01:15:16.709Z] [IntakeForm - Test 4: >10MB file shows size error] [screenshot] Saved form-size-error.png
+[2026-03-31T01:15:16.725Z] [IntakeForm - Test 4: >10MB file shows size error] [assert] Size error message visible
+[2026-03-31T01:15:16.725Z] [IntakeForm - Test 4: >10MB file shows size error] [end] Test passed
+[2026-03-31T01:15:16.859Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [start] Test started
+[2026-03-31T01:15:17.073Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [navigate] Navigated to /
+[2026-03-31T01:15:17.177Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [screenshot] Saved form-desktop.png
+[2026-03-31T01:15:17.213Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [assert] Key form elements visible
+[2026-03-31T01:15:17.214Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [end] Test passed
+[2026-03-31T01:15:17.304Z] [IntakeForm - Test 7: valid WebP upload works] [start] Test started
+[2026-03-31T01:15:17.528Z] [IntakeForm - Test 7: valid WebP upload works] [navigate] Navigated to /
+[2026-03-31T01:15:17.717Z] [IntakeForm - Test 7: valid WebP upload works] [action] Filled all form fields with WebP image
+[2026-03-31T01:15:17.832Z] [IntakeForm - Test 7: valid WebP upload works] [screenshot] Saved form-webp-filled.png
+[2026-03-31T01:15:17.885Z] [IntakeForm - Test 7: valid WebP upload works] [action] Clicked submit button
+[2026-03-31T01:15:17.893Z] [IntakeForm - Test 7: valid WebP upload works] [assert] Loading state visible
+[2026-03-31T01:15:19.408Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Chat view appeared after backend processing
+[2026-03-31T01:15:19.507Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved chat-after-submit.png
+[2026-03-31T01:15:19.508Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [end] Test passed
+[2026-03-31T01:15:21.833Z] [IntakeForm - Test 7: valid WebP upload works] [assert] Chat view appeared after WebP upload
+[2026-03-31T01:15:21.915Z] [IntakeForm - Test 7: valid WebP upload works] [screenshot] Saved chat-webp-submit.png
+[2026-03-31T01:15:21.915Z] [IntakeForm - Test 7: valid WebP upload works] [end] Test passed
+[2026-03-31T01:16:18.070Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [start] Test started
+[2026-03-31T01:16:18.299Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [navigate] Navigated to /
+[2026-03-31T01:16:18.783Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [action] Filled form and submitted
+[2026-03-31T01:16:22.729Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [assert] Chat view appeared (Nowa sesja button visible)
+[2026-03-31T01:16:22.815Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [screenshot] Saved chat-initial-ai-message.png
+[2026-03-31T01:16:22.826Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [assert] AI message visible in chat
+[2026-03-31T01:16:22.827Z] [ChatFlow - Test 1: form submit → chat view appears with AI message] [end] Test passed
+[2026-03-31T01:16:22.967Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [start] Test started
+[2026-03-31T01:16:23.194Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [navigate] Navigated to /
+[2026-03-31T01:16:23.631Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [action] Filled form and submitted
+[2026-03-31T01:16:26.540Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [assert] Chat view appeared
+[2026-03-31T01:16:26.554Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [assert] Session ID stored in localStorage: de8457e1-66a6-4415-96f5-884d83bc42a7
+[2026-03-31T01:16:26.554Z] [ChatFlow - Test 2: session ID stored in localStorage after form submit] [end] Test passed
+[2026-03-31T01:16:26.637Z] [ChatFlow - Test 3: chat input visible and user can type] [start] Test started
+[2026-03-31T01:16:26.867Z] [ChatFlow - Test 3: chat input visible and user can type] [navigate] Navigated to /
+[2026-03-31T01:16:27.328Z] [ChatFlow - Test 3: chat input visible and user can type] [action] Filled form and submitted
+[2026-03-31T01:16:31.240Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] Chat view appeared
+[2026-03-31T01:16:31.252Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] Chat input visible
+[2026-03-31T01:16:31.303Z] [ChatFlow - Test 3: chat input visible and user can type] [assert] User can type in chat input
+[2026-03-31T01:16:31.406Z] [ChatFlow - Test 3: chat input visible and user can type] [screenshot] Saved chat-user-typing.png
+[2026-03-31T01:16:31.407Z] [ChatFlow - Test 3: chat input visible and user can type] [end] Test passed
+[2026-03-31T01:16:31.523Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [start] Test started
+[2026-03-31T01:16:31.747Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [navigate] Navigated to /
+[2026-03-31T01:16:32.212Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [action] Filled form and submitted
+[2026-03-31T01:16:36.138Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [assert] Chat view appeared
+[2026-03-31T01:16:36.152Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [info] Session ID before Nowa sesja: e931aa72-ac31-4da6-937a-0dd77b1afcf6
+[2026-03-31T01:16:36.238Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [action] Clicked Nowa sesja button
+[2026-03-31T01:16:36.243Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [assert] Form view visible after Nowa sesja
+[2026-03-31T01:16:36.246Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [assert] Session ID cleared from localStorage
+[2026-03-31T01:16:36.338Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [screenshot] Saved form-after-nowa-sesja.png
+[2026-03-31T01:16:36.339Z] [ChatFlow - Test 4: "Nowa sesja" button clears session and shows form] [end] Test passed
+[2026-03-31T01:16:36.458Z] [ChatFlow - Test 5: send message → response streams in] [start] Test started
+[2026-03-31T01:16:36.659Z] [ChatFlow - Test 5: send message → response streams in] [navigate] Navigated to /
+[2026-03-31T01:16:37.130Z] [ChatFlow - Test 5: send message → response streams in] [action] Filled form and submitted
+[2026-03-31T01:16:40.057Z] [ChatFlow - Test 5: send message → response streams in] [assert] Chat view appeared
+[2026-03-31T01:16:40.098Z] [ChatFlow - Test 5: send message → response streams in] [action] Typed user message
+[2026-03-31T01:16:40.190Z] [ChatFlow - Test 5: send message → response streams in] [screenshot] Saved chat-before-send.png
+[2026-03-31T01:16:40.210Z] [ChatFlow - Test 5: send message → response streams in] [action] Pressed Enter to send message
+[2026-03-31T01:16:40.235Z] [ChatFlow - Test 5: send message → response streams in] [assert] User message visible in chat
+[2026-03-31T01:17:08.198Z] [ChatFlow - Test 6: session resume on page reload] [start] Test started
+[2026-03-31T01:17:08.422Z] [ChatFlow - Test 6: session resume on page reload] [navigate] Navigated to /
+[2026-03-31T01:17:08.878Z] [ChatFlow - Test 6: session resume on page reload] [action] Filled form and submitted
+[2026-03-31T01:17:12.826Z] [ChatFlow - Test 6: session resume on page reload] [assert] Chat view appeared
+[2026-03-31T01:17:12.833Z] [ChatFlow - Test 6: session resume on page reload] [info] Session ID: be03abdd-b9d7-4920-bbc5-a7b42a70046d
+[2026-03-31T01:17:12.913Z] [ChatFlow - Test 6: session resume on page reload] [screenshot] Saved chat-before-reload.png
+[2026-03-31T01:17:12.992Z] [ChatFlow - Test 6: session resume on page reload] [action] Reloaded page
+[2026-03-31T01:17:13.061Z] [ChatFlow - Test 6: session resume on page reload] [assert] Chat view restored after reload (session resumed)
+[2026-03-31T01:17:13.195Z] [ChatFlow - Test 6: session resume on page reload] [screenshot] Saved chat-after-reload.png
+[2026-03-31T01:17:13.196Z] [ChatFlow - Test 6: session resume on page reload] [end] Test passed
+[2026-03-31T01:17:13.304Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [start] Test started
+[2026-03-31T01:17:13.548Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [navigate] Navigated to /
+[2026-03-31T01:17:14.026Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [action] Filled form and submitted
+[2026-03-31T01:17:16.939Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [assert] Chat view appeared
+[2026-03-31T01:17:17.061Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [assert] Key chat elements visible
+[2026-03-31T01:17:17.062Z] [ChatFlow - Test 7 (Visual): take screenshot of chat view] [end] Test passed
+[2026-03-31T01:17:17.204Z] [IntakeForm - Test 1: form renders with all 5 fields] [start] Test started
+[2026-03-31T01:17:17.204Z] [IntakeForm - Test 1: form renders with all 5 fields] [navigate] Navigating to /
+[2026-03-31T01:17:17.615Z] [IntakeForm - Test 1: form renders with all 5 fields] [screenshot] Saved form-initial-load.png
+[2026-03-31T01:17:17.633Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Intent radio buttons visible
+[2026-03-31T01:17:17.639Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Order number input visible
+[2026-03-31T01:17:17.643Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Product name input visible
+[2026-03-31T01:17:17.648Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Description textarea visible
+[2026-03-31T01:17:17.654Z] [IntakeForm - Test 1: form renders with all 5 fields] [assert] Image upload button visible
+[2026-03-31T01:17:17.654Z] [IntakeForm - Test 1: form renders with all 5 fields] [end] Test passed
+[2026-03-31T01:17:17.742Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [start] Test started
+[2026-03-31T01:17:17.995Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [navigate] Navigated to /
+[2026-03-31T01:17:18.109Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [action] Clicked submit with empty fields
+[2026-03-31T01:17:18.207Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [screenshot] Saved form-after-empty-submit.png
+[2026-03-31T01:17:18.213Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [assert] 5 validation errors shown
+[2026-03-31T01:17:18.245Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [assert] All 5 error messages verified
+[2026-03-31T01:17:18.246Z] [IntakeForm - Test 2: empty submit shows 5 validation errors] [end] Test passed
+[2026-03-31T01:17:18.346Z] [IntakeForm - Test 3: PDF upload shows format error] [start] Test started
+[2026-03-31T01:17:18.549Z] [IntakeForm - Test 3: PDF upload shows format error] [navigate] Navigated to /
+[2026-03-31T01:17:18.632Z] [IntakeForm - Test 3: PDF upload shows format error] [action] Uploaded PDF file
+[2026-03-31T01:17:18.748Z] [IntakeForm - Test 3: PDF upload shows format error] [screenshot] Saved form-pdf-error.png
+[2026-03-31T01:17:18.758Z] [IntakeForm - Test 3: PDF upload shows format error] [assert] Format error message visible
+[2026-03-31T01:17:18.759Z] [IntakeForm - Test 3: PDF upload shows format error] [end] Test passed
+[2026-03-31T01:17:18.869Z] [IntakeForm - Test 4: >10MB file shows size error] [start] Test started
+[2026-03-31T01:17:19.079Z] [IntakeForm - Test 4: >10MB file shows size error] [navigate] Navigated to /
+[2026-03-31T01:17:20.542Z] [IntakeForm - Test 4: >10MB file shows size error] [action] Uploaded 11MB JPEG file
+[2026-03-31T01:17:20.647Z] [IntakeForm - Test 4: >10MB file shows size error] [screenshot] Saved form-size-error.png
+[2026-03-31T01:17:20.656Z] [IntakeForm - Test 4: >10MB file shows size error] [assert] Size error message visible
+[2026-03-31T01:17:20.657Z] [IntakeForm - Test 4: >10MB file shows size error] [end] Test passed
+[2026-03-31T01:17:20.797Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [start] Test started
+[2026-03-31T01:17:21.018Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [navigate] Navigated to /
+[2026-03-31T01:17:21.192Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Filled all form fields with real data
+[2026-03-31T01:17:21.302Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-filled.png
+[2026-03-31T01:17:21.347Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [action] Clicked submit button
+[2026-03-31T01:17:21.358Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Loading state visible and button disabled
+[2026-03-31T01:17:21.452Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved form-loading-state.png
+[2026-03-31T01:17:24.373Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [assert] Chat view appeared after backend processing
+[2026-03-31T01:17:24.443Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [screenshot] Saved chat-after-submit.png
+[2026-03-31T01:17:24.449Z] [IntakeForm - Test 5: valid submit shows loading state then chat view] [end] Test passed
+[2026-03-31T01:17:24.574Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [start] Test started
+[2026-03-31T01:17:24.784Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [navigate] Navigated to /
+[2026-03-31T01:17:24.898Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [screenshot] Saved form-desktop.png
+[2026-03-31T01:17:24.934Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [assert] Key form elements visible
+[2026-03-31T01:17:24.935Z] [IntakeForm - Test 6: screenshot of form (visual validation)] [end] Test passed
+[2026-03-31T01:17:25.038Z] [IntakeForm - Test 7: valid WebP upload works] [start] Test started
+[2026-03-31T01:17:25.268Z] [IntakeForm - Test 7: valid WebP upload works] [navigate] Navigated to /
+[2026-03-31T01:17:25.436Z] [IntakeForm - Test 7: valid WebP upload works] [action] Filled all form fields with WebP image
+[2026-03-31T01:17:25.550Z] [IntakeForm - Test 7: valid WebP upload works] [screenshot] Saved form-webp-filled.png
+[2026-03-31T01:17:25.618Z] [IntakeForm - Test 7: valid WebP upload works] [action] Clicked submit button
+[2026-03-31T01:17:25.629Z] [IntakeForm - Test 7: valid WebP upload works] [assert] Loading state visible
+[2026-03-31T01:17:28.550Z] [IntakeForm - Test 7: valid WebP upload works] [assert] Chat view appeared after WebP upload
+[2026-03-31T01:17:28.628Z] [IntakeForm - Test 7: valid WebP upload works] [screenshot] Saved chat-webp-submit.png
+[2026-03-31T01:17:28.628Z] [IntakeForm - Test 7: valid WebP upload works] [end] Test passed

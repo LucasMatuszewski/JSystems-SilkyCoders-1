@@ -68,6 +68,7 @@
       "Edit",
       "Write",
       "MultiEdit",
+      "Read(.env.example)",
 
       "WebSearch",
       "WebFetch(domain:blog.jetbrains.com)",
@@ -93,7 +94,10 @@
 
       "Read(.env.*)",
       "Read(**/.env)",
-      "Read(**/secrets/**)"
+      "Read(**/logs/**)",
+      "Read(**/secrets/**)",
+      "Read(examples/**)"
     ]
-  }
+  },
+  "plansDirectory": "./docs/plans"
 }

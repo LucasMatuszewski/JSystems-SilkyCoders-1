@@ -32,7 +32,7 @@ Does NOT cover: frontend, UI protocol choices, React components.
 - `GET /api/sessions/{id}` — load from DB, return session + message history
 
 **ChatController** handles:
-- `POST /api/sessions/{id}/messages` — validate, load session+history, delegate to `ChatService`, return `ResponseBodyEmitter`
+- `POST /api/sessions/{id}/messages` — extract last user message from `messages[]` in request body (sent by `AssistantChatTransport`), load session+history from DB, delegate to `ChatService`, return `SseEmitter`
 
 Controllers do no business logic. They validate input, call services, and map responses.
 
@@ -52,8 +52,9 @@ Controllers do no business logic. They validate input, call services, and map re
 - Builds `ChatCompletionCreateParams` with: system message (policy docs re-loaded), full history as USER/ASSISTANT messages, new user message
 - Persists new USER message before calling API
 - Calls `OpenAIClient.chat().completions().createStreaming(params)`
-- For each chunk: extracts delta text, encodes as Vercel data stream line, writes to `ResponseBodyEmitter`
-- After stream completes: writes finish line, calls `emitter.complete()`, persists full ASSISTANT message
+- Generates a message UUID for the SSE events
+- Writes SSE events to `SseEmitter`: `start` → `text-start` → `text-delta` (per chunk) → `text-end`
+- After stream completes: calls `emitter.complete()`, persists full ASSISTANT message
 
 **PolicyDocService**
 - Reads `regulamin.md` from disk on application startup (or lazily — either is acceptable for PoC)
@@ -87,8 +88,11 @@ Controllers do no business logic. They validate input, call services, and map re
 - `description`: String, required, max 5000 chars
 - `image`: MultipartFile, required, max 10 MB, content type must be one of: `image/jpeg`, `image/png`, `image/webp`, `image/gif`
 
-**Chat message request** (JSON body):
-- `content`: String, required, max 5000 chars
+**Chat message request** (JSON body from `AssistantChatTransport`):
+- `messages`: Array of `{ role, content }` objects — sent by assistant-ui. Backend extracts the last user message's text content only.
+- `system`: String, optional — ignored by backend (backend builds its own system prompt from policy docs)
+- `tools`: Array, optional — ignored by backend (no frontend tools)
+- Other fields from `AssistantChatTransport` are ignored.
 
 ### Response DTOs
 
@@ -136,29 +140,38 @@ The request to OpenAI for the initial analysis includes:
 
 ---
 
-## 5. Vercel Data Stream Format (Backend Responsibility)
+## 5. Vercel AI SDK UI Message Stream Format (Backend Responsibility)
 
-The chat continuation endpoint must produce this exact format:
+The chat continuation endpoint must produce SSE (Server-Sent Events) in the Vercel AI SDK v6 UI Message Stream format:
 
 ```
-Content-Type: text/plain;charset=UTF-8
-Transfer-Encoding: chunked
-X-Vercel-AI-Data-Stream: v1
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+x-vercel-ai-ui-message-stream: v1
 
-0:"Hello"\n
-0:" there"\n
-0:"!"\n
-d:{"finishReason":"stop"}\n
+data: {"type":"start","messageId":"<uuid>"}
+
+data: {"type":"text-start","id":"<uuid>"}
+
+data: {"type":"text-delta","id":"<uuid>","delta":"Hello"}
+
+data: {"type":"text-delta","id":"<uuid>","delta":" there"}
+
+data: {"type":"text-delta","id":"<uuid>","delta":"!"}
+
+data: {"type":"text-end","id":"<uuid>"}
+
 ```
 
 Rules for encoding:
-- Each text delta from OpenAI is JSON-escaped and wrapped: `0:"<escaped_text>"\n`
-- Quotation marks inside text must be escaped: `"` → `\"`
-- Newlines inside text must be escaped: `\n` → `\\n`
-- The stream MUST end with the finish line: `d:{"finishReason":"stop"}\n`
-- Each line ends with exactly one `\n` (not `\r\n`)
+- Each SSE event is a line starting with `data: ` followed by a JSON object, then `\n\n` (double newline per SSE spec)
+- The `messageId` in `start` and `id` in `text-*` events should be the same UUID, identifying the assistant message
+- Text deltas from OpenAI are sent as-is in the `delta` field (JSON-escaped within the JSON object naturally)
+- The stream MUST include `start` → `text-start` → one or more `text-delta` → `text-end` events in order
+- The response MUST include header `x-vercel-ai-ui-message-stream: v1`
 
-`ResponseBodyEmitter` is used (Spring MVC). It is returned from the controller immediately. A separate thread (from a thread pool) drives the OpenAI async stream and writes to the emitter. On stream completion or error, `emitter.complete()` or `emitter.completeWithError(e)` is called.
+`SseEmitter` is used (Spring MVC). It is returned from the controller immediately. A separate thread (from a thread pool) drives the OpenAI async stream and writes SSE events to the emitter. On stream completion or error, `emitter.complete()` or `emitter.completeWithError(e)` is called.
 
 ---
 
@@ -185,11 +198,13 @@ The system prompt assembled by `PolicyDocService` must contain these sections in
 ### WebMVC vs WebFlux for streaming
 **Status:** Accepted
 **Context:** Chat endpoint must stream OpenAI response tokens to the client. Spring offers WebFlux (reactive) and WebMVC + `ResponseBodyEmitter` (servlet-based).
-**Decision:** Spring WebMVC with `ResponseBodyEmitter`. The OpenAI Java SDK's async streaming (`createStreaming`) runs on its own thread pool. We bridge it to `ResponseBodyEmitter` from a `@Async` thread or executor service. WebMVC is simpler to set up and test; the reactive overhead of WebFlux is unnecessary for PoC.
+**Decision:** Spring WebMVC with `SseEmitter`. The OpenAI Java SDK's async streaming (`createStreaming`) runs on its own thread pool. We bridge it to `SseEmitter` from a `@Async` thread or executor service. `SseEmitter` extends `ResponseBodyEmitter` and provides convenient `send(SseEmitter.event().data(...))` methods for producing SSE format. WebMVC is simpler to set up and test; the reactive overhead of WebFlux is unnecessary for PoC.
 **Rejected alternatives:**
 - WebFlux + `Flux<String>`: More elegant for streaming but requires full reactive stack (different testing, config, driver compatibility for SQLite).
+- Plain `ResponseBodyEmitter`: Would work but requires manual SSE formatting; `SseEmitter` handles the `data:` prefix and `\n\n` termination automatically.
 **Consequences:**
 - (+) Simpler stack, familiar programming model, easier integration testing
+- (+) `SseEmitter` handles SSE encoding details
 - (-) Blocking thread per open SSE connection — acceptable for PoC load (~handful of concurrent users)
 **Review trigger:** If concurrent users exceed ~50 or if reactive features become needed elsewhere in the system.
 
@@ -253,10 +268,10 @@ Test backend logic independently of OpenAI API calls. Use Mockito to stub `OpenA
 - Session is persisted with correct intent, orderNumber, productName, description
 - Two ChatMessage records created: role=USER (seq 0) and role=ASSISTANT (seq 1)
 
-**ChatService — stream format:**
-- Simple text "Hello world" → emits `0:"Hello world"\n` then `d:{"finishReason":"stop"}\n`
-- Text containing a double quote `it's "great"` → emits `0:"it's \"great\""\n`
-- Text containing newline → emits `0:"line1\\nline2"\n`
+**ChatService — SSE stream format:**
+- Simple text "Hello world" → emits SSE events: `start` → `text-start` → `text-delta` with `"delta":"Hello world"` → `text-end`
+- Multiple chunks → each emits a separate `text-delta` event with the chunk in `delta` field
+- All events share the same message `id` UUID
 - After stream, ASSISTANT message is persisted with full content
 
 **Validation:**
@@ -277,8 +292,8 @@ Test backend logic independently of OpenAI API calls. Use Mockito to stub `OpenA
 - TAC-BE-01: `PolicyDocService.getSystemPrompt(RETURN)` does not contain the string "reklamacj" (from reklamacje.md)
 - TAC-BE-02: `PolicyDocService.getSystemPrompt(COMPLAINT)` does not contain the string "zwrot" from zwrot-30-dni.md
 - TAC-BE-03: `AnalysisService` builds a user message with exactly 2 content parts: one image type, one text type
-- TAC-BE-04: Stream encoder correctly JSON-escapes `"`, `\`, `\n` in text deltas
-- TAC-BE-05: Chat endpoint response body ends with `d:{"finishReason":"stop"}\n`
+- TAC-BE-04: SSE stream encoder produces valid `data: {"type":"text-delta","id":"...","delta":"..."}` events with correct JSON encoding
+- TAC-BE-05: Chat endpoint response includes `x-vercel-ai-ui-message-stream: v1` header and body contains `text-start` and `text-end` events
 - TAC-BE-06: After streaming completes, `ChatMessageRepository.findBySessionId(id)` returns one additional ASSISTANT message
 - TAC-BE-07: Multipart upload with 10,485,761 bytes (10 MB + 1 byte) returns HTTP 400
 - TAC-BE-08: `OpenAIClient` bean is configured with `baseUrl` and `apiKey` from environment — verify via `@SpringBootTest` with test properties

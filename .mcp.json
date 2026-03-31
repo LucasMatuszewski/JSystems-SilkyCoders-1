@@ -6,6 +6,17 @@
       "headers": {
         "CONTEXT7_API_KEY": "ctx7sk-c75deb6c-7404-478e-a6f4-a046126789df"
       }
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "env": {},
+      "enabled": false
     }
   }
 }

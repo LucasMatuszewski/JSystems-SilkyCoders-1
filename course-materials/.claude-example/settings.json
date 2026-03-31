@@ -71,7 +71,7 @@
       "Bash(printenv:*)",
       "Bash(date)",
       "Bash(whoami)",
-      
+
       // Claude's tools:
       // ── File edit (approve all writes — remove if you want diff review per file)
       "Edit",
@@ -108,5 +108,12 @@
       "Read(**/.env)",
       "Read(**/secrets/**)"
     ]
+  },
+  // Override the plans directory (default is "~/.claude/plans")
+  "plansDirectory": "./docs/plans",
+
+  "statusLine": {
+    "type": "command",
+    "command": "bash C:/Users/lucas/.claude/statusline.sh"
   }
 }

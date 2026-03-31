@@ -1,0 +1,388 @@
+2026-03-27 08:00:03 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/tree/march-2026
+
+2026-03-27 08:03:48 From Kamil to Everyone:
+	{E80FA0E2-74B8-46FB-9961-E01DE6539AFD}.png
+
+2026-03-27 08:06:01 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/changelog.md
+
+CHANGELOG
+
+2026-03-27 08:08:23 From JSystems Szkolenia to Everyone:
+	<!-- Add to user folder: C:/Users/user/.claude/CLAUDE.md -->
+Be concise! Provide short answers unless I ask for more details. I prefer short step-by-step instructions that are straight to the point. Never repeat the same information.
+
+You may provide your opinions on topics but always make it clear that this is your opinion, not a fact. When you don't know, just say that you don't know.
+
+If you work in Git repo you should always commit changes after every step, before you go to the text step. Commit often to make it easier to revert changes if you make a mistake on any step.
+
+Before commiting and finishing the task you should always check if your changes lint (no errors) & work correctly (tests pass).
+
+2026-03-27 08:15:10 From JSystems Szkolenia to Everyone:
+	https://arxiv.org/abs/2602.11988
+
+AGENTS.md research
+
+2026-03-27 08:16:48 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\.claude
+
+2026-03-27 08:23:22 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/memory#how-claude-md-files-load
+
+https://code.claude.com/docs/en/memory#path-specific-rules
+
+CLAUDE.md
+
+2026-03-27 08:42:43 From Daniel to Everyone:
+	Jaka agenda jest na dzisiaj?
+
+2026-03-27 08:54:22 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/memory#claude-md-vs-auto-memory
+
+2026-03-27 09:07:43 From JSystems Szkolenia to Everyone:
+	Dzień 3 – agenda:
+
+=== RANO: DOMKNIĘCIE + CLAUDE.md 2.0 ===
+09:00  Reset + agenda
+09:10  CLAUDE.md 2.0 — nowe funkcje ogłoszone 2 dni temu!
+09:55  Skills + Sub-Agenci — konfiguracja
+10:40  PRD/ADR weryfikacja + Task Plan Matrix
+11:00  ☕ PRZERWA
+
+=== DZIEŃ 3: FULL-STACK Z AI ===
+11:15  Moduł 3.1 — AI UX Researcher: Playwright + design tokens + Sinsay.com
+12:30  Moduł 3.2 — Multi-Agent TDD: config agentów, implementacja
+13:00  🍽️ PRZERWA OBIAD
+13:30  Moduł 3.2 cd — TDD workflow + Git Worktrees + parallel agents
+14:30  ☕ OPCJONALNA PRZERWA
+14:45  Moduł 3.3 — Debugging & Refactoring z agentem
+15:30  Git Worktrees demo + podsumowanie
+15:55  Podsumowanie dnia
+16:00  Koniec
+
+2026-03-27 09:13:14 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/tree/march-2026/docs
+
+2026-03-27 09:28:39 From JSystems Szkolenia to Everyone:
+	/init create CLAUDE.md based on project description in
+  @docs/PRD-Product-Requirements-Document.md and technical decision described in ADR files
+  in folder: @docs/ADR
+
+2026-03-27 09:43:09 From JSystems Szkolenia to Everyone:
+	/init create AGENTS.md in root folder based on project description in
+  @docs/PRD-Product-Requirements-Document.md and technical decision described in ADR files
+  in folder: @docs/ADR\
+
+  Create CLAUDE.md file in root folder, that will use `@AGENTS.md` link to automatically
+  inject content of AGENTS.md file to CLAUDE.md file and below add only instruction
+  specific to Claude Code.
+
+  Remember to keep root AGENTS.md and CLAUDE.md file generic and very concise, they will be
+  added to context of every agent working in our project so should contain only
+  information ALWAYS needed for every agent, not very specific to parts of our system.
+  Later we will create detailed nested files in frontend and backed folders.
+
+2026-03-27 09:46:44 From JSystems Szkolenia to Everyone:
+	/init create AGENTS.md in root folder based on project description in
+  @docs/PRD-Product-Requirements-Document.md and technical decision described in ADR files
+  in folder: @docs/ADR\
+
+  Create CLAUDE.md file in root folder, that will use `@AGENTS.md` link to automatically
+  inject content of AGENTS.md file to CLAUDE.md file and below add only instruction
+  specific to Claude Code.
+
+  Remember to keep root AGENTS.md and CLAUDE.md file generic and very concise, they will be
+  added to context of every agent working in our project so should contain only
+  information ALWAYS needed for every agent, not very specific to parts of our system.
+
+  Next create detailed nested files in frontend and backed folders with separate AGENTS.md
+  linked inside CLAUDE.md with detailed instructions for FE and BE parts of our system. And
+  also go deeper and create nested files for tests folders.
+
+2026-03-27 09:49:18 From JSystems Szkolenia to Everyone:
+	Use existing @AGENTS.md and @CLAUDE.md file as draft version and update them to details from
+ our ADR and PRD files as main source of information.
+
+move BE files to /backend folder to make it easier to target
+
+2026-03-27 10:16:36 From JSystems Szkolenia to Everyone:
+	11:30 koniec przerwy
+
+2026-03-27 10:18:47 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/memory#how-claude-md-files-load
+
+2026-03-27 10:23:59 From JSystems Szkolenia to Everyone:
+	11:35 koniec przerwy
+
+2026-03-27 10:24:06 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/monitoring-usage  OTEL observability
+
+2026-03-27 10:30:04 From Artur to Everyone:
+	Wrzucę TIP jeśli ktoś chce dyktować w języku polskim do Claude/Codex. Samo /voice nie wyłapuje języka polskiego, u mnie średnio działa również  w języku angielskim (w IntelliJ), ale Windows+H otwiera panel speach to text, można dyktować prompt/zapytanie.
+
+2026-03-27 10:36:17 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/voice-dictation#change-the-dictation-language
+
+2026-03-27 10:38:24 From JSystems Szkolenia to Everyone:
+	https://handy.computer/
+
+2026-03-27 10:43:51 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/AI-Programming-Course-JSystem-03-2026/blob/master/AGENTS.md
+
+2026-03-27 10:59:53 From JSystems Szkolenia to Everyone:
+	https://github.com/sivaprasadreddy/sivalabs-marketplace/tree/main
+.claude-plugin
+
+2026-03-27 11:00:44 From JSystems Szkolenia to Everyone:
+	Plugins discover: https://code.claude.com/docs/en/discover-plugins#code-intelligence-issues
+
+2026-03-27 11:00:58 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/plugins
+
+2026-03-27 11:01:25 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/AI-Programming-Course-JSystem-03-2026/blob/master/AGENTS.md
+
+2026-03-27 11:03:08 From JSystems Szkolenia to Everyone:
+	based on what you did create a skill in @.agents/skills\ folder that will follow the same
+  workflow and create similar AGENTS.md and CLAUDE.md files
+
+2026-03-27 11:12:16 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/tree/march-2026
+
+2026-03-27 11:15:55 From JSystems Szkolenia to Everyone:
+	https://www.promptcowboy.ai/
+
+2026-03-27 11:18:04 From JSystems Szkolenia to Everyone:
+	Based on below PRD document, generate prompt for Nano Banana for image generation to generate basic Wireframe image for first view of this application. Function basic Wireframe without design details.
+
+2026-03-27 11:21:44 From JSystems Szkolenia to Everyone:
+	https://skills.sh/?q=playwright
+
+2026-03-27 11:25:15 From JSystems Szkolenia to Everyone:
+	https://github.com/microsoft/playwright-mcp
+
+2026-03-27 11:25:54 From JSystems Szkolenia to Everyone:
+	claude mcp add playwright npx @playwright/mcp@latest
+
+2026-03-27 11:28:05 From JSystems Szkolenia to Everyone:
+	npx skills add https://github.com/microsoft/playwright-cli --skill playwright-cli
+
+2026-03-27 11:32:57 From JSystems Szkolenia to Everyone:
+	https://skills.sh/currents-dev/playwright-best-practices-skill/playwright-best-practices
+
+2026-03-27 11:33:33 From JSystems Szkolenia to Everyone:
+	npx skills add https://github.com/currents-dev/playwright-best-practices-skill --skill playwright-best-practices
+
+2026-03-27 11:42:59 From JSystems Szkolenia to Everyone:
+	npx skills add https://github.com/currents-dev/playwright-best-practices-skill --skill playwright-best-practices
+
+2026-03-27 11:44:20 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\.claude.json
+
+2026-03-27 11:47:47 From JSystems Szkolenia to Everyone:
+	claude mcp add playwright npx @playwright/mcp@latest --scope project
+
+2026-03-27 12:03:33 From JSystems Szkolenia to Everyone:
+	koniec przerwy 14:00, przedłużamy szkolenie do 16:30
+
+2026-03-27 12:43:20 From JSystems Szkolenia to Everyone:
+	Jeśli jesteście bezpośrednio na Windows możecie musieć zmodyfikować MCP w .mcp.json file aby używał wrap cmd - na linux/mac npx będzie działać bezpośrednio.
+Na windows zamieńcie mcp config na:
+
+{
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+
+2026-03-27 12:44:20 From JSystems Szkolenia to Everyone:
+	Potem zrestartujcie terminal najlepiej i po odpaleniu claude w projekcie powinno wam się pojawić okno ze screena oznaczające, że wykrył to mcp poprawnie
+	{23F6745B-CD7F-4333-B234-FDD3BEF99941}.png
+
+2026-03-27 12:51:34 From JSystems Szkolenia to Everyone:
+	🏋️ Ćwiczenie 3.2 — Analiza designu Sinsay.com (20 min)
+
+Wklej do claude:
+
+```
+Używając Playwright MCP, przeanalizuj stronę https://www.sinsay.com/pl/pl i:
+
+1. Zrób screenshot strony głównej i zapisz jako assets/sinsay-homepage.png
+2. Wyciągnij z CSS/DOM design tokeny:
+   - Kolory (primary, secondary, background, text, accent)
+   - Fonty (family, size, weight)
+   - Spacing (padding, margin values używane najczęściej)
+   - Border radius
+   - itp.
+3. Pobierz favicon i zapisz jako assets/sinsay-favicon.ico
+4. Sprawdź czy logo jest dostępne jako SVG lub PNG i zapisz je jako assets/logo.png (lub svg)
+5. Zapisz znalezione tokeny oraz szczegółowy opis design system jako /docs/design-guidelines.md który ma posłużyć agentom do dokładnego odzwierciedlenia wyglądu strony Sinsay w naszej aplikacji aby była ona spójna - powinien on zawierać odnośniki do wszystkich zapisanych plików w assets.
+6. same design tokens zapisz w pliku assets/design-tokens.json
+
+Cel: będziemy używać tych tokenów i opisu design guidelines tworząc naszą aplikację aby była spójna z brendem Sinsay.
+
+Commit: "Docs: add sinsay design tokens and assets"
+```
+
+2026-03-27 12:52:53 From JSystems Szkolenia to Everyone:
+	Używając Playwright MCP, przeanalizuj stronę https://www.sinsay.com/pl/pl i:
+
+2026-03-27 13:03:15 From Kamil to Everyone:
+	jeszcze trwa
+
+2026-03-27 13:03:33 From JSystems Szkolenia to Everyone:
+	to do której? :)
+
+2026-03-27 13:03:42 From JSystems Szkolenia to Everyone:
+	Dajcie znać, ja będę na nasłuchu :)
+
+2026-03-27 13:12:37 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\AppData\Roaming\aichat\config.yaml
+
+2026-03-27 13:12:49 From JSystems Szkolenia to Everyone:
+	model: openrouter:deepseek/deepseek-v3.2
+clients:
+  - type: openai-compatible
+    name: openrouter
+    api_base: https://openrouter.ai/api/v1
+    api_key:
+
+2026-03-27 13:16:02 From JSystems Szkolenia to Everyone:
+	"playwright": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "env": {},
+      "enabled": false
+    }
+
+2026-03-27 13:20:20 From JSystems Szkolenia to Everyone:
+	https://openrouter.ai/workspaces/default/guardrails
+
+2026-03-27 13:38:34 From JSystems Szkolenia to Everyone:
+	Analyse the workflow we just proceed in this session everything you you did and describe this as skill for agents. Add this as a new skill, for design
+  system, in agents folder @.agents/skills\ as "create-design-system" - analyse what you did and try to avoid the issues you had in the future describing in
+  the skill how to avoid these issues. Skills should be generic for any website URL user will provide.
+
+2026-03-27 13:39:42 From JSystems Szkolenia to Everyone:
+	"mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_evaluate",
+
+2026-03-27 13:40:12 From JSystems Szkolenia to Everyone:
+	"enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "context7",
+    "playwright"
+
+2026-03-27 13:42:49 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/sub-agents
+
+2026-03-27 13:48:36 From JSystems Szkolenia to Everyone:
+	Agent Teams:
+https://code.claude.com/docs/en/agent-teams
+
+2026-03-27 14:00:03 From Rafał to Everyone:
+	 Use the --worktree (or -w) flag:                                                                                                                                                                                                                                                                                                                                                                                                    claude --worktree feature-auth   # named worktree                                                                                                                                                                 claude --worktree                # auto-generated name
+
+2026-03-27 14:08:11 From JSystems Szkolenia to Everyone:
+	claude --dangerously-skip-permissions
+
+2026-03-27 14:12:10 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/sub-agents#write-subagent-files
+
+2026-03-27 14:18:26 From JSystems Szkolenia to Everyone:
+	BE dev
+FE dev
+QA Engineer
+
+2026-03-27 14:42:39 From JSystems Szkolenia to Everyone:
+	mcpServers
+skills
+permissionMode: dontAsk
+name
+
+2026-03-27 14:43:52 From JSystems Szkolenia to Everyone:
+	+ prompt
+
+2026-03-27 14:51:30 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/agent-teams
+
+2026-03-27 14:54:55 From JSystems Szkolenia to Everyone:
+	generate subagent specialized in JAva BE. called BE-Developer. It should have
+  access to IntelliJ MCP and to java-springboot Skill. use permissionMode:
+  dontAsk.
+
+2026-03-27 15:22:29 From Tomasz to Everyone:
+	https://aistupidlevel.info/
+
+2026-03-27 15:40:22 From JSystems Szkolenia to Everyone:
+	I want you to create very detailed, plan of work to create full proof of
+  concept of our application, implementing both back end, front end tests and
+  following all, guidelines from your cloud files. I want you to follow,
+  instructions and, detailed documentation from product requirements,
+  documents for functional description. From, architecture those decision
+  records files, for architecture and decision and implementation technical
+  decisions. And, design, guidelines file to, follow the design of our CSA
+  brand, you should provide exact context to specialized agents and
+  orchestrate work of agents, you should not implement anything yourself. You
+  are only orchestrator and manager. You should only delegate to specialized
+  agents. And provides for each agent, everything what is required for this
+  agent to, do its work without asking few questions. So every agent for every
+  task should have very detailed instructions for this specific task, So it
+  should be only on the task level. You should not, ask agents to implement
+  everything at once. So your next task is to create detailed plan make
+  phases, and you should plan work of multiple agents in many steps in small
+  steps, with commiss on every steps and with full test driven development
+  process for every step. And you should, make matrix of dependencies between
+  tasks and between agents. To coordinate their work in the way that we will
+  allow 1 agent to not interrupt or not, interfere or with other agents and to
+  let them work together and to plan the task and every step in this process.
+  In the way that we, provide information which task need to be finished
+  first before we go to the next stage.
+
+  Agent you should always use to delegate work to based on specialization:
+  @"fe-developer (agent)"
+  @"be-developer (agent)"
+  @"qa-engineer (agent)"
+
+  Files you should use to create detailed plan of implemention of our PoC
+  application:
+  - @docs/PRD-Product-Requirements-Document.md
+  - @docs/ADR/001-backend.md
+  - @docs/ADR/002-frontend.md
+  - @docs/ADR/000-main-architecture.md
+  - @docs/design-guidelines.md
+
+  You should provide exact context needed to every task for every sub agent,
+  only required information for this specific task. So don't blow the context
+  window with, everything about the application So so you should only provide
+  to the specialized subagents information needed to complete the task At
+  hand.
+
+2026-03-27 15:41:31 From JSystems Szkolenia to Everyone:
+	If enything is unclear, you should ask minimum 5 questions to make sure
+  that you understand everything correct and that you don't have any doubts
+  about what you should do and how this process should work.
+
+2026-03-27 15:53:48 From JSystems Szkolenia to Everyone:
+	https://github.com/jesseduffield/lazygit
+
+2026-03-27 15:54:05 From JSystems Szkolenia to Everyone:
+	https://github.com/jesseduffield/lazydocker
+
+2026-03-27 15:54:36 From JSystems Szkolenia to Everyone:
+	https://github.com/sinelaw/fresh
+
+2026-03-27 15:54:52 From JSystems Szkolenia to Everyone:
+	https://github.com/folke/lazy.nvim

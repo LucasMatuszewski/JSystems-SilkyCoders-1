@@ -1,0 +1,72 @@
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+  }
+
+  parameters {
+    string(name: 'BITBUCKET_WORKSPACE', defaultValue: '', description: 'Bitbucket Cloud workspace')
+    string(name: 'BITBUCKET_REPO_SLUG', defaultValue: '', description: 'Bitbucket Cloud repository slug')
+    string(name: 'PULL_REQUEST_ID', defaultValue: '', description: 'Override PR ID if CHANGE_ID is not populated')
+    string(name: 'TARGET_BRANCH', defaultValue: 'main', description: 'Fallback base branch if CHANGE_TARGET is not populated')
+  }
+
+  environment {
+    REVIEW_DIR = '.claude-ci'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Install Claude Code') {
+      steps {
+        sh 'npm install -g @anthropic-ai/claude-code'
+      }
+    }
+
+    stage('Review Pull Request') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'anthropic-api-key', variable: 'ANTHROPIC_API_KEY'),
+          usernamePassword(credentialsId: 'bitbucket-api-credentials', usernameVariable: 'BITBUCKET_USERNAME', passwordVariable: 'BITBUCKET_APP_PASSWORD')
+        ]) {
+          script {
+            env.ACTUAL_PR_ID = env.CHANGE_ID?.trim() ? env.CHANGE_ID.trim() : params.PULL_REQUEST_ID.trim()
+            env.ACTUAL_TARGET_BRANCH = env.CHANGE_TARGET?.trim() ? env.CHANGE_TARGET.trim() : params.TARGET_BRANCH.trim()
+
+            if (!env.ACTUAL_PR_ID) {
+              error('Missing pull request id. Expected CHANGE_ID or parameter PULL_REQUEST_ID.')
+            }
+
+            if (!params.BITBUCKET_WORKSPACE?.trim() || !params.BITBUCKET_REPO_SLUG?.trim()) {
+              error('BITBUCKET_WORKSPACE and BITBUCKET_REPO_SLUG parameters are required.')
+            }
+          }
+
+          sh '''
+            set -euo pipefail
+            chmod +x ./course-materials/03-2026/cicd-headless/scripts/claude_pr_review.sh
+            ./course-materials/03-2026/cicd-headless/scripts/claude_pr_review.sh "$ACTUAL_TARGET_BRANCH" "$REVIEW_DIR"
+          '''
+
+          sh '''
+            set -euo pipefail
+            python3 ./course-materials/03-2026/cicd-headless/scripts/bitbucket_post_pr_comment.py \
+              --workspace "$BITBUCKET_WORKSPACE" \
+              --repo-slug "$BITBUCKET_REPO_SLUG" \
+              --pull-request-id "$ACTUAL_PR_ID" \
+              --username "$BITBUCKET_USERNAME" \
+              --app-password "$BITBUCKET_APP_PASSWORD" \
+              --comment-file "$REVIEW_DIR/review.md"
+          '''
+        }
+      }
+    }
+  }
+}

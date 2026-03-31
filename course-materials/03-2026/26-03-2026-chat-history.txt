@@ -1,0 +1,541 @@
+2026-03-26 08:06:54 From JSystems Szkolenia to Everyone:
+	Dzień 2 – agenda:
+
+=== RANO: DOMKNIĘCIE DNIA 1 ===
+09:00  Reset + agenda + projekt tygodnia
+09:10  Sandbox, Permissions, WSL/macOS — bezpieczeństwo agentów
+09:50  IntelliJ: stara integracja vs nowy ACP Registry + IntelliJ MCP Server
+10:25  Claude Code: komendy i funkcje (Ctrl+G, /loop, /batch, /schedule)
+10:55  ☕ PRZERWA
+
+=== DZIEŃ 2: OD POMYSŁU DO PROJEKTU ===
+11:10  Moduł 2.1 — AI jako Twój PM: PRD, User Stories, Requirements
+12:15  Moduł 2.2 — Research + Tech Stack + ADR
+13:00  🍽️ PRZERWA
+13:30  Moduł 2.2 cd — UML: Mermaid, PlantUML, architektura
+14:30  Moduł 2.3 — MCP, Skills, Sub-agenci, CLAUDE.md
+15:30  Projekt: decyzja o stacku + kickoff
+15:55  Podsumowanie dnia
+16:00  Koniec
+
+2026-03-26 08:07:20 From JSystems Szkolenia to Everyone:
+	https://openrouter.ai/docs/guides/coding-agents/claude-code-integration
+
+2026-03-26 08:08:20 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/blob/master/course-materials/.bashrc
+
+2026-03-26 08:10:49 From JSystems Szkolenia to Everyone:
+	OpenRouter z OpenAI SDK:
+https://openrouter.ai/docs/quickstart#using-the-openai-sdk
+
+2026-03-26 08:14:57 From JSystems Szkolenia to Everyone:
+	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
+
+2026-03-26 08:16:01 From JSystems Szkolenia to Everyone:
+	OPENROUTER_API_KEY
+
+2026-03-26 08:28:57 From Sebastian to Everyone:
+	{6B54B014-1DB8-4265-B34E-028CB92CB807}.png
+
+2026-03-26 08:41:55 From JSystems Szkolenia to Everyone:
+	CC wtyczka IntelliJ
+https://plugins.jetbrains.com/plugin/29342-cc-gui-claude-or-codex-
+
+2026-03-26 08:51:42 From JSystems Szkolenia to Everyone:
+	https://plugins.jetbrains.com/plugin/22282-jetbrains-ai-assistant
+
+JetBrains AI Assistant
+
+2026-03-26 08:52:23 From JSystems Szkolenia to Everyone:
+	Cursor CLI:
+https://cursor.com/cli
+
+2026-03-26 08:57:43 From JSystems Szkolenia to Everyone:
+	https://zed.dev/acp
+
+2026-03-26 09:03:48 From JSystems Szkolenia to Everyone:
+	MCP Server IntelliJ
+
+https://www.jetbrains.com/help/idea/mcp-server.html#supported-tools
+
+2026-03-26 09:06:54 From JSystems Szkolenia to Everyone:
+	MCP protocol:
+
+https://modelcontextprotocol.io/docs/getting-started/intro
+
+2026-03-26 09:09:41 From JSystems Szkolenia to Everyone:
+	https://www.jetbrains.com/help/idea/mcp-server.html#supported-tools
+
+2026-03-26 09:25:24 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/mcp
+MCP Servers w Claude Code
+
+2026-03-26 09:31:57 From JSystems Szkolenia to Everyone:
+	C:\Users\lucas\.claude.json
+
+2026-03-26 09:33:07 From JSystems Szkolenia to Everyone:
+	"mcpServers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "ctx7sk-xxx"
+      }
+    },
+    "inteliij": {
+      "type": "stdio",
+      "env": {
+        "IJ_MCP_SERVER_PORT": "64342"
+      },
+      "command": "D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\jbr\\bin\\java",
+      "args": [
+        "-classpath",
+        "D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\plugins\\mcpserver\\lib\\mcpserver-frontend.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\util-8.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\module-intellij.libraries.ktor.client.cio.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\module-intellij.libraries.ktor.client.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\module-intellij.libraries.ktor.network.tls.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\module-intellij.libraries.ktor.io.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\module-intellij.libraries.ktor.utils.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\module-intellij.libraries.kotlinx.io.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\module-intellij.libraries.kotlinx.serialization.core.jar;D:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\lib\\module-intellij.libraries.kotlinx.serialization.json.jar",
+        "com.intellij.mcpserver.stdio.McpStdioRunnerKt"
+      ]
+    }
+  },
+
+2026-03-26 09:36:57 From JSystems Szkolenia to Everyone:
+	claude mcp add --transport http notion https://mcp.notion.com/mcp
+
+2026-03-26 09:41:08 From JSystems Szkolenia to Everyone:
+	https://github.com/sooperset/mcp-atlassian
+
+Jira i Confluence MCP
+
+2026-03-26 09:50:21 From JSystems Szkolenia to Everyone:
+	/vercel/ai
+
+2026-03-26 09:54:59 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/sandboxing
+
+2026-03-26 09:55:45 From JSystems Szkolenia to Everyone:
+	https://docs.docker.com/ai/sandboxes/
+
+2026-03-26 10:09:34 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1/blob/master/course-materials/.claude-example/settings.json
+
+
+Permissions Claude
+
+2026-03-26 10:10:20 From JSystems Szkolenia to Everyone:
+	Permission:
+
+2026-03-26 10:10:21 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/permissions
+
+2026-03-26 10:29:40 From Sebastian to Everyone:
+	11:45
+
+2026-03-26 10:46:20 From JSystems Szkolenia to Everyone:
+	https://github.com/LucasMatuszewski/JSystems-SilkyCoders-1
+
+2026-03-26 11:00:55 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/permission-modes#skip-all-checks-with-bypasspermissions-mode
+
+2026-03-26 11:04:58 From JSystems Szkolenia to Everyone:
+	https://docs.docker.com/ai/sandboxes/architecture/#credential-injection
+
+2026-03-26 11:11:19 From JSystems Szkolenia to Everyone:
+	{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+      "Bash(pwd)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(diff:*)",
+
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git stash list:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(git restore:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(npm audit:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm test:*)",
+      "Bash(yarn install:*)",
+      "Bash(yarn run:*)",
+
+      "Bash(tsc:*)",
+      "Bash(eslint:*)",
+      "Bash(prettier:*)",
+      "Bash(jest:*)",
+      "Bash(vitest:*)",
+      "Bash(next:*)",
+      "Bash(turbo:*)",
+      "Bash(tsx:*)",
+      "Bash(node:*)",
+
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip install:*)",
+      "Bash(uv:*)",
+      "Bash(pytest:*)",
+
+      "Bash(docker ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker images:*)",
+
+      "Bash(which:*)",
+      "Bash(env:*)",
+      "Bash(printenv:*)",
+      "Bash(date)",
+      "Bash(whoami)",
+
+      "Edit",
+      "Write",
+      "MultiEdit",
+
+      "WebSearch",
+      "WebFetch(domain:blog.jetbrains.com)",
+      "WebFetch(domain:www.jetbrains.com)"
+    ],
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(rmdir:*)",
+      "Bash(git push:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(chmod:*)",
+      "Bash(chown:*)",
+      "Bash(sudo:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(docker run:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker rmi:*)",
+      "Bash(docker-compose down:*)",
+
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(**/secrets/**)"
+    ]
+  }
+}
+
+2026-03-26 11:21:10 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/permission-modes#skip-all-checks-with-bypasspermissions-mode
+
+2026-03-26 11:27:17 From JSystems Szkolenia to Everyone:
+	Prompt 2 — Wygeneruj PRD
+
+Dziekuje za pytania. Na podstawie naszej rozmowy
+przygotuj teraz PRD dla chatbota Sinsay.
+
+Format:
+## 1. Executive Summary (2-3 zdania)
+## 2. Problem Statement
+## 3. Uzytkownicyi / Persony (2-3 konkretne persony)
+## 4. Główny Flow (krok po kroku, dla każdego głównego scenariusza)
+## 5. User Stories
+   Format: "Jako [kto], chcę [co], żeby [dlaczego]"
+   Minimum 8 user stories, uwzgledniajac happy path i błędy
+## 6. Acceptance Criteria
+   Mierzalne i konkretne — nie "uzytkownik będzie zadowolony"
+## 7. Out of Scope
+   Co NIE wchodzi w MVP — równie ważne jak scope!
+## 8. Ograniczenia techniczne i biznesowe
+## 9. Metryki sukcesu MVP (liczby, nie opisy)
+
+Dokument stwóz w języku angielskim. Konkretnie. Bez marketingowego lania wody.
+PRD ma być uzyteczny dla developera i agenta — nie do prezentacji.
+Zapisz wynik jako docs/PRD.md
+
+2026-03-26 11:38:23 From JSystems Szkolenia to Everyone:
+	https://github.com/langgraph4j/langgraph4j-copilotkit
+
+2026-03-26 11:59:27 From JSystems Szkolenia to Everyone:
+	I provide you draft version of, product requirements document for our plant application. This is very early stage
+  proof of concept or MVP version of this application. Want you to, follow the format and requirements for this PRD
+  document that I described in, draft version of PRD. I want you to, analyze my idea for this application and make
+  more structurized and better version of this PRD that will be used later by agents to create production ready
+  version of this application for MVP. Based on description. So this document should provide all informations needed
+  for agents to to create this application. This field issued only, contain, functional descriptions without technical
+  details. You can override this document. So use this document as your, first version and use the same file to
+  create real PRD.
+
+2026-03-26 12:09:41 From JSystems Szkolenia to Everyone:
+	To create very basic flow, for this proof of concept stage, So we want to have, form as a first stage. So the user,
+  after entering the website, our application, should only see the form with, one field to select if the user want to
+  make a complaint, or return the product. The second field could be for the product name. And the third field could
+  be for, description of the problem. After receiving this data, we've with one more field for image. Of the product.
+  So user should attach the image with the product, And after receiving all this data, agents our application should
+  use, multimodal l m model to analyze this image, decide if this product, is in the stage in the states that's allow
+  return. So it's not the for example, destroyed. Or decide if the type of damage could be used for return. So if or
+  complaint for for the complaint. So based on the image, this description and based on the files we've terms of
+  service and with 2 separate files for returns, one for return, one for complaint, Agents should should decide, if
+  it's possible to make this complaint or if it's possible to, make a return. The product. After providing decision,
+  agents should, show to the user the information with explanation of this decision, and a and user should be allowed
+  to continue, conversation with our agent and ask more questions, about the decision, for example, or ask about the
+  the the the company. So it should be a normal chat window when where user should be allowed to just continue the
+  conversation in the chat window. It's important that we want to, always attach the terms of service, documents for
+  the agents. But if user select the feed to, get the complaint, we should attach only the file that describes the the
+  the complaint flow. And if user select the field that he wants to make, return, we should only attach the the
+  markdown file with explanation of how returns works.
+
+2026-03-26 12:15:12 From JSystems Szkolenia to Everyone:
+	@docs/PRD-Product-Requirements-Document.md
+  @course-materials/01-2026-Sinsay-PoC-Returns-Bot/sinsay-documents/regulamin.md
+  @course-materials/01-2026-Sinsay-PoC-Returns-Bot/sinsay-documents/reklamacje.md
+  @course-materials/01-2026-Sinsay-PoC-Returns-Bot/sinsay-documents/zwrot-30-dni.md
+
+2026-03-26 12:15:16 From JSystems Szkolenia to Everyone:
+	Analyze the all information you have already, all the files I attached. And think which information you don't have
+  now, what what data you need from me, Ask me minimum 5 question, and that's I should ask for you. And to let you
+  create better, product requirements, document, and to better understand the flow and how the application should work
+  from the functional side.
+
+2026-03-26 12:27:22 From JSystems Szkolenia to Everyone:
+	Analyze the all information you have already, all the files I attached. And think which information you don't have
+  now, what what data you need from me, Ask me minimum 5 question, and that's I should ask for you. And to let you
+  create better, product requirements, document, and to better understand the flow and how the application should work
+  from the functional side.
+
+2026-03-26 12:27:38 From JSystems Szkolenia to Everyone:
+	koniec przerwy 14:00
+
+2026-03-26 12:28:02 From JSystems Szkolenia to Everyone:
+	Example prompt created by PromtCowboy for PRD:
+https://www.promptcowboy.ai/share/PYr_k7a5ZkEkBnm-4yeSap9p
+
+2026-03-26 13:03:59 From JSystems Szkolenia to Everyone:
+    Opcja dla zaawansowanych (zamist OpenAI Java SDK + Assistant UI):
+	https://github.com/langgraph4j/langgraph4j-copilotkit
+
+2026-03-26 13:06:39 From JSystems Szkolenia to Everyone:
+	https://www.copilotkit.ai/
+
+2026-03-26 13:09:06 From JSystems Szkolenia to Everyone:
+	https://github.com/ag-ui-protocol/ag-ui/tree/main/sdks/community/java
+
+2026-03-26 13:11:02 From JSystems Szkolenia to Everyone:
+	https://www.langchain.com/langchain
+
+2026-03-26 13:12:31 From JSystems Szkolenia to Everyone:
+	https://www.langchain.com/langgraph
+
+2026-03-26 13:16:15 From JSystems Szkolenia to Everyone:
+	Mastra
+
+2026-03-26 13:16:23 From JSystems Szkolenia to Everyone:
+	https://mastra.ai/
+
+2026-03-26 13:22:55 From JSystems Szkolenia to Everyone:
+	claude plugin install context7@claude-plugins-official
+
+2026-03-26 13:23:44 From JSystems Szkolenia to Everyone:
+	npx ctx7 setup
+
+2026-03-26 13:25:00 From JSystems Szkolenia to Everyone:
+	/websites/assistant-ui
+
+2026-03-26 13:25:20 From JSystems Szkolenia to Everyone:
+	/assistant-ui/assistant-ui
+
+2026-03-26 13:27:56 From JSystems Szkolenia to Everyone:
+	/openai/openai-java
+
+2026-03-26 13:34:41 From JSystems Szkolenia to Everyone:
+	https://openrouter.ai/docs/guides/community/openai-sdk
+
+2026-03-26 13:34:54 From JSystems Szkolenia to Everyone:
+	import OpenAI from "openai"
+
+const openai = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: "${API_KEY_REF}",
+  defaultHeaders: {
+    ${getHeaderLines().join('\n        ')}
+  },
+})
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: "${Model.GPT_4_Omni}",
+    messages: [
+      { role: "user", content: "Say this is a test" }
+    ],
+  })
+
+  console.log(completion.choices[0].message)
+}
+main();
+
+2026-03-26 13:38:10 From JSystems Szkolenia to Everyone:
+	OPENROUTER_API_KEY=sk-or-v1-xxx
+OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
+OPENROUTER_MODEL="openai/gpt-5.4-mini"
+
+2026-03-26 13:49:42 From JSystems Szkolenia to Everyone:
+	Prompt — ADR dla projektu Sinsay:
+
+Napisz trzy krótkie ADR dla projektu Sinsay Chatbot.
+Uzasadnij decyzję na podstawie research który przeprowadziliśmy wcześniej.
+
+ADR-001: OpenAI Java SDK vs Spring AI
+ADR-002: Dwa osobne wywołania LLM (vision + decision) vs jedno multimodalne
+ADR-003: SQLite jako baza sesji vs Redis vs PostgreSQL w MVP
+
+Format kazdego ADR:
+## ADR-XXX: [Tytuł]
+**Status:** Accepted | Proposed | Superseded
+**Data:** [dzis]
+**Kontekst:** [Dlaczego ta decyzja byla potrzebna, 2-3 zdania]
+**Decyzja:** [Co zdecydowalismy i krótkie uzasadnienie]
+**Odrzucone alternatywy:** [Co rozważaliśmy z 1-2 zdaniami dlaczego odrzucono]
+**Konsekwencje:** [Plusy i minusy tej decyzji]
+**Trigger rewizji:** [Kiedy wrocic do tej decyzji — konkretny warunek]
+
+Pisz po angielsku. Konkretnie. Każdy ADR max pol strony A4.
+Zapisz jako docs/ADR/ADR-001.md, ADR-002.md, ADR-003.md
+
+2026-03-26 14:00:22 From JSystems Szkolenia to Everyone:
+	Wrzucić PRD jako opis funkcjonalności
+Contex7 z dokumentacji OpenAI Java SDK i Assistant-UI
+
+dodać link do pliku .env z zmiennymi dla OpenRouter
+
+Poprosić aby przemyślał na podstawie ADR całość działania i przeanalizował dokumentację bibliotek, zarekomendował sposób implementacji na tej podstawie.
+
+Opisał flow i stworzył diagramy UML / Mermaid dla naszej aplikacji
+
+Opisał struktury danych zgodne z wymaganiami Assistant UI
+
+Zadał nam minimum 5 pytań aby wyjaśnić jakich informacji mu brakuje, co jest niejasne
+
+2026-03-26 14:00:52 From JSystems Szkolenia to Everyone:
+	/assistant-ui/assistant-ui
+
+2026-03-26 14:01:44 From JSystems Szkolenia to Everyone:
+	https://openai.github.io/openai-agents-js/
+
+2026-03-26 14:02:59 From JSystems Szkolenia to Everyone:
+	https://openrouter.ai/docs/api/reference/responses/overview
+
+2026-03-26 14:04:10 From JSystems Szkolenia to Everyone:
+	https://developers.openai.com/api/reference/responses/overview
+
+2026-03-26 14:05:22 From JSystems Szkolenia to Everyone:
+	https://developers.openai.com/api/docs/guides/completions?lang=node.js
+
+2026-03-26 14:15:45 From JSystems Szkolenia to Everyone:
+    Multimodal LLM from Google:
+	https://ollama.com/library/gemma3
+
+2026-03-26 14:16:02 From JSystems Szkolenia to Everyone:
+	https://ollama.com/library/glm-ocr
+
+2026-03-26 14:16:07 From JSystems Szkolenia to Everyone:
+	https://ollama.com/library/deepseek-ocr
+
+2026-03-26 14:17:21 From JSystems Szkolenia to Everyone:
+	https://docs.ollama.com/api/openai-compatibility
+
+2026-03-26 14:21:45 From Sebastian to Everyone:
+	Mam taki błąd:
+	Context7 nie obsługuje pre-konfiguracji bibliotek w .mcp.json — biblioteki (/assistant-ui/assistant-ui,
+	  /openai/openai-java) podaje się przy każdym wywołaniu narzędzia get-library-docs. Zaktualizowałem konfigurację
+	  serwera; biblioteki będą używane na żądanie w trakcie pracy.
+
+2026-03-26 14:24:04 From Sebastian to Everyone:
+	{1F661A21-302A-4B5A-A618-4AB1A989A9FD}.png
+
+2026-03-26 14:27:11 From JSystems Szkolenia to Everyone:
+	"mcpServers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "ctx7sk-xxx"
+      }
+    },
+}
+
+2026-03-26 14:31:18 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/mcp#project-scope
+
+2026-03-26 14:39:54 From JSystems Szkolenia to Everyone:
+	https://agents.md/
+
+2026-03-26 14:40:19 From JSystems Szkolenia to Everyone:
+	https://claude.com/blog/using-claude-md-files
+
+2026-03-26 14:55:27 From JSystems Szkolenia to Everyone:
+	https://github.com/mattpocock/skills/blob/main/write-a-prd/SKILL.md
+
+2026-03-26 14:56:27 From JSystems Szkolenia to Everyone:
+	https://skills.sh/
+
+2026-03-26 14:59:14 From JSystems Szkolenia to Everyone:
+	npx skills add https://github.com/github/awesome-copilot --skill java-springboot
+
+2026-03-26 15:06:27 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/sub-agents
+
+2026-03-26 15:07:03 From JSystems Szkolenia to Everyone:
+	https://code.claude.com/docs/en/sub-agents#write-subagent-files
+
+2026-03-26 15:11:44 From Artur to Everyone:
+    // NOT WORKING CONFIG (we either use local npx or remote http)
+	{
+	  "mcpServers": {
+	    "context7": {
+	      "command": "npx",
+	      "args": ["-y", "@upstash/context7-mcp@latest"],
+	      "type": "http",
+	      "url": "https://mcp.context7.com/mcp",
+	      "headers": {
+	        "CONTEXT7_API_KEY": "ctx7sk-xxx"
+	      }
+	    }
+	  }
+	}
+
+2026-03-26 15:14:40 From JSystems Szkolenia to Everyone:
+    // WORKING CONFIG (remote http)
+	{
+	  "mcpServers": {
+	    "context7": {
+	      "type": "http",
+	      "url": "https://mcp.context7.com/mcp",
+	      "headers": {
+	        "CONTEXT7_API_KEY": "ctx7sk-xxx"
+	      }
+	    }
+	  }
+	}
+
+2026-03-26 15:26:46 From JSystems Szkolenia to Everyone:
+	https://flowiseai.com/
+
+2026-03-26 15:27:12 From JSystems Szkolenia to Everyone:
+	https://n8n.io/
+
+2026-03-26 15:33:55 From JSystems Szkolenia to Everyone:
+	https://mastra.ai/

@@ -1,0 +1,52 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import IntakeForm from '../components/IntakeForm'
+
+describe('MSW Integration Test', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+  })
+
+  it('makes a POST request to /api/sessions', async () => {
+    const mockOnSuccess = vi.fn()
+    const user = userEvent.setup({ delay: null })
+
+    render(<IntakeForm onSuccess={mockOnSuccess} />)
+
+    // Fill form with valid data
+    await user.click(screen.getByLabelText('Zwrot'))
+
+    const orderInput = screen.getByLabelText('Numer zamówienia')
+    await user.clear(orderInput)
+    await user.type(orderInput, 'TEST123')
+
+    const productInput = screen.getByLabelText('Nazwa produktu')
+    await user.clear(productInput)
+    await user.type(productInput, 'Test Product')
+
+    const descInput = screen.getByLabelText('Opis problemu')
+    await user.clear(descInput)
+    await user.type(descInput, 'Test description')
+
+    const fileInput = screen.getByLabelText(/Wybierz zdjęcie produktu/i)
+    const imageFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' })
+    await user.upload(fileInput, imageFile)
+
+    // Wait for image upload
+    await new Promise((resolve) => setTimeout(resolve, 200))
+
+    // Submit form
+    const submitButton = screen.getByRole('button', { name: 'Sprawdź' })
+    await user.click(submitButton)
+
+    // Wait for result
+    await waitFor(
+      () => {
+        expect(mockOnSuccess).toHaveBeenCalled()
+      },
+      { timeout: 5000 }
+    )
+  })
+})

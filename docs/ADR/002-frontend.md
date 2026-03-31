@@ -66,15 +66,19 @@ Custom hook:
 - `clearSession()`: removes from localStorage
 
 ### ChatRuntime setup
-Uses `useChatRuntime` from `@assistant-ui/react-ai-sdk`:
+Uses `useChatRuntime` with `AssistantChatTransport` from `@assistant-ui/react-ai-sdk`:
+```ts
+import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
+
+const runtime = useChatRuntime({
+  transport: new AssistantChatTransport({
+    api: `/api/sessions/${sessionId}/messages`,
+  }),
+});
 ```
-useChatRuntime({
-  api: `/api/sessions/${sessionId}/messages`,
-  initialMessages: [...],  // pre-populated from API load or form response
-  body: {},                // no extra body fields needed
-})
-```
-The `api` prop points to the Spring Boot streaming endpoint. `useChatRuntime` handles the Vercel data stream protocol automatically.
+The `AssistantChatTransport` sends `{ messages, system, tools }` to the backend endpoint and parses the SSE response (Vercel AI SDK v6 UI Message Stream format with `x-vercel-ai-ui-message-stream: v1` header) automatically. The backend extracts only the last user message from `messages[]` — it maintains its own conversation history in the DB.
+
+For session resume, messages loaded from `GET /api/sessions/{id}` should be pre-populated into the runtime via the `initialMessages` option on the transport or by programmatically appending them after mount.
 
 ### Image upload sub-component
 - Renders a drag-and-drop zone with click-to-browse fallback
@@ -110,16 +114,17 @@ The `api` prop points to the Spring Boot streaming endpoint. `useChatRuntime` ha
 }
 ```
 
-### Message format for useChat / useChatRuntime
-The `initialMessages` array passed to `useChatRuntime` must use the Vercel AI SDK `Message` type:
-```
+### Message format for AssistantChatTransport / useChatRuntime
+The `initialMessages` array must use the Vercel AI SDK `UIMessage` type:
+```ts
 {
   id: string,
   role: 'user' | 'assistant',
-  content: string
+  parts: [{ type: 'text', text: string }],
+  createdAt?: Date
 }
 ```
-Messages loaded from `GET /api/sessions/{id}` are mapped to this format before passing to the runtime.
+Messages loaded from `GET /api/sessions/{id}` are mapped to this format before passing to the runtime. Note: the `parts` array replaces the old `content` string — each message has structured parts (for this PoC, only `text` parts are used).
 
 ### localStorage entry
 Key: `sinsay_session_id`
@@ -161,17 +166,19 @@ App.tsx mounts
 
 ## 6. Technical Decisions
 
-### assistant-ui runtime: useChatRuntime vs useLocalRuntime
-**Status:** Accepted
-**Context:** assistant-ui offers several runtimes. `useChatRuntime` wraps Vercel AI SDK's `useChat`. `useLocalRuntime` allows a fully custom `run` function.
-**Decision:** Use `useChatRuntime` from `@assistant-ui/react-ai-sdk`. It provides built-in streaming support via the Vercel data stream protocol, `initialMessages` for session restore, and abort signal handling. The Spring Boot backend is designed to emit the Vercel data stream format, making this a natural fit.
+### assistant-ui runtime: useChatRuntime + AssistantChatTransport
+**Status:** Accepted (updated 2026-03-30 — migrated to AI SDK v6 API)
+**Context:** assistant-ui offers several runtimes. `useChatRuntime` with `AssistantChatTransport` provides built-in SSE streaming via the Vercel AI SDK v6 UI Message Stream protocol. `useLocalRuntime` allows a fully custom `run` function.
+**Decision:** Use `useChatRuntime` from `@assistant-ui/react-ai-sdk` with `AssistantChatTransport`. The transport sends `{ messages, system, tools }` to the backend and parses the SSE response automatically. The Spring Boot backend is designed to emit the UI Message Stream format (`x-vercel-ai-ui-message-stream: v1`), making this a natural fit.
 **Rejected alternatives:**
-- `useLocalRuntime`: Would require manually reading the `ReadableStream` from `fetch` and parsing the Vercel data stream format — redundant since `useChatRuntime` does this automatically.
+- `useLocalRuntime`: Would require manually reading the `ReadableStream` from `fetch` and parsing the SSE stream — redundant since `AssistantChatTransport` does this automatically.
 - `useExternalStoreRuntime`: Designed for fully custom message stores; adds complexity without benefit for this use case.
+- `TextStreamChatTransport`: Simpler but loses structured message types and assistant-ui Thread component features.
 **Consequences:**
 - (+) Streaming, abort, message state management all handled by the library
-- (+) Session restore via `initialMessages` is clean
-- (-) Tied to Vercel AI SDK protocol — backend must match exactly
+- (+) `AssistantChatTransport` handles SSE parsing and message assembly
+- (-) Tied to Vercel AI SDK v6 UI Message Stream protocol — backend must match exactly
+- (-) Transport sends full `messages[]` to backend (backend must extract only the last user message)
 **Review trigger:** If assistant-ui deprecates `useChatRuntime` or changes the default protocol.
 
 ---
@@ -317,14 +324,16 @@ sequenceDiagram
 
     User->>Chat: type message + press Enter
     Chat->>Runtime: append user message to thread
-    Runtime->>API: POST /api/sessions/{id}/messages\n{content: "..."}
-    API-->>Runtime: 200 text/plain (streaming)
-    loop each token chunk "0:\"...\"\n"
-        API-->>Runtime: stream chunk
+    Runtime->>API: POST /api/sessions/{id}/messages\n{messages: [...], system: "..."}
+    API-->>Runtime: 200 text/event-stream (SSE streaming)
+    API-->>Runtime: data: {"type":"start","messageId":"..."}
+    API-->>Runtime: data: {"type":"text-start","id":"..."}
+    loop each token chunk
+        API-->>Runtime: data: {"type":"text-delta","id":"...","delta":"..."}
         Runtime->>Chat: update assistant message content
         Chat-->>User: display partial response
     end
-    API-->>Runtime: "d:{\"finishReason\":\"stop\"}\n"
+    API-->>Runtime: data: {"type":"text-end","id":"..."}
     Runtime->>Chat: mark message complete
     Chat-->>User: full response visible, input re-enabled
 ```

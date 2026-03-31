@@ -1,0 +1,7 @@
+openai:
+  api-key: test-api-key
+  base-url: https://test.openai.com/v1
+  model: openai/gpt-4o-mini
+
+policy-docs:
+  path: ../docs

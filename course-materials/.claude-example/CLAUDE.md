@@ -5,4 +5,4 @@ You may provide your opinions on topics but always make it clear that this is yo
 
 If you work in Git repo you should always commit changes after every step, before you go to the text step. Commit often to make it easier to revert changes if you make a mistake on any step.
 
-Before commiting and finishing the task you should always check if your changes lint (no errors) & work correctly (tests pass).
+Before commiting and finishing the task you should always check if your changes lint (no errors) & work correctly (e.g. tests pass).

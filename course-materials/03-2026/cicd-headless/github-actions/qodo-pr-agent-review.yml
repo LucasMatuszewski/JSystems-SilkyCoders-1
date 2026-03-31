@@ -1,0 +1,88 @@
+name: Qodo PR Agent Review
+
+on:
+  # pull_request:
+  #   types: [opened, synchronize, reopened, ready_for_review, review_requested] # synchronize = new commits. edited = title, description.
+  # issue_comment:
+  #   types: [created]
+  workflow_dispatch:
+
+jobs:
+  qodo_pr_agent_review:
+    if: ${{ github.event.sender.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+      actions: read
+
+    steps:
+      - name: Qodo PR Agent Review
+        uses: qodo-ai/pr-agent@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Model Configuration - Using newest Claude models (OPUS is very expensive)
+          config.model: "anthropic/claude-sonnet"
+          config.fallback_models: '["anthropic/claude-haiku", "anthropic/claude-opus"]'
+          ANTHROPIC.KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # GitHub Action Configuration
+          github_action_config.auto_review: "true"
+          github_action_config.auto_describe: "true"
+          github_action_config.auto_improve: "true"
+          github_action_config.pr_actions: '["opened", "synchronize", "reopened", "ready_for_review", "review_requested"]'
+
+          # PR Reviewer Configuration (Review Tool)
+          pr_reviewer.extra_instructions: |
+            Please provide concise, actionable code reviews focusing on:
+
+            1. **Security vulnerabilities**: Identify potential security issues like SQL injection, XSS, authentication bypasses, or exposed secrets
+            2. **Performance issues**: Flag inefficient algorithms, unnecessary database queries, memory leaks, or blocking operations
+            3. **Error handling**: Ensure proper try-catch blocks, meaningful error messages, and graceful failure handling
+            4. **Code quality**: Check for maintainability, readability, typos, and adherence to best practices
+
+            For each issue found:
+            - Provide specific code examples showing the problem
+            - Suggest concrete fixes with production-ready code snippets
+            - Explain WHY the change is needed (security risk, performance impact, etc.)
+            - Keep explanations concise but informative
+
+            Focus on critical and high-impact issues first.
+
+          pr_reviewer.require_tests_review: "true"
+          pr_reviewer.require_security_review: "true"
+          pr_reviewer.require_estimate_effort_to_review: "false"
+          pr_reviewer.require_score_review: "false"
+          pr_reviewer.num_max_findings: "10" # default 3
+          pr_reviewer.enable_review_labels_security: "true"
+          pr_reviewer.enable_review_labels_effort: "false"
+          pr_reviewer.persistent_comment: "true"
+
+          # PR Code Suggestions Configuration (Improve Tool)
+          pr_code_suggestions.extra_instructions: |
+            Focus on security, performance, tests, and error handling improvements.
+            Provide production-ready code snippets based on original code and explain the reasoning behind each suggestion.
+            Prioritize critical issues that could cause bugs or security vulnerabilities.
+
+          pr_code_suggestions.num_code_suggestions_per_chunk: "5" # default 3
+          pr_code_suggestions.suggestions_depth: "regular" # Can be set to 'selective', 'regular', or 'exhaustive'. Default is 'regular'.
+          pr_code_suggestions.focus_only_on_problems: "false" # Omit style, best practices, mainteinability, readability
+          pr_code_suggestions.persistent_comment: "true" # Update the same comment on new CR
+          pr_code_suggestions.commitable_code_suggestions: "true" # Add in-code comments with commitable suggestions
+          pr_code_suggestions.apply_suggestions_checkbox: "true"
+          pr_code_suggestions.enable_more_suggestions_checkbox: "true"
+          pr_code_suggestions.wiki_page_accepted_suggestions: "true" # Track in .pr_agent_accepted_suggestions Wiki Page
+          pr_code_suggestions.publish_output_no_suggestions: "false" # Skip comment if no suggestions
+
+          # PR Description Settings
+          pr_description.add_original_user_description: "true"
+          pr_description.generate_ai_title: "false"
+          pr_description.enable_pr_diagram: "true" # Mermaid Diagram
+          pr_description.enable_semantic_files_types: "false" # File Walkthrough
+          pr_description.extra_instructions: |
+            Be concise and focus on the most important changes.
+
+          # Add Docs with `/add_docs` comment or command: https://qodo-merge-docs.qodo.ai/tools/documentation/
+          # Generate Tests with `/test component_name` comment: https://qodo-merge-docs.qodo.ai/tools/test/

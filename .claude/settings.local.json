@@ -5,10 +5,27 @@
       "WebFetch(domain:blog.jetbrains.com)",
       "WebFetch(domain:www.jetbrains.com)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__query-docs"
+      "mcp__context7__query-docs",
+      "Bash(./mvnw test:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_evaluate",
+      "Bash(powershell -Command \"Invoke-WebRequest -Uri 'https://www.sinsay.com/pl/pl/skin/frontend/6.444.0/sinsay/default/favicon.ico' -OutFile 'D:/DEV/COURSES/JSystems-SilkyCoders-1/assets/sinsay-favicon.ico'\" 2>&1)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7"
-  ]
+  ],
+  "env": {
+    "__comment_env_docs": "https://code.claude.com/docs/en/env-vars",
+    "__comment_task_list": "To reuse existing tasks use ID of folder where tasks are stored and restart Claude. In my case: C:/Users/lucas/.claude/tasks/f2d4990d-bc8f-48ca-884b-7f21dbcee59e",
+    "CLAUDE_CODE_TASK_LIST_ID": "f2d4990d-bc8f-48ca-884b-7f21dbcee59e",
+    "__comment_disable_telemetry": "Disable Statsig telemetry",
+    "DISABLE_TELEMETRY": 0,
+    "__comment_is_demo": "Set to true to enable demo mode: hides email and organization from the UI, skips onboarding, and hides internal commands. Useful for streaming or recording sessions",
+    "IS_DEMO": false
+  }
 }
