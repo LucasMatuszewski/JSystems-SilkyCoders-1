@@ -15,14 +15,16 @@ Tests run against:
 ## QA Workflow: Quality FIRST, Tests SECOND
 
 ### Phase 1: Manual Smoke Test (MANDATORY)
+Use **Playwright MCP** (browser automation tools) to perform this live — do NOT skip.
+
 1. Start backend: `cd backend && ./mvnw spring-boot:run`
 2. Start frontend: `cd frontend && npm run dev`
-3. Open `http://localhost:5173`
+3. Use Playwright MCP to navigate to `http://localhost:5173`
 4. Fill form with REAL data + image from `assets/example-images/`
-5. Submit → verify chat appears
-6. Send follow-up → verify response streams
-7. "Nowa sesja" → verify form shown
-8. Take screenshots
+5. Submit → screenshot loading state → screenshot chat view
+6. Send follow-up message → screenshot streamed response
+7. Click "Nowa sesja" → screenshot form returned
+8. **Analyze each screenshot visually** — compare to `docs/wireframe-form.png`, `docs/wireframe-decision+chat.png`, `assets/sinsay-homepage.png`
 
 **If any step fails → document bug, don't write tests yet.**
 
@@ -33,7 +35,16 @@ Codify working behavior with Playwright. Use REAL images from `assets/example-im
 - `cloth1.webp` — WebP format
 - `cloth2.jpg`, `cloth3.jpg`, `cloth4.jpg` — JPEG format
 
-Load with `fs.readFileSync(path.resolve('../../assets/example-images/cloth2.jpg'))`.
+Load with `__dirname`-based path (do NOT use CWD-relative `path.resolve()`):
+```ts
+import { fileURLToPath } from 'url'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const cloth2Jpg = fs.readFileSync(
+  path.resolve(__dirname, '../../../assets/example-images/cloth2.jpg')
+)
+```
 
 ## Screenshots (REQUIRED)
 Save to `tests/e2e/screenshots/<descriptive-name>.png`.

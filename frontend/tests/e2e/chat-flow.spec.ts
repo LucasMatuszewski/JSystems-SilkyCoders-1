@@ -8,14 +8,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Real images from assets/example-images/
-const cloth2Jpg = fs.readFileSync(
-  path.resolve(__dirname, '../../../assets/example-images/cloth2.jpg')
-)
 const cloth3Jpg = fs.readFileSync(
   path.resolve(__dirname, '../../../assets/example-images/cloth3.jpg')
-)
-const cloth4Jpg = fs.readFileSync(
-  path.resolve(__dirname, '../../../assets/example-images/cloth4.jpg')
 )
 
 async function uploadFileViaInput(page: Page, fileBuffer: Buffer, fileName: string, mimeType: string) {
@@ -36,9 +30,6 @@ async function fillAndSubmitForm(page: Page) {
   await page.getByRole('button', { name: 'Sprawdź' }).click()
 }
 
-async function setSessionInLocalStorage(page: Page, sessionId: string) {
-  await page.evaluate((id) => localStorage.setItem('sinsay_session_id', id), sessionId)
-}
 
 function ensureScreenshotsDir(): void {
   const screenshotsDir = path.join(__dirname, 'screenshots')
@@ -48,7 +39,7 @@ function ensureScreenshotsDir(): void {
 }
 
 test.describe('ChatFlow', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     await verifyBackendRunning()
   })
 
@@ -70,10 +61,15 @@ test.describe('ChatFlow', () => {
     await page.screenshot({ path: 'tests/e2e/screenshots/chat-initial-ai-message.png', fullPage: true })
     log(testName, 'screenshot', 'Saved chat-initial-ai-message.png')
 
-    // The initial AI message should be visible (content varies, but message area should be present)
+    // The initial AI message should be visible and contain a decision from the LLM
     const chatMessages = page.locator('[data-testid="assistant-message"]')
     await expect(chatMessages.first()).toBeVisible()
     log(testName, 'assert', 'AI message visible in chat')
+
+    // Verify LLM returned a non-empty decision (not a blank/error response)
+    const initialResponse = await chatMessages.first().innerText()
+    expect(initialResponse.trim().length).toBeGreaterThan(10)
+    log(testName, 'assert', `LLM initial decision non-empty: "${initialResponse.substring(0, 80)}..."`)
 
     log(testName, 'end', 'Test passed')
   })
@@ -197,6 +193,11 @@ test.describe('ChatFlow', () => {
     await expect(assistantMessages.nth(1)).toBeVisible({ timeout: 30000 })
     log(testName, 'assert', 'Assistant response appeared (streamed)')
 
+    // Verify LLM actually responded with non-empty Polish content
+    const responseText = await assistantMessages.nth(1).innerText()
+    expect(responseText.trim().length).toBeGreaterThan(0)
+    log(testName, 'assert', `LLM response non-empty: "${responseText.substring(0, 80)}..."`)
+
     await page.screenshot({ path: 'tests/e2e/screenshots/chat-after-response.png', fullPage: true })
     log(testName, 'screenshot', 'Saved chat-after-response.png')
 
@@ -253,21 +254,14 @@ test.describe('ChatFlow', () => {
     const screenshotsDir = path.join(__dirname, 'screenshots')
     const screenshotPath = path.join(screenshotsDir, 'chat-desktop.png')
     await page.screenshot({ path: screenshotPath, fullPage: false })
+    log(testName, 'screenshot', `Saved chat-desktop.png — review at: ${screenshotPath}`)
+    log(testName, 'visual', 'Compare screenshot against: docs/wireframe-decision+chat.png and assets/sinsay-homepage.png')
 
-    console.log(`Screenshot saved to: ${screenshotPath}`)
-    console.log('--- Visual Validation Observations ---')
-    console.log('Summary bar: visible at top, shows intent badge (Zwrot), order number, product name')
-    console.log('"Nowa sesja" button: visible in summary bar, right-aligned, black border, square corners')
-    console.log('Messages thread: scrollable area, assistant messages left-aligned (gray bg), user messages right-aligned (orange bg)')
-    console.log('Composer: input with placeholder "Zadaj pytanie...", send button (orange), full-width at bottom')
-    console.log('Logo bar: Sinsay logo centered, above summary bar')
-    console.log('Overall layout aligns with wireframe: logo > summary bar > messages > composer')
-    console.log('--- End of Observations ---')
-
-    // Non-blocking visual check: just verify key elements are rendered
+    // Structural checks: verify all key chat UI elements are present
     await expect(page.getByRole('button', { name: 'Nowa sesja' })).toBeVisible()
     await expect(page.getByPlaceholder('Zadaj pytanie...')).toBeVisible()
-    log(testName, 'assert', 'Key chat elements visible')
+    await expect(page.locator('[data-testid="assistant-message"]').first()).toBeVisible()
+    log(testName, 'assert', 'All key chat elements visible (summary bar, messages, composer)')
 
     log(testName, 'end', 'Test passed')
   })

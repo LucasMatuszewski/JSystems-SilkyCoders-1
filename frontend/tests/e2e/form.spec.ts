@@ -201,27 +201,18 @@ test.describe('IntakeForm', () => {
 
     const screenshotPath = path.join(screenshotsDir, 'form-desktop.png')
     await page.screenshot({ path: screenshotPath, fullPage: false })
-    log(testName, 'screenshot', 'Saved form-desktop.png')
+    log(testName, 'screenshot', `Saved form-desktop.png — review at: ${screenshotPath}`)
+    log(testName, 'visual', 'Compare screenshot against: docs/wireframe-form.png and assets/sinsay-homepage.png')
 
-    console.log(`Screenshot saved to: ${screenshotPath}`)
-    console.log('--- Visual Validation Observations ---')
-    console.log('Layout: Form is centered on page with max-width container (max-w-lg)')
-    console.log('Logo: Sinsay logo (logo.svg) displayed at top, centered, h-8 height')
-    console.log('Heading: "Sprawdź zwrot lub reklamację" centered below logo')
-    console.log('Subtitle: "Asystent AI zwrotów i reklamacji Sinsay" centered in gray')
-    console.log('Fields (top to bottom):')
-    console.log('  1. Radio group "Rodzaj zgłoszenia" — Zwrot | Reklamacja buttons')
-    console.log('  2. Text input "Numer zamówienia"')
-    console.log('  3. Text input "Nazwa produktu"')
-    console.log('  4. Textarea "Opis problemu" (4 rows)')
-    console.log('  5. Drag-and-drop image upload area "Zdjęcie produktu"')
-    console.log('Submit button: Full-width orange ("Sprawdź"), square corners, brand color #e09243')
-    console.log('--- End of Observations ---')
-
-    // Non-blocking visual check: just verify the page has key elements rendered
+    // Structural checks: verify key elements are present and rendered
     await expect(page.getByRole('heading', { name: 'Sprawdź zwrot lub reklamację' })).toBeVisible()
+    await expect(page.getByRole('radio', { name: 'Zwrot' })).toBeVisible()
+    await expect(page.getByRole('radio', { name: 'Reklamacja' })).toBeVisible()
+    await expect(page.getByLabel('Numer zamówienia')).toBeVisible()
+    await expect(page.getByLabel('Nazwa produktu')).toBeVisible()
+    await expect(page.getByLabel('Opis problemu')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Sprawdź' })).toBeVisible()
-    log(testName, 'assert', 'Key form elements visible')
+    log(testName, 'assert', 'All key form elements visible')
 
     log(testName, 'end', 'Test passed')
   })
