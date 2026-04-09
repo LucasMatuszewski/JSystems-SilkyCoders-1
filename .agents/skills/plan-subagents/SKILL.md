@@ -9,7 +9,28 @@ Keep the plan actionable. Every planned task must give a future main agent enoug
 
 ## Workflow
 
-### 1. Gather only the needed context
+### 1. Start with discovery and mandatory clarification
+
+The main agent is an orchestrator only. It must not implement code, write files for the feature, or take ownership of delivery tasks itself. Its job is to gather context, design the plan, and later delegate execution to subagents.
+
+Before planning, the main agent must:
+
+- Ask at least 5 concise questions to remove ambiguity about scope, outcome, constraints, verification, and desired workflow
+- Check which specialized subagents are actually configured in the current environment
+- Confirm with the user whether all available relevant agents should be used
+- If specialized agents are missing, ask whether to create specialized agents or use a default subagent
+
+The questions should cover:
+
+- Final deliverable and definition of done
+- Areas in scope and explicitly out of scope
+- Required technologies, libraries, or architectural constraints
+- Testing and verification expectations
+- Preferred agent roster and delegation boundaries
+
+Do not write the plan until these checks are done unless the user already provided the answers clearly.
+
+### 2. Gather only the needed context
 
 Read only the files required for the requested scope:
 
@@ -20,7 +41,7 @@ Read only the files required for the requested scope:
 
 If the request is ambiguous in a way that would materially change task boundaries, ask concise questions. Otherwise proceed with reasonable assumptions and state them in the plan.
 
-### 2. Define planning boundaries before writing tasks
+### 3. Define planning boundaries before writing tasks
 
 Decide these first:
 
@@ -32,7 +53,7 @@ Decide these first:
 
 For Codex CLI, optimize for isolated write scopes. Parallel tasks must not edit the same files or tightly-coupled modules in the same slot.
 
-### 3. Build the task graph from write ownership
+### 4. Build the task graph from write ownership
 
 Split work into small tasks that each have:
 
@@ -51,7 +72,7 @@ Prefer sequencing over parallelism when two tasks touch:
 - Shared generated artifacts
 - The same database schema or API contract in incompatible ways
 
-### 4. Encode parallelism deliberately
+### 5. Encode parallelism deliberately
 
 Produce both:
 
@@ -67,7 +88,39 @@ Only place tasks in the same slot when all of these are true:
 
 If parallel work is possible only after a contract is fixed, create a contract-defining task first and make later tasks depend on it.
 
-### 5. Write delegation-ready task briefs
+Use a concrete dependency diagram, not only prose. Prefer an ASCII graph like:
+
+```text
+BE-1 ──────┬──> BE-2 ──┬──> BE-4 ──> BE-6 ──> BE-7 ──> BE-8 ──┐
+           │           │                                        │
+           └──> BE-3 ──┤                                        ├──> QA-1 ──> QA-2 ──> QA-3
+                       │                                        │
+                       └──> BE-5 ──────────────────┘            │
+                                                                │
+FE-1 ──┬──> FE-2 ──┬──> FE-4 ──┬──> FE-6 ──> FE-7 ────────────┘
+       │           │            │
+       └──> FE-3 ──┘            │
+       │                        │
+       └──> FE-5 ───────────────┘
+```
+
+Also provide a concrete parallelism map like:
+
+| Step | Slot 1 (be-developer) | Slot 2 (fe-developer) |
+|---|---|---|
+| 1 | **BE-1** | **FE-1** |
+| 2 | **BE-2** + **BE-3** (sequential) | **FE-2** + **FE-3** (sequential) |
+| 3 | **BE-4** + **BE-5** (sequential) | **FE-4** + **FE-5** (sequential) |
+| 4 | **BE-6** | **FE-6** |
+| 5 | **BE-7** | **FE-7** |
+| 6 | **BE-8** | — |
+| 7 | — | **QA-1** (qa-engineer) |
+| 8 | — | **QA-2** (qa-engineer) |
+| 9 | — | **QA-3** (qa-engineer) |
+
+Adapt the pattern to the actual repository and agent roster. The goal is to make the critical path and safe parallel slots obvious at a glance.
+
+### 6. Write delegation-ready task briefs
 
 For each task, include:
 
@@ -86,10 +139,12 @@ For each task, include:
 
 Do not dump full repository context into every task. Give each subagent only the minimum files, facts, and constraints needed for that task.
 
-### 6. Add main-agent orchestration rules
+### 7. Add main-agent orchestration rules
 
 Every plan must tell the future main agent how to run the work safely:
 
+- Never implement the planned feature directly; always delegate execution to subagents
+- Never keep a task for itself just because it seems small; the main agent is planner and coordinator, not implementer
 - Never delegate implementation without first checking dependency readiness
 - Never assign overlapping write scopes in parallel
 - Reuse contract language verbatim across dependent tasks
@@ -97,8 +152,10 @@ Every plan must tell the future main agent how to run the work safely:
 - Integrate results between slots before launching dependent work
 - Preserve unrelated user changes; do not revert them
 - Require test-first workflow, scoped verification, runtime smoke checks, and focused commits
+- If available agent names differ from the example roles, rewrite the plan using the actual configured names
+- If no specialized agents exist, explicitly record the fallback decision approved by the user
 
-### 7. Format the result as an execution artifact
+### 8. Format the result as an execution artifact
 
 Use the template in [plan-template.md](D:\DEV\COURSES\JSystems-SilkyCoders-1\.agents\skills\plan-subagents\references\plan-template.md).
 
