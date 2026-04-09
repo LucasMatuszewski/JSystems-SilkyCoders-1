@@ -1,0 +1,4 @@
+interface:
+  display_name: "Subagent Planning"
+  short_description: "Build dependency-aware multi-agent implementation plans"
+  default_prompt: "Use $plan-subagents to create a phased implementation plan with dependency matrix, parallel workstreams, and subagent delegation prompts."
