@@ -14,11 +14,14 @@
       "WebFetch(domain:vercel.com)",
       "Bash(git add:*)",
       "mcp__maven-indexer__search_artifacts",
-      "Bash(./mvnw test:*)"
+      "Bash(./mvnw test:*)",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_console_messages",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm lint:*)"
     ]
   },
-  "enabledMcpjsonServers": [
-    "playwright"
-  ],
-  "enableAllProjectMcpServers": true
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["playwright"]
 }
