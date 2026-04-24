@@ -8,9 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.next/
 dist
 dist-ssr
 *.local
+src/e2e/test-results/
+src/e2e/screenshots/
+tsconfig.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
