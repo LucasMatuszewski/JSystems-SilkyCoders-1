@@ -100,9 +100,9 @@ The system prompt sent to the LLM must include these 6 sections in order:
 
 ## Testing
 
-**Integration Tests:** HTTP → Controller → Service → DB (real). Mock ONLY OpenAIClient.
-❌ WRONG: `@MockBean` for services
-✅ CORRECT: `@MockBean` for OpenAIClient only
+**Integration Tests:** HTTP → Controller → DB (real). Mock the service layer (`AnalysisService`, `ChatService`) — do NOT mock `OpenAIClient` directly (the OpenAI SDK uses Kotlin final methods that Mockito cannot deep-stub, causing real SDK code to run and throw).
+❌ WRONG: `@MockBean(answer = RETURNS_DEEP_STUBS) OpenAIClient`
+✅ CORRECT: `@MockBean AnalysisService`, `@MockBean ChatService`
 
 ## Verification (MANDATORY)
 1. `./mvnw test` — pass
