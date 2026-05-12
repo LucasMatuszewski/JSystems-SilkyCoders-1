@@ -20,7 +20,7 @@
 ## Package Structure
 
 `com.sinsay` — use this package for all new classes:
-- `config/` — `WebConfig` (CORS), `OpenAiConfig`
+- `config/` — `OpenAIConfig` (model bean, API key fallback), `DotenvInitializer`
 - `controller/` — `SessionController`, `ChatController`
 - `service/` — `AnalysisService`, `ChatService`, `PolicyDocService`
 - `model/` — `Session`, `ChatMessage` (JPA entities)
@@ -83,16 +83,15 @@ Each SSE event is `data: <JSON>\n\n`. The `messageId`/`id` should be the same UU
 
 ## System Prompt Structure
 
-The system prompt sent to the LLM must include these 6 sections in order:
+The system prompt sent to the LLM must include these 8 sections in order (see `PolicyDocService.getSystemPrompt()`):
 1. Role definition (returns/complaints evaluator for Sinsay)
 2. Decision categories: "Prawdopodobnie zaakceptowane" / "Prawdopodobnie odrzucone" / "Niejasne"
 3. Mandatory disclaimer (assessment is non-binding, human makes final decision)
 4. Scope boundary (answer only Sinsay policy questions; redirect off-topic)
-5. Language instruction (always respond in Polish)
-6. Policy document content (concatenated markdown, intent-specific)
-7.**Security constraints** (prompt injection protection, jailbreak prevention)
-8. **Image analysis instructions** (two-stage: analyze image, then evaluate)
-9. Policy content (regulamin.md + intent-specific doc)
+5. Security constraints (prompt injection protection, jailbreak prevention)
+6. Language instruction (always respond in Polish)
+7. Image analysis instructions (two-stage: analyze image, then evaluate)
+8. Policy documents (regulamin.md + intent-specific doc)
 
 **Policy doc selection** per intent:
 - `RETURN`: `regulamin.md` + `zwrot-30-dni.md`
@@ -100,9 +99,16 @@ The system prompt sent to the LLM must include these 6 sections in order:
 
 ## Testing
 
-**Integration Tests:** HTTP → Controller → Service → DB (real). Mock ONLY OpenAIClient.
-❌ WRONG: `@MockBean` for services
-✅ CORRECT: `@MockBean` for OpenAIClient only
+**Integration Tests:** HTTP → Controller → Service → DB (real). Mock at the **service layer**.
+
+The OpenAI Java SDK has Kotlin final methods that Mockito cannot deep-stub — do NOT use `@MockBean(answer = RETURNS_DEEP_STUBS) OpenAIClient` in `@SpringBootTest` tests (causes `RuntimeException("API error")`).
+
+```
+✅ CORRECT: @MockBean AnalysisService  /  @MockBean ChatService
+❌ WRONG:   @MockBean(answer = RETURNS_DEEP_STUBS) OpenAIClient
+```
+
+See `SessionControllerTests` and `ChatControllerTests` for the reference pattern.
 
 ## Verification (MANDATORY)
 1. `./mvnw test` — pass
