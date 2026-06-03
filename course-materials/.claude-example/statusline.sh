@@ -2,18 +2,29 @@
 
 # Claude Code Status Line Script
 # Docs: https://code.claude.com/docs/en/statusline
-# 2 lines: git|path on line 1, model|context|cost on line 2
+# 2 lines: git|path on line 1, model|context|cost|usage on line 2
 
 set -euo pipefail
 
 input=$(cat)
 
-# ANSI colors
-BAR_FILLED='\033[38;5;244m'  # Medium gray for used context
-BAR_EMPTY='\033[38;5;240m'   # Dark gray for empty context
-GRAY='\033[38;5;245m'
-GOLD='\033[38;5;220m'
+# ---------- Tokyo Night palette (truecolor) ----------
+# 24-bit hex so the status line matches a Tokyo Night terminal theme exactly.
+FG='\033[38;2;169;177;214m'      # #a9b1d6 foreground
+DIM='\033[38;2;120;124;153m'     # #787c99 comment/dim (separators, labels)
+ACCENT='\033[38;2;187;154;247m'  # #bb9af7 magenta (model name)
+BLUE='\033[38;2;122;162;247m'    # #7aa2f7 blue (path, context bar fill)
+CYAN='\033[38;2;68;157;171m'     # #449dab teal (git branch)
+GOLD='\033[38;2;224;175;104m'    # #e0af68 yellow (cost)
+GREEN='\033[38;2;158;206;106m'   # #9ece6a green   — usage OK (<50%)
+ORANGE='\033[38;2;255;158;100m'  # #ff9e64 orange  — usage warning (50-79%)
+RED='\033[38;2;247;118;142m'     # #f7768e red     — usage high (>=80%)
+BAR_FILLED='\033[38;2;122;162;247m' # #7aa2f7 blue  — filled context
+BAR_EMPTY='\033[38;2;50;52;74m'     # #32344a       — empty context
 RESET='\033[0m'
+
+# Themed separator used between segments
+SEP="${DIM} | ${RESET}"
 
 # Check if jq is available
 if command -v jq &>/dev/null; then
@@ -22,12 +33,21 @@ if command -v jq &>/dev/null; then
     model_display=$(echo "$input" | jq -r '.model.display_name // "Unknown"')
     context_used=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
     used_tokens=$(echo "$input" | jq -r '.context_window.tokens_used // 0')
+    # Subscription rate limits (Pro/Max only; absent until first API response)
+    five_h_pct=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+    five_h_reset=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
+    week_pct=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+    week_reset=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 else
     HAS_JQ=false
     model_id=""
     model_display=""
     context_used=0
     used_tokens=0
+    five_h_pct=""
+    five_h_reset=""
+    week_pct=""
+    week_reset=""
 fi
 
 # Get git branch (works without jq)
@@ -40,7 +60,7 @@ fi
 # Git branch
 git_part=""
 if [ -n "$git_branch" ]; then
-    git_part="${GRAY}git:$git_branch${RESET}"
+    git_part="${CYAN}git:$git_branch${RESET}"
 fi
 
 # Current directory (shortened)
@@ -62,13 +82,14 @@ if [ "$current_dir" != "N/A" ]; then
 fi
 
 # Build line 1
+dir_part="${BLUE}${dir_display}${RESET}"
 if [ -n "$git_part" ]; then
-    line1="$git_part | $dir_display"
+    line1="${git_part}${SEP}${dir_part}"
 else
-    line1="$dir_display"
+    line1="$dir_part"
 fi
 
-# ---------- LINE 2: model | context bar | cost ----------
+# ---------- LINE 2: model | context bar | cost | usage ----------
 # Model name
 model_part="?"
 if [ "$HAS_JQ" = true ]; then
@@ -80,7 +101,7 @@ if [ "$HAS_JQ" = true ]; then
         *deepseek*) model_short="DeepSeek" ;;
         *glm*) model_short="GLM" ;;
     esac
-    model_part="$model_short"
+    model_part="${ACCENT}${model_short}${RESET}"
 else
     model_part="? (no jq)"
 fi
@@ -100,7 +121,7 @@ if [ "$EMPTY" -gt 0 ]; then
     BAR="${BAR}${BAR_EMPTY}${PAD// /░}${RESET}"
 fi
 
-context_part="$BAR $context_used%"
+context_part="$BAR ${FG}${context_used}%${RESET}"
 
 # Cost estimate (using bash arithmetic to avoid bc dependency)
 cost_part=""
@@ -143,13 +164,52 @@ if [ "$HAS_JQ" = true ] && [ "$used_tokens" -gt 0 ]; then
             cost_formatted=""
         fi
     fi
-    cost_part="${GOLD}${cost_formatted}${RESET}"
+    [ -n "$cost_formatted" ] && cost_part="${GOLD}${cost_formatted}${RESET}"
+fi
+
+# ---------- Subscription usage (5h + weekly) ----------
+# Pro/Max only: Claude Code passes rate_limits on stdin after the first API
+# response. Color by severity, and append a short "resets in" countdown.
+usage_color() {
+    # $1 = integer percent -> echoes the color escape
+    if [ "$1" -ge 80 ]; then printf '%b' "$RED"
+    elif [ "$1" -ge 50 ]; then printf '%b' "$ORANGE"
+    else printf '%b' "$GREEN"; fi
+}
+
+reset_in() {
+    # $1 = unix epoch -> echoes compact "3d4h" / "1h23m" / "45m" until reset
+    local now diff d h m
+    now=$(date +%s)
+    diff=$(( $1 - now ))
+    [ "$diff" -le 0 ] && { printf 'now'; return; }
+    d=$(( diff / 86400 )); h=$(( (diff % 86400) / 3600 )); m=$(( (diff % 3600) / 60 ))
+    if [ "$d" -gt 0 ]; then printf '%dd%dh' "$d" "$h"
+    elif [ "$h" -gt 0 ]; then printf '%dh%02dm' "$h" "$m"
+    else printf '%dm' "$m"; fi
+}
+
+usage_part=""
+if [ -n "$five_h_pct" ]; then
+    p=${five_h_pct%.*}
+    seg="$(usage_color "$p")5h:${p}%"
+    [ -n "$five_h_reset" ] && seg="$seg(↻$(reset_in "$five_h_reset"))"
+    usage_part="${seg}${RESET}"
+fi
+if [ -n "$week_pct" ]; then
+    p=${week_pct%.*}
+    seg="$(usage_color "$p")7d:${p}%"
+    [ -n "$week_reset" ] && seg="$seg(↻$(reset_in "$week_reset"))"
+    usage_part="${usage_part:+$usage_part }${seg}${RESET}"
 fi
 
 # Build line 2
-line2="$model_part | $context_part"
+line2="${model_part}${SEP}${context_part}"
 if [ -n "$cost_part" ]; then
-    line2="$line2 | $cost_part"
+    line2="${line2}${SEP}${cost_part}"
+fi
+if [ -n "$usage_part" ]; then
+    line2="${line2}${SEP}${usage_part}"
 fi
 
 # ---------- OUTPUT ----------
