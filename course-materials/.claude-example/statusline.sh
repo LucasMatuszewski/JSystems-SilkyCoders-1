@@ -168,8 +168,15 @@ if [ "$HAS_JQ" = true ] && [ "$used_tokens" -gt 0 ]; then
 fi
 
 # ---------- Subscription usage (5h + weekly) ----------
-# Pro/Max only: Claude Code passes rate_limits on stdin after the first API
-# response. Color by severity, and append a short "resets in" countdown.
+# Claude Code now provides your subscription usage DIRECTLY on stdin as
+# `rate_limits` — no API calls, no third-party tools (ccusage, etc.) needed.
+# Requirements: a Pro/Max (Claude.ai) subscription and Claude Code >= 2.1.x.
+# Notes:
+#   - `rate_limits` only appears AFTER the first API response in a session,
+#     so the segment is simply hidden at the very start of a chat.
+#   - On API-key / Console billing (no subscription) it is absent too, and the
+#     script degrades gracefully — the rest of the status line still renders.
+# Color by severity, and append a short "resets in" countdown.
 usage_color() {
     # $1 = integer percent -> echoes the color escape
     if [ "$1" -ge 80 ]; then printf '%b' "$RED"
